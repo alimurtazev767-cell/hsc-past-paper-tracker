@@ -73,6 +73,8 @@ Pick one. (The URL Configuration and SMTP page locations were checked in Supabas
 
 ### 4. Deploy on Vercel
 
+**If you linked Supabase through Vercel's Supabase integration**, skip step 3 below: the integration adds `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` (and `NEXT_PUBLIC_` copies) itself, and the build reads those. It also adds `SUPABASE_SECRET_KEY`, which the build never reads. You still need to run the SQL (step 2), set the URL Configuration (step 5) and redeploy.
+
 1. At vercel.com, choose **Add New > Project** and import the GitHub repository from step 1.
 2. Leave **Framework Preset** as **Other**. `vercel.json` already sets the build command and output folder.
 3. Under **Environment Variables**, add:

@@ -10,8 +10,12 @@ if (existsSync(".env.local")) {
   }
 }
 
-const url = (process.env.SUPABASE_URL || "").trim().replace(/\/+$/, "");
-const key = (process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || "").trim();
+// Names set by hand (see README) or by Vercel's Supabase integration, which adds SUPABASE_URL and
+// SUPABASE_PUBLISHABLE_KEY plus NEXT_PUBLIC_ copies; older projects use the ANON_KEY names.
+// The secret key the integration also adds (SUPABASE_SECRET_KEY) is never read here.
+const env = (...names) => (names.map(n => process.env[n]).find(v => v && v.trim()) || "").trim();
+const url = env("SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL").replace(/\/+$/, "");
+const key = env("SUPABASE_PUBLISHABLE_KEY", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "SUPABASE_ANON_KEY", "NEXT_PUBLIC_SUPABASE_ANON_KEY");
 const google = process.env.ENABLE_GOOGLE_SIGNIN === "true";
 
 // The key ends up in the browser, so refuse anything that isn't a public key.
