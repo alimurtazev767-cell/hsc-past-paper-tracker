@@ -28,7 +28,7 @@ npx vercel --prod   # puts it on your main .vercel.app address
 
 | Path | What it is |
 | --- | --- |
-| `site/index.html` | The home page at `/`: what the tracker is, Get started and Sign in buttons, and a quick way back in for returning students. Old links such as `/#chem` and sign-in email links are sent on to the tracker |
+| `site/index.html` | The landing page at `/`, for new visitors only: what the tracker does, Get started and Sign in buttons. Anyone signed in or with progress saved in the browser is sent straight to `/tracker` before the page draws; `/?home` shows it anyway (the tracker's Home button uses that). Old links such as `/#chem` and sign-in email links are sent on to the tracker too |
 | `site/tracker.html` | The tracker itself, at `/tracker` (`vercel.json` turns on clean URLs). Each subject has a red / amber / green confidence light the student sets, saved and synced with their ticks |
 | `site/config.js` | Empty placeholder (logins off). The build replaces it with your Supabase settings |
 | `site/data/*.json` | Paper lists for the 33 subjects (copied unchanged from the Artifact) |
