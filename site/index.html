@@ -4,1339 +4,274 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>HSC Past Paper Log</title>
-<meta name="description" content="Tick off the HSC past papers, trials and assessment tasks you've done, subject by subject.">
+<meta name="description" content="Tick off the HSC past papers, trials and assessment tasks you've done, subject by subject, and see which subjects need work.">
 <meta name="theme-color" content="#070708">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23121214'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<style>html{-webkit-text-size-adjust:100%}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<script>
+// The tracker used to live at this address. Old bookmarks (/#chem) and sign-in email links still go to it, with everything after the address kept.
+(function () {
+  var h = location.hash, q = location.search;
+  if (/access_token|refresh_token|error_description|[#&]type=/.test(h) || /^#(signin|signup|[a-z0-9]{2,8})$/.test(h) && h !== "#how" || /[?&](code|error)=/.test(q))
+    location.replace("tracker" + q + h);
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Geist+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
-/* Layout: subject cards as the nav up top, then the chosen subject as a year-by-year grid of paper chips, with a completed-papers log beside it on wide screens */
-/* Single dark look (screen.movie-inspired, from alim's spec): pure black base, near-black panels, hairline zinc borders, white type */
+/* Same layered dark look as the tracker: canvas #070708, raised panels #121214, recessed wells #1A1A1E */
 :root {
-  --bg: #000000;
-  --sheet: #09090B;
-  --sheet-2: #05050A;
-  --raise: #121215;
-  --fg: #FFFFFF;
-  --muted: #A1A1AA;
-  --faint: #71717A;
-  --rule: #1F1F23;
-  --rule-2: #27272A;
-  --accent: #FFFFFF;
-  --accent-ink: #000000;
-  --accent-soft: #18181B;
-  --done: #FAFAFA;
-  --done-ink: #000000;
-  --done-soft: #18181B;
-  --danger: #F87171;
-  --band1: #FFFFFF; --band2: #3F3F46;
-  --shadow: none;
-  --display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  color-scheme: dark;
-}
-
-* { box-sizing: border-box; }
-body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 22px; }
-button, input, select { font: inherit; color: inherit; }
-button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-/* Header */
-.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 14px; }
-.eyebrow { font: 600 12px var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
-h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; margin: 0; letter-spacing: -0.025em; font-optical-sizing: auto; text-wrap: balance; }
-.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 10px; color: var(--muted); font-size: 13.5px; }
-.stats b { font: 500 15px var(--mono); color: var(--fg); font-variant-numeric: tabular-nums; }
-.btn { font-weight: 600; font-size: 14px; padding: 9px 14px; border-radius: 8px; border: 1px solid var(--rule); background: var(--sheet); cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
-.btn:hover { border-color: var(--accent); }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.btn.ghost { background: transparent; }
-
-/* Subject cards */
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-.card { transition: border-color .18s ease, box-shadow .18s ease; text-align: left; background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 14px 12px; cursor: pointer; display: grid; gap: 8px; box-shadow: var(--shadow); min-width: 0; }
-.card:hover { border-color: var(--accent); }
-.card[aria-current="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset, var(--shadow); }
-.card .cname { font: 600 15px/1.25 var(--display); }
-.card .cnum { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; font-size: 12.5px; color: var(--muted); }
-.card .pct { font: 500 22px var(--mono); color: var(--fg); font-variant-numeric: tabular-nums; }
-.meter { height: 8px; border-radius: 999px; background: var(--accent-soft); overflow: hidden; }
-.meter > span { display: block; height: 100%; background: var(--done); border-radius: inherit; transition: width .35s ease; }
-.card.add { border-style: dashed; box-shadow: none; background: transparent; place-content: center; text-align: center; color: var(--muted); font-weight: 600; min-height: 104px; }
-
-/* Subject view */
-.view { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
-.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow); min-width: 0; }
-.vhead { padding: 18px 18px 14px; display: grid; gap: 10px; border-bottom: 1px solid var(--rule); }
-.vtitle { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 14px; }
-h2 { font: 700 1.5rem/1.15 var(--display); letter-spacing: -0.015em; margin: 0; text-wrap: balance; }
-.sub { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
-.vhead .meter { height: 10px; }
-.links { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; }
-.links a { color: var(--accent); }
-.controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--rule); }
-.controls input[type=search] { flex: 1 1 14em; min-width: 0; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--bg); }
-.controls label { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--muted); cursor: pointer; }
-.controls select { padding: 6px 8px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); font-size: 13.5px; }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); padding: 10px 18px 0; }
-.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
-
-.section-label { font: 600 12px var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 16px 18px 6px; display: flex; justify-content: space-between; gap: 8px; }
-.yrow { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; padding: 8px 18px; border-top: 1px solid var(--rule); align-items: start; }
-.yrow:first-of-type { border-top: 0; }
-.ylab { display: grid; gap: 0; padding-top: 4px; }
-.ylab b { font: 600 15px var(--display); }
-.ylab span { font: 500 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
-.ylab.old b { color: var(--muted); }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
-.chip { border: 1px solid var(--rule); background: var(--bg); border-radius: 10px; padding: 6px 12px; min-height: 40px; font-size: 14px; transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .12s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; max-width: 100%; text-align: left; }
-.chip:hover { border-color: var(--accent); }
-.chip:active { transform: scale(.97); }
-.chip .ck svg { width: 14px; height: 14px; display: block; }
-.chip .t { overflow-wrap: anywhere; }
-.chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none; }
-.chip .ck { display: none; }
-.chip[aria-pressed="true"] { background: var(--done); border-color: var(--done); color: var(--done-ink); }
-.chip[aria-pressed="true"] .ck { display: inline; }
-.chip[aria-pressed="true"] .dot { background: var(--done-ink); opacity: .7; }
-.chip .m { font: 500 12px var(--mono); padding: 0 5px; border-radius: 4px; background: rgb(255 255 255 / .22); }
-.chip.hscchip { font-weight: 600; }
-.empty { padding: 10px 18px 16px; color: var(--muted); font-size: 14px; margin: 0; }
-.more { padding: 4px 18px 16px; }
-
-details.addbox { border-top: 1px solid var(--rule); }
-details.addbox > summary { cursor: pointer; padding: 14px 18px; font-weight: 600; color: var(--accent); }
-form.add { display: grid; grid-template-columns: 6.5em 8em minmax(0, 1fr) auto; gap: 8px; padding: 0 18px 18px; }
-form.add input, form.add select { padding: 8px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); min-width: 0; }
-
-/* Log panel */
-.log { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
-.log h3 { font: 600 1.05rem var(--display); margin: 0; padding: 16px 16px 4px; }
-.log .hint { margin: 0; padding: 0 16px 10px; font-size: 12.5px; color: var(--muted); }
-.log ul { list-style: none; margin: 0; padding: 0; max-height: 60vh; overflow: auto; }
-.log li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 9px 16px; border-top: 1px solid var(--rule); align-items: center; }
-.log .n { font-size: 13.5px; font-weight: 500; overflow-wrap: anywhere; }
-.log .d { font-size: 12px; color: var(--muted); grid-column: 1; }
-.log .mark { grid-row: 1 / span 2; grid-column: 2; width: 4.8em; font: 500 13px var(--mono); padding: 5px 7px; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); text-align: right; }
-.log .none { padding: 4px 16px 16px; color: var(--muted); font-size: 13.5px; margin: 0; }
-
-/* Picker dialog */
-dialog { border: 1px solid var(--rule); border-radius: 14px; padding: 0; background: var(--sheet); color: var(--fg); width: min(720px, calc(100vw - 32px)); max-height: min(86vh, 900px); box-shadow: 0 20px 60px rgb(0 0 0 / .25); }
-dialog::backdrop { background: rgb(10 12 20 / .45); }
-.dlg { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; max-height: min(86vh, 900px); }
-.dlg header { padding: 18px 20px 10px; border-bottom: 1px solid var(--rule); }
-.dlg header p { margin: 4px 0 0; color: var(--muted); font-size: 13.5px; }
-.dlg .body { overflow: auto; padding: 8px 20px 16px; display: grid; gap: 4px; }
-.dlg h4 { font: 600 12px var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 14px 0 4px; }
-.opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px; }
-.opt { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; }
-.opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
-.opt input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; flex: none; }
-.opt span { display: grid; min-width: 0; }
-.opt small { color: var(--muted); font-size: 12px; }
-.dlg footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 20px; border-top: 1px solid var(--rule); flex-wrap: wrap; }
-.dlg footer span { color: var(--muted); font-size: 13px; }
-
-footer.notes { color: var(--muted); font-size: 12.5px; display: grid; gap: 6px; max-width: 75ch; }
-footer.notes p { margin: 0; }
-.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 9px 14px; border-radius: 8px; font-size: 13.5px; display: flex; gap: 12px; align-items: center; box-shadow: var(--shadow); }
-.toast button { background: none; border: 0; color: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; padding: 0; }
-
-
-/* Header band and filters */
-.band { height: 6px; border-radius: 999px; background: linear-gradient(90deg, var(--band1), var(--band2)); width: 120px; margin-bottom: 14px; }
-.top-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.swatches { display: inline-flex; gap: 6px; padding: 5px; border: 1px solid var(--rule); border-radius: 999px; background: var(--sheet); }
-.sw { width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
-.sw[aria-pressed="true"] { border-color: var(--fg); }
-.types { display: flex; flex-wrap: nowrap; gap: 6px; padding: 10px 18px 2px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; scroll-padding-inline: 18px; mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); }
-.types::-webkit-scrollbar { display: none; }
-.type { flex: none; scroll-snap-align: start; }
-.type { border: 1px solid var(--rule); background: var(--sheet); border-radius: 999px; padding: 7px 14px; min-height: 40px; font-size: 14px; transition: background-color .18s ease, color .18s ease; font-weight: 600; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
-.type .n { font: 500 12px var(--mono); color: var(--muted); }
-.type[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.type[aria-pressed="true"] .n { color: var(--accent-ink); opacity: .8; }
-.type:disabled { opacity: .45; cursor: default; }
-.section-note { margin: -2px 18px 6px; font-size: 12.5px; color: var(--muted); }
-.yrow + .section-label, .chips + .section-label { border-top: 1px solid var(--rule); margin-top: 6px; }
-
-
-.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-form.add label.fl { display: grid; gap: 4px; font-size: 12px; font-weight: 600; color: var(--muted); min-width: 0; }
-form.add .btn { align-self: end; min-height: 42px; }
-.btn { min-height: 42px; }
-@media (pointer: coarse) {
-  .chip, .type, .btn, .controls select, .controls input[type=search] { min-height: 44px; }
-  .sw { width: 44px; height: 44px; }
-  .controls label { min-height: 44px; }
-}
-@media (prefers-reduced-motion: reduce) { .chip, .type, .card { transition: none; } .chip:active { transform: none; } }
-
-
-/* Apple-style material: sticky translucent filter bar; content scrolls underneath */
-.opts-row { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; padding: 10px 18px 0; }
-.opts-row label { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--muted); cursor: pointer; min-height: 36px; }
-.opts-row select { padding: 6px 8px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); font-size: 13.5px; }
-.toolbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--sheet) 72%, transparent); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--rule); border-radius: 12px 12px 0 0; }
-.toolbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: -12px; height: 12px; pointer-events: none; background: linear-gradient(var(--sheet), transparent); opacity: .6; }
-@media (prefers-reduced-transparency: reduce) { .toolbar { background: var(--sheet); -webkit-backdrop-filter: none; backdrop-filter: none; } }
-@media (prefers-contrast: more) { .toolbar { background: var(--sheet); border-bottom: 2px solid var(--fg); } }
-.seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 10px; background: var(--accent-soft); }
-.seg button { border: 0; background: transparent; border-radius: 8px; padding: 6px 12px; min-height: 36px; font-size: 13.5px; font-weight: 600; color: var(--muted); cursor: pointer; transition: background-color .2s ease, color .2s ease; }
-.seg button[aria-pressed="true"] { background: var(--sheet); color: var(--fg); box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
-.srow { display: grid; grid-template-columns: minmax(150px, 210px) minmax(0, 1fr); gap: 10px 14px; padding: 10px 18px; border-top: 1px solid var(--rule); align-items: start; }
-.srow .slab { display: grid; padding-top: 7px; min-width: 0; }
-.srow .slab b { font-size: 15px; font-weight: 600; letter-spacing: -0.005em; overflow-wrap: anywhere; }
-.srow .slab span { font: 500 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
-.chip .k { font-size: 11.5px; font-weight: 600; letter-spacing: .02em; opacity: .75; }
-.eyebrow, .section-label, .dlg h4 { letter-spacing: .06em; }
-dialog[open] { animation: sheet-in .32s cubic-bezier(.2, .9, .25, 1); transform-origin: top right; }
-dialog[open]::backdrop { animation: fade-in .25s ease; }
-@keyframes sheet-in { from { opacity: 0; transform: translateY(-6px) scale(.97); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
-@keyframes fade-in { from { opacity: 0; } }
-.meter > span { transform-origin: left; }
-.chip:active, .type:active, .card:active, .btn:active, .seg button:active { transform: scale(.97); transition: transform .1s ease-out; }
-@media (prefers-reduced-motion: reduce) { dialog[open] { animation: fade-in .2s ease; } .chip:active, .type:active, .card:active, .btn:active, .seg button:active { transform: none; } }
-@media (max-width: 560px) { .srow { grid-template-columns: minmax(0, 1fr); gap: 4px; } .srow .slab { display: flex; gap: 10px; align-items: baseline; padding: 0; } }
-
-@media (max-width: 860px) {
-  .view { grid-template-columns: minmax(0, 1fr); }
-  .log { position: static; }
-  .log ul { max-height: none; }
-}
-@media (max-width: 560px) {
-  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-  .card { padding: 12px 11px 10px; }
-  .card .pct { font-size: 18px; }
-  .yrow { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-  .ylab { display: flex; gap: 10px; align-items: baseline; padding: 0; }
-  form.add { grid-template-columns: 1fr 1fr; }
-  form.add .name-input, form.add .btn { grid-column: 1 / -1; }
-}
-@media (prefers-reduced-motion: reduce) { .meter > span { transition: none; } }
-
-/* ---- dark spec overrides ---- */
-body { font-feature-settings: "cv11", "ss01"; letter-spacing: -0.006em; }
-.wrap { gap: 26px; padding-block: 36px 72px; }
-button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
-.badge { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border: 1px solid var(--rule-2); border-radius: 999px; background: var(--sheet); font: 500 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; }
-.badge i { width: 6px; height: 6px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 10px rgb(255 255 255 / .6); }
-h1 { font-weight: 700; font-size: clamp(2.4rem, 6.5vw, 4.2rem); line-height: 1; letter-spacing: -0.035em; color: var(--fg); }
-.stats { gap: 0; margin-top: 14px; font-size: 14px; color: var(--muted); align-items: center; }
-.stats > span + span::before { content: "\00b7"; margin: 0 10px; color: var(--faint); }
-.stats b { font: 600 14px var(--mono); color: var(--fg); }
-.top { align-items: end; }
-.top-actions { padding: 6px; border: 1px solid var(--rule); border-radius: 14px; background: var(--sheet); }
-.btn { background: var(--raise); border: 1px solid var(--rule-2); color: var(--fg); border-radius: 10px; transition: border-color .2s ease, background-color .2s ease; }
-.btn:hover { border-color: #52525B; background: #18181B; }
-.btn.primary { background: #FFFFFF; color: #000000; border-color: #FFFFFF; }
-.btn.primary:hover { background: #E4E4E7; }
-.btn.ghost { background: transparent; }
-/* cards */
-.cards { gap: 12px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-@media (max-width: 560px) { .card.add { min-height: 64px; } }
-.card { background: var(--sheet); border: 1px solid var(--rule); border-radius: 16px; padding: 16px; gap: 14px; box-shadow: none; }
-.card:hover { border-color: var(--rule-2); background: #0C0C0F; }
-.card[aria-current="true"] { border-color: var(--rule-2); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .55); background: #0C0C0F; }
-.card .cname { font: 600 15px/1.3 var(--display); letter-spacing: -0.01em; color: var(--fg); }
-.card .line { display: flex; align-items: center; gap: 10px; }
-.card .pct { font: 700 20px var(--display); letter-spacing: -0.02em; color: var(--fg); min-width: 3.2ch; font-variant-numeric: tabular-nums; }
-.card .line .meter { flex: 1; height: 4px; }
-.card .frac { font: 500 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
-.card .cnum { font-size: 12.5px; color: var(--muted); }
-.meter { background: var(--rule-2); height: 6px; }
-.meter > span { background: #FFFFFF; }
-.card.add { border: 1px dashed var(--rule-2); background: transparent; color: var(--muted); opacity: .7; transition: opacity .2s ease, border-color .2s ease; min-height: 118px; }
-.card.add:hover { opacity: 1; border-color: #52525B; background: transparent; }
-/* panels */
-.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 16px; box-shadow: none; }
-.vhead { border-bottom-color: var(--rule); padding: 22px 20px 16px; }
-h2 { font-weight: 700; font-size: 1.7rem; letter-spacing: -0.03em; }
-.sub { color: var(--muted); }
-.vhead .meter { height: 4px; }
-.links a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--rule-2); transition: color .2s ease, border-color .2s ease; }
-.links a:hover { color: var(--fg); border-color: var(--fg); }
-.toolbar { background: rgb(9 9 11 / .78); border-bottom-color: var(--rule); border-radius: 16px 16px 0 0; }
-.toolbar::after { display: none; }
-.type { background: var(--sheet-2); border: 1px solid var(--rule); color: var(--muted); font-weight: 500; }
-.type:hover { border-color: var(--rule-2); color: var(--fg); }
-.type .n { color: var(--faint); }
-.type[aria-pressed="true"] { background: #FFFFFF; border-color: #FFFFFF; color: #000000; font-weight: 600; }
-.type[aria-pressed="true"] .n { color: #3F3F46; opacity: 1; }
-.seg { background: var(--sheet-2); border: 1px solid var(--rule); }
-.seg button { color: var(--muted); font-weight: 500; }
-.seg button[aria-pressed="true"] { background: var(--raise); color: var(--fg); box-shadow: inset 0 0 0 1px var(--rule-2); }
-.controls input[type=search], form.add input, form.add select, .opts-row select, .log .mark { background: var(--sheet-2); border: 1px solid var(--rule-2); color: var(--fg); border-radius: 10px; transition: border-color .2s ease; }
-.controls input[type=search]::placeholder, form.add input::placeholder, .log .mark::placeholder { color: #52525B; }
-.controls input[type=search]:hover, form.add input:hover, .log .mark:hover { border-color: #3F3F46; }
-.opts-row label, .controls label { color: var(--muted); }
-input[type=checkbox] { accent-color: #FFFFFF; }
-.legend { color: var(--faint); }
-.section-label { color: var(--faint); font-weight: 500; letter-spacing: .1em; }
-.srow, .yrow, .section-label + .srow { border-top-color: var(--rule); }
-.yrow + .section-label, .chips + .section-label { border-top-color: var(--rule); }
-.srow .slab b { color: var(--fg); font-weight: 600; }
-.srow .slab span, .ylab span { color: var(--faint); }
-.chip { background: var(--sheet-2); border: 1px solid var(--rule); color: #D4D4D8; border-radius: 10px; }
-.chip:hover { border-color: #3F3F46; color: var(--fg); }
-.chip .dot { background: #71717A; }
-.chip .k { color: var(--faint); opacity: 1; }
-.chip[aria-pressed="true"] { background: #FAFAFA; border-color: #FAFAFA; color: #000000; }
-.chip[aria-pressed="true"] .k { color: #52525B; }
-.chip[aria-pressed="true"] .dot { background: #000000; opacity: .45; }
-.chip .m { background: rgb(0 0 0 / .1); }
-details.addbox { border-top-color: var(--rule); }
-details.addbox > summary { color: var(--muted); font-weight: 500; transition: color .2s ease; }
-details.addbox > summary:hover { color: var(--fg); }
-/* completed panel */
-.log h3 { font-weight: 600; letter-spacing: -0.015em; padding: 20px 18px 4px; }
-.log .hint { color: var(--faint); padding: 0 18px 12px; }
-.log li { border-top-color: var(--rule); padding: 11px 18px; }
-.log .d { color: var(--faint); }
-.log .none { padding: 18px 18px 26px; color: var(--muted); opacity: .55; font-size: 14px; text-align: center; line-height: 1.6; }
-/* picker */
-dialog { background: var(--sheet); border: 1px solid var(--rule-2); border-radius: 18px; box-shadow: 0 30px 80px rgb(0 0 0 / .8); }
-dialog::backdrop { background: rgb(0 0 0 / .7); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
-.dlg header, .dlg footer { border-color: var(--rule); }
-.opt { border-color: var(--rule); background: var(--sheet-2); transition: border-color .2s ease; }
-.opt:hover { border-color: var(--rule-2); }
-.opt:has(input:checked) { border-color: rgb(255 255 255 / .5); background: var(--raise); }
-.opt small { color: var(--faint); }
-.toast { background: #FAFAFA; color: #000000; border-radius: 12px; }
-footer.notes { color: var(--faint); }
-::selection { background: #FFFFFF; color: #000000; }
-
-/* ---- polish pass (alim's spec, Tailwind zinc scale translated) ---- */
-:root { --faint: #8A8A93; }
-.masthead { display: grid; gap: 0; }
-.titlerow { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; }
-h1 { font-weight: 800; letter-spacing: -0.05em; line-height: .95; color: #FFFFFF; }
-.top-actions { padding: 0; border: 0; background: transparent; }
-.stats { margin-top: 16px; }
-.stats, .stats span, .card .cnum, .card .frac, .links a { color: var(--muted); }
-.card .pct { color: #FFFFFF; font-weight: 700; }
-.card { border: 1px solid rgb(39 39 42 / .8); }
-.card:hover { border-color: #3F3F46; }
-.card[aria-current="true"] { border-color: #A1A1AA; box-shadow: none; background: #0C0C0F; }
-.card.add { border: 1px dashed #27272A; color: #71717A; opacity: 1; background: transparent; }
-.card.add:hover { border-color: #3F3F46; color: #A1A1AA; background: transparent; }
-.type[aria-pressed="true"] { background: #FFFFFF; color: #000000; font-weight: 500; border-color: #FFFFFF; }
-.type:not([aria-pressed="true"]):hover { background: #18181B; color: #E4E4E7; border-color: #27272A; }
-.toolbar { display: grid; gap: 16px; padding: 16px 0; }
-.types { padding: 0 18px; }
-.controls { padding: 0 18px; border-bottom: 0; }
-.opts-row { padding: 16px 18px 0; }
-.legend { padding: 16px 18px 4px; }
-.btn, .card, .chip, .type, .seg button, .opt, .log li, .links a, details.addbox > summary, .srow, .yrow { transition: all .2s ease-in-out; }
-.log li:hover, .srow:hover, .yrow:hover { background: rgb(255 255 255 / .015); }
-@media (prefers-reduced-motion: reduce) { .btn, .card, .chip, .type, .seg button, .opt, .log li, .links a, details.addbox > summary, .srow, .yrow { transition: none; } }
-@media (max-width: 560px) { .titlerow { align-items: flex-start; flex-direction: column; } }
-/* ---- v10: Apple-style layered window (alim's HIG spec) ----
-   Canvas #070708 -> raised panels #121214 with 6% white hairlines -> recessed wells #1A1A1E.
-   System font first so Apple devices get SF; Inter elsewhere. */
-:root {
-  --bg: #070708;
-  --sheet: #121214;
-  --sheet-2: #1A1A1E;
-  --well: #1A1A1E;
-  --raise: #1C1C20;
-  --muted: #8E8E93;
-  --faint: #8E8E93;
-  --rule: rgb(255 255 255 / .06);
-  --rule-2: rgb(255 255 255 / .10);
-  --slate: #2C2C31;
+  --bg: #070708; --sheet: #121214; --well: #1A1A1E; --raise: #1C1C20; --slate: #2C2C31;
+  --fg: #FFFFFF; --text: #F5F5F7; --muted: #8E8E93; --dim: #636366;
+  --rule: rgb(255 255 255 / .06); --rule-2: rgb(255 255 255 / .10);
+  --tl-r: #FF453A; --tl-a: #FF9F0A; --tl-g: #30D158; --tl-off: #2C2C31;
   --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif;
   --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
   --lift: inset 0 1px 0 rgb(255 255 255 / .035), 0 1px 2px rgb(0 0 0 / .4), 0 12px 32px -12px rgb(0 0 0 / .6);
   --recess: inset 0 1px 2px rgb(0 0 0 / .45), inset 0 0 0 1px rgb(255 255 255 / .04);
   --sheen: linear-gradient(180deg, rgb(255 255 255 / .09), rgb(255 255 255 / 0) 55%);
-  --spring: cubic-bezier(.32, .72, 0, 1);
+  color-scheme: dark;
 }
-body { background: var(--bg); font-feature-settings: normal; letter-spacing: 0; }
-.wrap { gap: 40px; padding-block: 56px 88px; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; }
+[hidden] { display: none !important; }
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+::selection { background: #FFFFFF; color: #000000; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left)); }
 
-/* type hierarchy */
-.meta-label, .section-label, .dlg h4, .badge { font: 600 10px/1.4 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.meta-label { margin: 0 0 12px; }
-.group { display: grid; }
-.badge { justify-self: start; padding: 6px 12px; border: 1px solid var(--rule); background: var(--sheet); box-shadow: var(--lift); margin-bottom: 20px; }
-.badge i { box-shadow: 0 0 8px rgb(255 255 255 / .5); }
-h1 { font-family: var(--display); font-weight: 800; font-size: clamp(2.5rem, 6.5vw, 4.5rem); letter-spacing: -0.025em; line-height: 1; color: #FFFFFF; }
-.stats { margin-top: 18px; font-size: 13px; }
-.stats, .stats span { color: var(--muted); }
-.stats b { color: #F5F5F7; font-weight: 600; }
-.stats > span + span::before { color: #48484A; }
-h2 { font-family: var(--display); font-weight: 700; letter-spacing: -0.025em; }
+/* top bar: translucent material, content scrolls under it */
+.nav { position: sticky; top: 0; z-index: 5; background: rgb(7 7 8 / .72); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); border-bottom: 1px solid var(--rule); padding-top: env(safe-area-inset-top); }
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 600 15px var(--display); letter-spacing: -0.01em; text-decoration: none; min-width: 0; }
+.brand span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mark { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; flex: none; background: var(--sheen), var(--slate); box-shadow: inset 0 1px 0 rgb(255 255 255 / .1), 0 0 0 .5px rgb(255 255 255 / .12); }
+.mark svg { width: 16px; height: 16px; }
+.nav-actions { display: flex; gap: 8px; flex: none; }
 
-/* buttons */
-.btn { background: var(--sheet); border: 1px solid var(--rule-2); box-shadow: var(--lift); border-radius: 10px; font-weight: 500; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 9px 16px; border-radius: 11px; font: 500 14px var(--body); text-decoration: none; cursor: pointer; background: var(--sheet); color: var(--fg); border: 1px solid var(--rule-2); box-shadow: var(--lift); transition: background-color .2s ease, border-color .2s ease, transform .1s ease-out; white-space: nowrap; }
 .btn:hover { background: var(--raise); border-color: rgb(255 255 255 / .16); }
-.btn.primary { background: #F5F5F7; color: #000; border-color: transparent; }
+.btn:active { transform: scale(.97); }
+.btn.primary { background: #F5F5F7; color: #000000; border-color: transparent; font-weight: 600; }
 .btn.primary:hover { background: #FFFFFF; }
+.btn.big { min-height: 50px; padding: 12px 22px; font-size: 15.5px; border-radius: 13px; }
+.btn svg { width: 16px; height: 16px; }
+@media (pointer: coarse) { .btn { min-height: 44px; } }
 
-/* subject cards: raised tiles */
-.cards { gap: 14px; }
-.card { background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); border-radius: 14px; padding: 18px; gap: 16px; }
-.card:hover { background: #151518; border-color: var(--rule-2); }
-.card[aria-current="true"] { background: #17171A; border-color: rgb(255 255 255 / .28); box-shadow: var(--lift), 0 0 0 3px rgb(255 255 255 / .04); }
-.card .cname { font-family: var(--display); font-weight: 600; letter-spacing: -0.012em; }
-.card .pct { font-family: var(--display); font-weight: 700; letter-spacing: -0.025em; color: #FFFFFF; }
-.card .cnum, .card .frac { color: var(--muted); }
-.meter { background: var(--well); box-shadow: var(--recess); }
-.meter > span { background: linear-gradient(90deg, #D1D1D6, #FFFFFF); }
-.card.add { background: transparent; box-shadow: none; border: 1.5px dashed rgb(255 255 255 / .09); color: #636366; font-weight: 500; font-size: 14px; }
-.card.add:hover { border-color: rgb(255 255 255 / .2); color: var(--muted); background: rgb(255 255 255 / .015); }
+/* hero */
+.hero { padding: 72px 0 40px; display: grid; gap: 22px; justify-items: start; }
+.badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; margin: 0; border: 1px solid var(--rule); border-radius: 999px; background: var(--sheet); box-shadow: var(--lift); font: 600 10px/1.4 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.badge i { width: 6px; height: 6px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 8px rgb(255 255 255 / .5); }
+h1 { margin: 0; font: 800 clamp(2.6rem, 7.5vw, 5rem)/.98 var(--display); letter-spacing: -0.035em; text-wrap: balance; max-width: 14ch; font-optical-sizing: auto; }
+.lede { margin: 0; max-width: 54ch; font-size: clamp(1.02rem, 2vw, 1.18rem); line-height: 1.5; color: var(--muted); text-wrap: pretty; }
+.lede b { color: var(--text); font-weight: 500; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.small { margin: 0; font-size: 13px; color: var(--muted); }
 
-/* main window and sidebar */
-.view { gap: 20px; }
-.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 16px; box-shadow: var(--lift); }
-.vhead { padding: 24px 22px 18px; gap: 12px; border-bottom-color: var(--rule); }
-.links a { color: var(--muted); border-bottom-color: rgb(255 255 255 / .12); }
-.toolbar { background: rgb(18 18 20 / .8); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); border-bottom: 1px solid var(--rule); padding: 18px 0; gap: 16px; }
-.types { padding: 0 22px; gap: 6px; }
-.controls { padding: 0 22px; gap: 12px 16px; }
-.opts-row { padding: 18px 22px 0; }
-.legend { padding: 18px 22px 4px; color: var(--muted); }
-.section-label { padding: 22px 22px 8px; }
-.srow, .yrow { padding-inline: 22px; border-top-color: var(--rule); }
+/* returning student */
+.back { width: 100%; max-width: 560px; display: grid; gap: 14px; padding: 18px 20px; border-radius: 16px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); }
+.back-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.back h2 { margin: 0; font: 600 1.05rem var(--display); letter-spacing: -0.015em; }
+.back .who { font-size: 12.5px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+.back .who i { width: 7px; height: 7px; border-radius: 50%; background: var(--tl-g); }
+.nums { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13.5px; color: var(--muted); }
+.nums b { display: block; font: 700 1.5rem/1.1 var(--display); letter-spacing: -0.02em; color: var(--fg); font-variant-numeric: tabular-nums; }
+.tlsum { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--muted); }
+.tlsum span { display: inline-flex; align-items: center; gap: 6px; }
+.tlsum b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tlsum i { width: 8px; height: 8px; border-radius: 50%; }
 
-/* category pills: muted until chosen; chosen = slate with a micro-sheen and hairline stroke */
-.type { background: transparent; border: 1px solid transparent; color: var(--muted); font-weight: 500; }
-.type:not([aria-pressed="true"]):hover { background: rgb(255 255 255 / .05); color: #E5E5EA; border-color: transparent; }
-.type[aria-pressed="true"] { background: var(--sheen), var(--slate); color: #FFFFFF; border-color: rgb(255 255 255 / .14); font-weight: 600; box-shadow: inset 0 1px 0 rgb(255 255 255 / .1), 0 1px 3px rgb(0 0 0 / .5); }
-.type .n { color: #636366; }
-.type[aria-pressed="true"] .n { color: #AEAEB2; }
+/* example window */
+.shot { margin: 8px 0 0; border-radius: 20px; padding: 18px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift), 0 40px 100px -40px rgb(0 0 0 / .9); display: grid; gap: 16px; position: relative; overflow: hidden; }
+.shot::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 50% at 70% 0%, rgb(255 255 255 / .05), transparent 70%); pointer-events: none; }
+.shot-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.shot-bar .dots { display: flex; gap: 6px; }
+.shot-bar .dots i { width: 10px; height: 10px; border-radius: 50%; background: #2C2C31; }
+.shot-bar small { font: 600 10px/1.4 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.mcards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.mcard { position: relative; display: grid; gap: 14px; padding: 16px; border-radius: 14px; background: #161618; border: 1px solid var(--rule); box-shadow: var(--lift); min-width: 0; }
+.mcard.on { border-color: rgb(255 255 255 / .28); }
+.mcard b { font: 600 14.5px/1.3 var(--display); letter-spacing: -0.012em; padding-right: 52px; }
+.mline { display: flex; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; }
+.mline strong { font: 700 19px var(--display); letter-spacing: -0.025em; min-width: 3.2ch; }
+.meter { flex: 1; height: 4px; border-radius: 99px; background: var(--well); box-shadow: var(--recess); overflow: hidden; }
+.meter span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #D1D1D6, #FFFFFF); }
+.lights { position: absolute; top: 15px; right: 14px; display: inline-flex; gap: 4px; padding: 4px 6px; border-radius: 999px; background: var(--well); box-shadow: var(--recess); }
+.lights i { width: 8px; height: 8px; border-radius: 50%; background: var(--tl-off); }
+.lights .r { background: var(--tl-r); box-shadow: 0 0 8px rgb(255 69 58 / .75); }
+.lights .a { background: var(--tl-a); box-shadow: 0 0 8px rgb(255 159 10 / .7); }
+.lights .g { background: var(--tl-g); box-shadow: 0 0 8px rgb(48 209 88 / .7); }
+.mchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.mchip { position: relative; padding: 8px 12px; border-radius: 10px; font-size: 13.5px; background: var(--well); box-shadow: var(--recess); color: #D1D1D6; }
+.mchip.done { background: #F5F5F7; color: #000000; box-shadow: 0 1px 2px rgb(0 0 0 / .4); }
+.mchip.done::after { content: ""; position: absolute; top: -6px; right: -6px; width: 17px; height: 17px; border-radius: 50%; background: #070708 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.2 3.2L13 4.8' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 10px no-repeat; box-shadow: 0 0 0 1.5px #F5F5F7; }
+.mrow { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; align-items: start; padding-top: 14px; border-top: 1px solid var(--rule); }
+.mrow > span { padding-top: 7px; font-size: 14px; font-weight: 600; }
+.mrow > span small { display: block; font: 500 12px ui-monospace, "SF Mono", Menlo, monospace; color: var(--muted); }
 
-/* macOS-style segmented control: recessed track, elevated capsule that slides */
-.seg { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 3px; border-radius: 10px; background: var(--well); border: 0; box-shadow: var(--recess); isolation: isolate; }
-.seg .thumb { position: absolute; z-index: 0; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 7px; background: var(--sheen), var(--slate); box-shadow: inset 0 1px 0 rgb(255 255 255 / .1), 0 0 0 .5px rgb(255 255 255 / .12), 0 2px 6px rgb(0 0 0 / .45); transition: transform .38s var(--spring); }
-.seg[data-on="year"] .thumb { transform: translateX(100%); }
-.seg button { position: relative; z-index: 1; background: transparent !important; box-shadow: none !important; border-radius: 7px; padding: 6px 16px; color: var(--muted); font-weight: 500; transition: color .2s ease; }
-.seg button[aria-pressed="true"] { color: #FFFFFF; }
-.seg button:not([aria-pressed="true"]):hover { color: #E5E5EA; }
+/* sections */
+section.block { padding: 72px 0 0; display: grid; gap: 22px; }
+.eyebrow { margin: 0; font: 600 10px/1.4 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+h2.title { margin: 0; font: 700 clamp(1.7rem, 4vw, 2.4rem)/1.08 var(--display); letter-spacing: -0.028em; text-wrap: balance; max-width: 22ch; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; counter-reset: s; }
+.steps li { padding: 22px 20px; border-radius: 16px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); display: grid; gap: 8px; align-content: start; }
+.steps .n { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 6px; font: 600 13px var(--display); background: var(--sheen), var(--slate); box-shadow: inset 0 1px 0 rgb(255 255 255 / .1), 0 0 0 .5px rgb(255 255 255 / .12); }
+.steps h3 { margin: 0; font: 600 1.05rem/1.3 var(--display); letter-spacing: -0.015em; }
+.steps p { margin: 0; font-size: 14.5px; color: var(--muted); line-height: 1.5; }
+.legend { display: grid; gap: 6px; margin-top: 4px; }
+.legend span { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: #D1D1D6; }
+.legend i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.facts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-radius: 16px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); overflow: hidden; }
+.facts li { padding: 18px 20px; display: grid; gap: 2px; border-top: 1px solid var(--rule); }
+.facts li:nth-child(-n+2) { border-top: 0; }
+.facts li:nth-child(2n) { border-left: 1px solid var(--rule); }
+.facts b { font: 600 15px var(--display); letter-spacing: -0.01em; }
+.facts span { font-size: 14px; color: var(--muted); }
+.end { padding: 80px 0 24px; display: grid; justify-items: center; text-align: center; gap: 16px; }
+.end h2 { margin: 0; font: 700 clamp(1.6rem, 4vw, 2.2rem)/1.1 var(--display); letter-spacing: -0.028em; }
+footer.notes { padding: 32px 0 calc(48px + env(safe-area-inset-bottom)); border-top: 1px solid var(--rule); margin-top: 48px; display: grid; gap: 8px; font-size: 12.5px; color: var(--muted); max-width: 75ch; }
+footer.notes p { margin: 0; }
 
-/* inputs and chips sit in recessed wells */
-.controls input[type=search], form.add input, form.add select, .opts-row select, .log .mark { background: var(--well); border: 1px solid transparent; box-shadow: var(--recess); border-radius: 9px; }
-.controls input[type=search]:hover, form.add input:hover, .log .mark:hover { border-color: rgb(255 255 255 / .08); }
-.controls input[type=search]:focus, form.add input:focus, .log .mark:focus { border-color: rgb(255 255 255 / .22); outline: none; }
-.controls input[type=search]::placeholder, form.add input::placeholder, .log .mark::placeholder { color: #636366; }
-.chip { background: var(--well); border: 1px solid transparent; box-shadow: var(--recess); color: #D1D1D6; }
-.chip:hover { border-color: rgb(255 255 255 / .12); color: #FFFFFF; }
-.chip[aria-pressed="true"] { background: #F5F5F7; border-color: #F5F5F7; box-shadow: 0 1px 2px rgb(0 0 0 / .4); color: #000000; }
-.chip .k { color: var(--muted); }
-.srow .slab span, .ylab span { color: var(--muted); }
-
-/* sidebar */
-.log h3.meta-label { padding: 22px 20px 6px; margin: 0; font-size: 10px; }
-.log .hint { padding: 0 20px 14px; color: var(--muted); }
-.log li { padding: 12px 20px; border-top-color: var(--rule); }
-.log .d { color: var(--muted); }
-details.addbox { border-top-color: var(--rule); }
-details.addbox > summary { padding: 16px 22px; }
-form.add { padding: 0 22px 22px; }
-
-/* picker sheet sits above the window */
-dialog { background: #161618; border: 1px solid var(--rule-2); box-shadow: inset 0 1px 0 rgb(255 255 255 / .05), 0 40px 100px rgb(0 0 0 / .75); }
-.opt { background: var(--well); border-color: transparent; box-shadow: var(--recess); }
-.opt:hover { border-color: rgb(255 255 255 / .08); }
-.opt:has(input:checked) { background: var(--sheen), var(--slate); border-color: rgb(255 255 255 / .14); box-shadow: inset 0 1px 0 rgb(255 255 255 / .08); }
-footer.notes { color: var(--muted); }
-
-@media (prefers-reduced-motion: reduce) { .seg .thumb { transition: none; } }
-@media (prefers-contrast: more) { :root { --rule: rgb(255 255 255 / .2); --rule-2: rgb(255 255 255 / .3); --muted: #AEAEB2; } }
-@media (max-width: 560px) {
-  .wrap { gap: 28px; padding-block: 32px 64px; }
-  .types, .controls, .opts-row, .legend, .section-label, .srow, .yrow { padding-inline: 16px; }
-  .vhead { padding: 20px 16px 16px; }
-  .card { padding: 14px 12px; }
+@media (max-width: 860px) {
+  .mcards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mcards .mcard:nth-child(n+3) { display: none; }
+  .steps { grid-template-columns: minmax(0, 1fr); }
 }
-
-/* ---- website: accounts ---- */
-#auth { width: min(420px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; overscroll-behavior: contain; }
-.au { position: relative; display: grid; gap: 16px; padding: 30px 28px 24px; }
-.au-x { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--well); color: var(--muted); cursor: pointer; display: grid; place-items: center; transition: color .2s ease, background-color .2s ease; }
-.au-x:hover { color: var(--fg); background: var(--slate); }
-.au-x svg { width: 12px; height: 12px; }
-.au-head { display: grid; justify-items: center; gap: 6px; text-align: center; padding-top: 4px; }
-.au-mark { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: var(--sheen), var(--slate); box-shadow: inset 0 1px 0 rgb(255 255 255 / .1), 0 0 0 .5px rgb(255 255 255 / .12), 0 6px 18px rgb(0 0 0 / .5); margin-bottom: 8px; color: #FFFFFF; }
-.au-mark svg { width: 24px; height: 24px; }
-.au-mark.avatar { border-radius: 50%; font: 600 22px var(--display); }
-.au h2 { font: 700 1.45rem/1.2 var(--display); letter-spacing: -0.02em; margin: 0; }
-.au-sub { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.45; text-wrap: pretty; max-width: 32ch; }
-.au-sub b { color: var(--fg); font-weight: 600; overflow-wrap: anywhere; }
-.au .seg { display: grid; width: 100%; }
-.au .seg button { padding: 7px 10px; font-size: 13.5px; border: 0; cursor: pointer; }
-.au .seg[data-on="signup"] .thumb { transform: translateX(100%); }
-.au-body { display: grid; gap: 12px; }
-.au-field { display: grid; gap: 6px; }
-.au-field > span { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; font-weight: 500; color: var(--muted); }
-.au-in { position: relative; display: block; }
-.au-in input { width: 100%; padding: 12px 14px; min-height: 48px; background: var(--well); border: 1px solid transparent; box-shadow: var(--recess); border-radius: 11px; color: var(--fg); font-size: 16px; transition: border-color .2s ease; }
-.au-in input:hover { border-color: rgb(255 255 255 / .08); }
-.au-in input:focus { border-color: rgb(255 255 255 / .28); outline: none; }
-.au-in input::placeholder { color: #636366; }
-.au-in input[aria-invalid="true"] { border-color: rgb(248 113 113 / .6); }
-.au-in.pw input { padding-right: 64px; }
-.au-eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: 0; background: transparent; color: var(--muted); font-size: 12.5px; font-weight: 600; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
-.au-eye:hover { color: var(--fg); background: rgb(255 255 255 / .06); }
-.au-hint { font-size: 12.5px; color: var(--muted); margin: 0; min-height: 1.3em; }
-.au-hint.warn { color: #FBBF24; }
-.au-meter { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-.au-meter i { height: 4px; border-radius: 99px; background: var(--well); box-shadow: var(--recess); transition: background-color .25s ease; }
-.au-meter[data-s="1"] i:nth-child(-n+1) { background: #F87171; }
-.au-meter[data-s="2"] i:nth-child(-n+2) { background: #FBBF24; }
-.au-meter[data-s="3"] i:nth-child(-n+3) { background: #A3E635; }
-.au-meter[data-s="4"] i { background: #4ADE80; }
-.au-go { width: 100%; justify-content: center; min-height: 48px !important; font-size: 15px; font-weight: 600 !important; border-radius: 12px !important; }
-.au-go[disabled] { opacity: .55; cursor: default; }
-.au-go .spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgb(0 0 0 / .2); border-top-color: #000; animation: au-spin .7s linear infinite; }
-@keyframes au-spin { to { transform: rotate(360deg); } }
-.au-google { width: 100%; justify-content: center; min-height: 48px; border-radius: 12px !important; font-size: 15px; }
-.au-google svg { width: 18px; height: 18px; }
-.au-or { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
-.au-or::before, .au-or::after { content: ""; height: 1px; background: var(--rule-2); }
-.au-msg { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--muted); padding: 10px 12px; border-radius: 10px; background: var(--well); }
-.au-msg:empty { display: none; }
-.au-msg.err { color: #FCA5A5; background: rgb(248 113 113 / .1); }
-.au-msg.ok { color: #86EFAC; background: rgb(74 222 128 / .08); }
-.au-msg .linkbtn { color: inherit; font-size: inherit; }
-.au-foot { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; font-size: 13px; color: var(--muted); text-align: center; }
-.au-foot:empty { display: none; }
-.linkbtn { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; font-size: 13px; }
-.linkbtn:hover { color: var(--fg); }
-.linkbtn[disabled] { opacity: .5; cursor: default; text-decoration: none; }
-.au-note { margin: 0; font-size: 12.5px; color: var(--muted); text-align: center; line-height: 1.45; }
-.au-rows { display: grid; border-radius: 12px; background: var(--well); box-shadow: var(--recess); }
-.au-rows > div { display: flex; justify-content: space-between; gap: 12px; padding: 12px 14px; font-size: 14px; }
-.au-rows > div + div { border-top: 1px solid rgb(255 255 255 / .05); }
-.au-rows dt { color: var(--muted); margin: 0; }
-.au-rows dd { margin: 0; text-align: right; overflow-wrap: anywhere; min-width: 0; }
-.au-actions { display: grid; gap: 8px; }
-.au-actions .btn { width: 100%; justify-content: center; min-height: 46px; border-radius: 12px; }
-.btn.danger { color: #FCA5A5; }
-.btn.danger:hover { border-color: rgb(248 113 113 / .4); }
-/* header account button: an avatar once signed in */
-.acct-btn.on { padding: 4px 12px 4px 4px; border-radius: 999px; gap: 8px; }
-.acct-av { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--sheen), var(--slate); font: 600 14px var(--display); color: #FFF; box-shadow: inset 0 1px 0 rgb(255 255 255 / .1); flex: none; }
-.acct-btn .acct-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ADE80; flex: none; }
-.acct-btn .acct-dot.warn { background: #FBBF24; }
-@media (max-width: 420px) { .au { padding: 26px 18px 20px; } }
-@media (prefers-reduced-motion: reduce) { .au-go .spin { animation-duration: 2s; } }
-/* Ticked papers keep their size: the tick sits as a small badge on the corner instead of adding width */
-.chip { position: relative; }
-.chip[aria-pressed="true"] .ck { display: grid; place-items: center; position: absolute; top: -6px; right: -6px; width: 17px; height: 17px; border-radius: 50%; background: #070708; color: #FFFFFF; box-shadow: 0 0 0 1.5px #F5F5F7; pointer-events: none; }
-.chip[aria-pressed="true"] .ck svg { width: 10px; height: 10px; }
+@media (max-width: 560px) {
+  .hero { padding: 44px 0 28px; gap: 18px; }
+  .cta { width: 100%; }
+  .cta .btn { flex: 1 1 auto; }
+  .nav .ghost-sm { display: none; }
+  .shot { padding: 14px; border-radius: 18px; }
+  .mcard { padding: 14px 12px; }
+  .mcard b { padding-right: 46px; font-size: 13.5px; }
+  .lights { right: 10px; top: 13px; }
+  .mrow { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .mrow > span { padding: 0; }
+  .facts { grid-template-columns: minmax(0, 1fr); }
+  .facts li:nth-child(2) { border-top: 1px solid var(--rule); }
+  .facts li:nth-child(2n) { border-left: 0; }
+  section.block { padding-top: 56px; }
+}
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } .btn:active { transform: none; } }
+@media (prefers-reduced-transparency: reduce) { .nav { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+@media (prefers-contrast: more) { :root { --rule: rgb(255 255 255 / .2); --rule-2: rgb(255 255 255 / .3); --muted: #AEAEB2; } }
 </style>
 </head>
 <body>
 
-<div class="wrap">
-  <header class="masthead">
-    <p class="badge"><i aria-hidden="true"></i>Year 12 &middot; HSC 2026</p>
-    <div class="titlerow">
-      <h1>HSC Past Paper Log</h1>
-      <div class="top-actions">
-        <button class="btn acct-btn" type="button" id="acct-btn" hidden>Sign in</button>
-        <button class="btn" type="button" id="pick-btn">Choose subjects</button>
-      </div>
-    </div>
-    <div class="stats" id="stats"></div>
-  </header>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="./" aria-label="HSC Past Paper Log, home"><span class="mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-6.5"/></svg></span><span>HSC Past Paper Log</span></a>
+    <nav class="nav-actions" aria-label="Get going">
+      <a class="btn ghost-sm" href="tracker#signin" id="nav-signin" hidden>Sign in</a>
+      <a class="btn primary" href="tracker" id="nav-open">Open tracker</a>
+    </nav>
+  </div>
+</header>
 
-  <section class="group">
-    <p class="meta-label" id="subj-label">Subjects</p>
-    <nav class="cards" id="cards" aria-labelledby="subj-label"></nav>
+<main class="wrap">
+  <section class="hero" aria-labelledby="h-t">
+    <p class="badge"><i aria-hidden="true"></i>Year 12 &middot; HSC 2026</p>
+    <h1 id="h-t">Every past paper, ticked off.</h1>
+    <p class="lede">Keep track of the <b>HSC papers, trials and assessment tasks</b> you've done, subject by subject. Give each subject a <b>red, amber or green</b> light so you can see where to spend your study time.</p>
+
+    <div class="back" id="back" hidden>
+      <div class="back-top"><h2>Welcome back</h2><span class="who" id="back-who" hidden><i aria-hidden="true"></i>Signed in</span></div>
+      <div class="nums" id="back-nums"></div>
+      <div class="tlsum" id="back-tl"></div>
+    </div>
+
+    <div class="cta">
+      <a class="btn primary big" href="tracker" id="go">Get started</a>
+      <a class="btn big" href="tracker#signin" id="signin" hidden>Sign in</a>
+      <a class="btn big" href="#how" id="how-link">How it works</a>
+    </div>
+    <p class="small" id="cta-note">Free, with no account needed. Your ticks save in this browser.</p>
   </section>
-  <main id="view"></main>
+
+  <figure class="shot" aria-label="Example of the tracker" style="margin-inline:0">
+    <div class="shot-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><small>Example</small></div>
+    <div class="mcards" aria-hidden="true">
+      <div class="mcard on"><b>Maths Ext 1</b><span class="lights"><i></i><i></i><i class="g"></i></span><span class="mline"><strong>67%</strong><span class="meter"><span style="width:67%"></span></span></span></div>
+      <div class="mcard"><b>Chemistry</b><span class="lights"><i></i><i class="a"></i><i></i></span><span class="mline"><strong>43%</strong><span class="meter"><span style="width:43%"></span></span></span></div>
+      <div class="mcard"><b>Physics</b><span class="lights"><i class="r"></i><i></i><i></i></span><span class="mline"><strong>14%</strong><span class="meter"><span style="width:14%"></span></span></span></div>
+      <div class="mcard"><b>Maths Ext 2</b><span class="lights"><i></i><i class="a"></i><i></i></span><span class="mline"><strong>33%</strong><span class="meter"><span style="width:33%"></span></span></span></div>
+    </div>
+    <div class="mrow" aria-hidden="true"><span>HSC papers<small>4/6</small></span><span class="mchips"><span class="mchip done">2025</span><span class="mchip done">2024</span><span class="mchip done">2023</span><span class="mchip">2022</span><span class="mchip done">2021</span><span class="mchip">2020</span></span></div>
+    <figcaption class="small">Made-up numbers, to show what it looks like.</figcaption>
+  </figure>
+
+  <section class="block" id="how" aria-labelledby="how-t">
+    <p class="eyebrow">How it works</p>
+    <h2 class="title" id="how-t">Three steps, then just keep ticking.</h2>
+    <ol class="steps">
+      <li><span class="n" aria-hidden="true">1</span><h3>Choose your subjects</h3><p>Pick from 32 Year 12 subjects, plus maths competitions. Each one lists the HSC papers and the trial papers and assessment tasks that THSC Online has, grouped by school or by year.</p></li>
+      <li><span class="n" aria-hidden="true">2</span><h3>Tick papers as you do them</h3><p>Tap a paper to mark it done. Add your mark if you like. Each subject shows how far through you are, and the Completed list keeps the dates.</p></li>
+      <li><span class="n" aria-hidden="true">3</span><h3>Set a traffic light</h3><p>Tap the lights on a subject to say how you feel about it. The colour is your call; the tracker only shows a faint hint from your progress.</p>
+        <span class="legend"><span><i style="background:var(--tl-r)"></i>Red: needs work</span><span><i style="background:var(--tl-a)"></i>Amber: getting there</span><span><i style="background:var(--tl-g)"></i>Green: confident</span></span></li>
+    </ol>
+  </section>
+
+  <section class="block" aria-labelledby="inc-t">
+    <p class="eyebrow">What's in it</p>
+    <h2 class="title" id="inc-t">Built for NSW Year 12.</h2>
+    <ul class="facts">
+      <li><b>HSC papers</b><span>From THSC Online up to 2018 and NESA after that.</span></li>
+      <li><b>Trials and assessments</b><span>Trial papers, plus half yearlies and AT1 to AT4 where THSC has them.</span></li>
+      <li><b>Your own papers</b><span>Add a paper that isn't listed, like your school's own trial.</span></li>
+      <li id="fact-sync"><b>Saved for you</b><span>Ticks save in this browser, so come back on the same device.</span></li>
+    </ul>
+  </section>
+
+  <section class="end" aria-labelledby="end-t">
+    <h2 id="end-t">Ready when you are.</h2>
+    <a class="btn primary big" href="tracker" id="go-2">Get started</a>
+  </section>
 
   <footer class="notes">
-    <p>Trial papers and HSC papers up to 2018 are copied from THSC Online's Year 12 pages as listed on 2 October 2026. THSC's HSC lists stop at 2018, so newer HSC papers come from each subject's NESA exam paper page, checked the same day. Software Engineering and Enterprise Computing have only the 2025 NESA paper. Assessment tasks (half yearly and AT1 to AT4) come from THSC's assessment task pages, sorted the way THSC sorts them; THSC has these for 14 subjects.</p>
-    <p>Paper names come from <a href="https://thsconline.github.io/s/" target="_blank" rel="noopener" style="color:inherit">THSC Online</a> and <a href="https://www.nsw.gov.au/education-and-training/nesa/curriculum/hsc-exam-papers" target="_blank" rel="noopener" style="color:inherit">NESA</a>. This site only lists names so you can track your practice; get the papers themselves from those sites. Free and non-commercial, for students' private study.</p>
-    <p>Each subject's progress counts papers from the year you pick in that subject (defaults: Maths Advanced and the Extensions from 2020, everything else from 2019). Every year THSC lists is shown, as on THSC; untick "Show papers before" to see only recent years. Older papers you tick still count in the totals.</p>
+    <p>Paper names come from <a href="https://thsconline.github.io/s/" target="_blank" rel="noopener">THSC Online</a> and <a href="https://www.nsw.gov.au/education-and-training/nesa/curriculum/hsc-exam-papers" target="_blank" rel="noopener">NESA</a>. This site only lists names so you can track your practice; get the papers themselves from those sites. Free and non-commercial, for students' private study.</p>
   </footer>
-</div>
-
-<dialog id="picker" aria-labelledby="pk-t">
-  <form method="dialog" class="dlg" id="pk-form">
-    <header><h2 id="pk-t">Choose your subjects</h2><p>Only the subjects you pick show up. Unticking a subject hides it but keeps your progress.</p></header>
-    <div class="body" id="pk-body"></div>
-    <footer><span id="pk-count"></span><span style="display:flex;gap:8px"><button class="btn ghost" type="button" id="pk-cancel">Cancel</button><button class="btn primary" type="submit" id="pk-save">Save subjects</button></span></footer>
-  </form>
-</dialog>
-
-<dialog id="auth" aria-labelledby="au-t" aria-describedby="au-sub">
-  <form class="au" id="au-form" novalidate>
-    <button class="au-x" type="button" id="au-close" aria-label="Close"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
-    <div class="au-head"><div class="au-mark" id="au-mark" aria-hidden="true"></div><h2 id="au-t">Sign in</h2><p class="au-sub" id="au-sub"></p></div>
-    <div class="seg" id="au-seg" role="group" aria-label="Sign in or create an account" data-on="signin"><span class="thumb" aria-hidden="true"></span><button type="button" data-m="signin" aria-pressed="true">Sign in</button><button type="button" data-m="signup" aria-pressed="false">Create account</button></div>
-    <div class="au-body" id="au-body"></div>
-    <p class="au-msg" id="au-msg" role="status" aria-live="polite"></p>
-    <button class="btn primary au-go" type="submit" id="au-go">Sign in</button>
-    <div class="au-foot" id="au-foot"></div>
-  </form>
-</dialog>
+</main>
 
 <script src="config.js"></script>
 <script>
-const INDEX = [{"id":"ext1","name":"Mathematics Extension 1","folder":"Maths","tp":["trialpapers_extension1"],"hp":["hscpapers_extension1"],"nesa":"mathematics-extension-1","from":2020,"t":810,"h":58,"a":544,"ap":"Maths/assessment-tasks_extension1"},{"id":"ext2","name":"Mathematics Extension 2","folder":"Maths","tp":["trialpapers_extension2"],"hp":["hscpapers_extension2"],"nesa":"mathematics-extension-2","from":2020,"t":720,"h":58,"a":556,"ap":"Maths/assessment-tasks_extension2"},{"id":"chem","name":"Chemistry","folder":"Chemistry","tp":["trialpapers"],"hp":["hscpapers"],"nesa":"chemistry","from":2019,"t":184,"h":25,"a":107,"ap":"Chemistry/assessment-tasks"},{"id":"phys","name":"Physics","folder":"Physics","tp":["trialpapers"],"hp":["hscpapers"],"nesa":"physics","from":2019,"t":178,"h":25,"a":37,"ap":"Physics/assessment-tasks"},{"id":"adv","name":"Mathematics Advanced","folder":"Maths","tp":["trialpapers_advanced"],"hp":["hscpapers_advanced"],"nesa":"mathematics-advanced","from":2020,"t":699,"h":58,"a":397,"ap":"Maths/assessment-tasks_advanced"},{"id":"std","name":"Mathematics Standard","folder":"Maths","tp":["trialpapers_general"],"hp":["hscpapers_general"],"nesa":"mathematics-standard","from":2019,"t":190,"h":25,"a":35,"ap":"Maths/assessment-tasks_general"},{"id":"engadv","name":"English Advanced","folder":"English","tp":["trialpapers_paper1","trialpapers_paper2_advanced"],"hp":["hscpapers"],"nesa":"english-advanced","from":2019,"t":393,"h":50,"a":5,"ap":"English/assessment-tasks"},{"id":"engstd","name":"English Standard","folder":"English","tp":["trialpapers_paper1","trialpapers_paper2_standard"],"hp":["hscpapers"],"nesa":"english-standard","from":2019,"t":264,"h":50,"a":5,"ap":"English/assessment-tasks"},{"id":"engx1","name":"English Extension 1","folder":"English Ext 1","tp":["trialpapers_extension1"],"hp":[],"nesa":"english-extension-1","from":2019,"t":41,"h":7,"a":0,"ap":null},{"id":"bio","name":"Biology","folder":"Biology","tp":["trialpapers"],"hp":["hscpapers"],"nesa":"biology","from":2019,"t":83,"h":25,"a":11,"ap":"Biology/assessment-tasks"},{"id":"ees","name":"Earth and Environmental Science","folder":"Earth & Environmental Science","tp":["trialpapers"],"hp":["hscpapers"],"nesa":"earth-and-environmental-science","from":2019,"t":11,"h":25,"a":0,"ap":null},{"id":"invsci","name":"Investigating Science","folder":"Investigating Science","tp":["trialpapers"],"hp":[],"nesa":"investigating-science","from":2019,"t":12,"h":7,"a":0,"ap":null},{"id":"agri","name":"Agriculture","folder":"Agriculture","tp":["trialpapers"],"hp":[],"nesa":"agriculture","from":2019,"t":10,"h":11,"a":1,"ap":"Agriculture/assessment-tasks"},{"id":"anc","name":"Ancient History","folder":"Ancient History","tp":["trialpapers"],"hp":["hscpapers"],"nesa":"ancient-history","from":2019,"t":3,"h":25,"a":0,"ap":null},{"id":"mod","name":"Modern History","folder":"Modern History","tp":["trialpapers"],"hp":["hscpapers"],"nesa":"modern-history","from":2019,"t":19,"h":25,"a":0,"ap":null},{"id":"histx","name":"History Extension","folder":"History Extension","tp":["trialpapers"],"hp":[],"nesa":"history-extension","from":2019,"t":1,"h":7,"a":0,"ap":null},{"id":"bus","name":"Business Studies","folder":"Business Studies","tp":["trialpapers"],"hp":["hscpapers"],"nesa":"business-studies","from":2019,"t":51,"h":25,"a":8,"ap":"Business Studies/assessment-tasks"},{"id":"eco","name":"Economics","folder":"Economics","tp":["trialpapers"],"hp":["hscpapers"],"nesa":"economics","from":2019,"t":88,"h":25,"a":11,"ap":"Economics/assessment-tasks"},{"id":"legal","name":"Legal Studies","folder":"Legal Studies","tp":["trialpapers"],"hp":["hscpapers"],"nesa":"legal-studies","from":2019,"t":45,"h":25,"a":0,"ap":null},{"id":"eng","name":"Engineering Studies","folder":"Engineering Studies","tp":["trialpapers"],"hp":["hscpapers"],"nesa":"engineering-studies","from":2019,"t":3,"h":25,"a":3,"ap":"Engineering Studies/assessment-tasks"},{"id":"ipt","name":"IPT / Enterprise Computing","folder":"IPT","tp":["trialpapers"],"hp":[],"nesa":"enterprise-computing","from":2019,"t":3,"h":1,"a":1,"ap":"IPT/assessment-tasks"},{"id":"sdd","name":"Software Engineering","folder":"Software","tp":["trialpapers"],"hp":[],"nesa":"software-engineering","from":2019,"t":8,"h":1,"a":0,"ap":null},{"id":"pdhpe","name":"PDHPE","folder":"PDHPE","tp":["trialpapers"],"hp":[],"nesa":"pdhpe","from":2019,"t":19,"h":11,"a":0,"ap":null},{"id":"sac","name":"Society and Culture","folder":"Society & Culture","tp":["trialpapers"],"hp":[],"nesa":"society-and-culture","from":2019,"t":2,"h":11,"a":0,"ap":null},{"id":"sor1","name":"Studies of Religion I","folder":"Studies of Religion","tp":["trialpapers_sor1"],"hp":[],"nesa":"studies-of-religion","from":2019,"t":1,"h":11,"a":0,"ap":null},{"id":"sor2","name":"Studies of Religion II","folder":"Studies of Religion","tp":["trialpapers_sor2"],"hp":[],"nesa":"studies-of-religion","from":2019,"t":1,"h":11,"a":0,"ap":null},{"id":"va","name":"Visual Arts","folder":"Visual Arts","tp":["trialpapers"],"hp":[],"nesa":"visual-arts","from":2019,"t":5,"h":8,"a":0,"ap":null},{"id":"jpc","name":"Japanese Continuers","folder":"LOTE/Japanese","tp":["trialpapers_continuers"],"hp":["hscpapers_continuers"],"nesa":null,"from":2019,"t":3,"h":18,"a":4,"ap":"LOTE/Japanese/assessment-tasks_continuers"},{"id":"jpx","name":"Japanese Extension","folder":"LOTE/Japanese","tp":[],"hp":["hscpapers_extension"],"nesa":null,"from":2019,"t":0,"h":8,"a":0,"ap":null},{"id":"jpb","name":"Japanese Beginners","folder":"LOTE/Japanese","tp":["trialpapers_beginners"],"hp":[],"nesa":null,"from":2019,"t":3,"h":0,"a":0,"ap":null},{"id":"latc","name":"Latin Continuers","folder":"LOTE/Latin","tp":["trialpapers_continuers"],"hp":[],"nesa":null,"from":2019,"t":1,"h":0,"a":0,"ap":null},{"id":"latx","name":"Latin Extension","folder":"LOTE/Latin","tp":["trialpapers_extension"],"hp":[],"nesa":null,"from":2019,"t":1,"h":0,"a":0,"ap":null},{"id":"comp","name":"Maths Competitions","folder":"Maths/Competitions","tp":["cp_imo"],"hp":[],"nesa":null,"from":2000,"t":230,"h":0,"a":0,"ap":null,"comp":true}];
-const NESA = "https://www.nsw.gov.au/education-and-training/nesa/curriculum/hsc-exam-papers/";
-const THSC = "https://thsconline.github.io/s/yr12/";
-const GROUPS = [
-  ["Mathematics", ["std", "adv", "ext1", "ext2"]],
-  ["English", ["engstd", "engadv", "engx1"]],
-  ["Science", ["bio", "chem", "phys", "ees", "invsci"]],
-  ["History and society", ["anc", "mod", "histx", "bus", "eco", "legal", "sac", "sor1", "sor2"]],
-  ["Technology, health and arts", ["eng", "ipt", "sdd", "agri", "pdhpe", "va"]],
-  ["Languages", ["jpb", "jpc", "jpx", "latc", "latx"]],
-  ["Extra practice", ["comp"]],
-];
-const DEFAULT_SUBJECTS = ["ext1", "ext2", "chem", "phys"];
-const SUB = Object.fromEntries(INDEX.map(s => [s.id, s]));
-const short = n => n.replace("Mathematics", "Maths").replace("Earth and Environmental Science", "Earth & Env Science");
+(function () {
+  var CFG = window.TRACKER_CONFIG || {};
+  var accounts = !!(CFG.supabaseUrl && CFG.supabaseKey);
+  function load(k, fb) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } }
+  var $ = function (id) { return document.getElementById(id); };
+  var st = load("hsc-log", {}) || {};
+  var done = st.done || {}, rag = st.rag || {};
+  var signedIn = !!load("hsc-owner", null);
+  var n = Object.keys(done).length;
+  var returning = n > 0 || (st.subjects && st.subjects.length) || Object.keys(rag).length > 0 || signedIn;
 
-let state = { done: {}, marks: {}, custom: [], subjects: null, from: {} };
-let ui = { active: null, query: "", all: true, solOnly: false, type: "all", group: "school" };
-const TYPES = ["hsc", "trial", "hy", "at1", "at2", "at3", "at4", "comp", "added"];
-const TYPE_NAME = { all: "All", hsc: "HSC", trial: "Trials", hy: "Half yearly", at1: "AT1", at2: "AT2", at3: "AT3", at4: "AT4", y11: "Year 11", y11hy: "Year 11 half yearly", y11pt1: "Year 11 task 1", y11pt2: "Year 11 task 2", y11pt3: "Year 11 task 3", comp: "Competitions", added: "Added by you" };
-const TYPE_SHORT = { hsc: "HSC", trial: "Trial", hy: "HY", at1: "AT1", at2: "AT2", at3: "AT3", at4: "AT4", y11: "Y11", y11hy: "Y11 HY", y11pt1: "Y11 T1", y11pt2: "Y11 T2", y11pt3: "Y11 T3", comp: "", added: "" };
-const TYPE_NOTE = {
-  hy: "Half-yearly exams as THSC files them.",
-  at1: "THSC files these as Task 1, typically held in Term 4. The year shown is the year the task was sat, not the HSC year.",
-  at2: "THSC files these as Task 2, typically held in Term 1.",
-  at3: "THSC files these as Task 3, typically held in Term 2.",
-  at4: "THSC files these as Task 4, typically held in Term 3 at schools that run trials in Term 2.",
-  y11: "Year 11 (preliminary) papers from THSC's Year 11 pages: yearly exams (Y11), half yearlies (Y11 HY) and tasks 1 to 3 (Y11 T1 to T3). The year shown is the year it was sat.",
-  y11pt1: "Year 11 Task 1 as THSC files it, typically March to April.", y11pt2: "Year 11 Task 2, typically June to July.", y11pt3: "Year 11 Task 3, typically August to September." };
-const CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>';
-const PALETTES = [["jacaranda", "Jacaranda", "#6a48c2"], ["harbour", "Harbour", "#0b6e8f"], ["eucalypt", "Eucalypt", "#3f6b4f"]];
-let docRef = null, syncMsg = "";
-const DATA = {};
-
-function load(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } }
-function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-state = Object.assign(state, load("hsc-log", {}));
-ui.active = load("hsc-tab2", null);
-const subjects = () => (state.subjects && state.subjects.length ? state.subjects : DEFAULT_SUBJECTS).filter(id => SUB[id]);
-const fromYear = id => state.from[id] || SUB[id].from;
-
-/* ---------- data ---------- */
-function papersOf(id) {
-  const d = DATA[id]; if (!d) return null;
-  if (d.papers) return d.papers;
-  const hsc = d.hsc.map(h => ({ id: id + "-hsc-" + h.y + (h.p ? "-p" + h.p.slice(-1) : ""), name: h.y + " HSC" + (h.p ? " " + h.p : ""),
-    chip: h.p ? "HSC " + h.p : "HSC", year: h.y, kind: "hsc", sol: h.src === "THSC" ? h.sol : null, src: h.src }));
-  const trials = d.trials.map(t => ({ id: id + "-t-" + t.n, name: t.n, chip: t.y ? (t.n.replace(String(t.y), "").replace(/\s+/g, " ").trim() || t.s) : t.n,
-    school: t.s, year: t.y, kind: "trial", sol: t.sol, src: "THSC" }));
-  const at = (d.at || []).map(a => ({ id: id + "-a-" + a.c + "-" + a.n, name: a.n + " " + TYPE_NAME[a.c], chip: a.y ? (a.n.replace(String(a.y), "").replace(/\s+/g, " ").trim() || a.s) : a.n,
-    school: a.s, year: a.y, kind: a.c, sol: a.sol, src: "THSC" }));
-  const y11 = (d.y11 || []).map(a => ({ id: id + "-y11-" + a.c + "-" + a.n, name: a.n + " " + (a.c === "y11" ? "Year 11 yearly" : TYPE_NAME[a.c]), school: a.s, sub: a.c, chip: a.y ? (a.n.replace(String(a.y), "").replace(/\s+/g, " ").trim() || a.s) : a.n,
-    year: a.y, kind: "y11", sol: a.sol, src: "THSC" }));
-  if (SUB[id].comp) trials.forEach(t => { t.kind = "comp"; t.name = t.name; });
-  d.papers = { hsc, trials, at: at.concat(y11) };
-  return d.papers;
-}
-function customOf(id) { return state.custom.filter(c => c.subject === id).map(c => ({ id: c.id, name: c.name, chip: c.name, year: c.year || 0, kind: "added", custom: true })); }
-function listed(id) { const p = papersOf(id); return p ? p.hsc.concat(p.trials, p.at) : []; }
-function allOf(id) { return listed(id).concat(customOf(id)); }
-const inType = (pp, t) => t === "all" || pp.kind === t;
-function tally(id, force) {
-  const p = papersOf(id); const f = fromYear(id);
-  const t = force || (id === ui.active ? ui.type : "all");
-  const cur = listed(id).filter(x => x.year >= f && inType(x, t));
-  const curDone = cur.filter(x => state.done[x.id]).length;
-  const doneAll = allOf(id).filter(x => state.done[x.id]);
-  const marks = doneAll.map(x => state.marks[x.id]).filter(v => v !== undefined && v !== "" && !isNaN(+v)).map(Number);
-  return { curDone, curTotal: cur.length, allDone: doneAll.length, avg: marks.length ? Math.round(marks.reduce((a, b) => a + b, 0) / marks.length) : null };
-}
-async function ensure(id) {
-  if (DATA[id]) return DATA[id];
-  try { const r = await fetch("data/" + id + ".json"); if (!r.ok) throw 0; DATA[id] = await r.json(); }
-  catch (e) { DATA[id] = { hsc: [], trials: [], failed: true }; }
-  return DATA[id];
-}
-
-/* ---------- saving ---------- */
-let saveTimer = null, saving = false, pending = false;
-function persist() {
-  save("hsc-log", state);
-  if (!docRef) return;
-  save("hsc-dirty", true);
-  clearTimeout(saveTimer); saveTimer = setTimeout(flush, 600);
-}
-async function flush() {
-  if (saving) { pending = true; return; }
-  saving = true;
-  try { await docRef.set(JSON.parse(JSON.stringify(state))); syncMsg = "Synced to your account"; }
-  catch (e) { syncMsg = "Couldn't sync just now, saved on this device"; }
-  saving = false; renderStats(); renderAcct();
-  if (pending) { pending = false; flush(); }
-}
-
-/* ---------- helpers ---------- */
-function el(tag, attrs, ...kids) {
-  const n = document.createElement(tag);
-  for (const k in attrs || {}) {
-    const v = attrs[k];
-    if (k === "class") n.className = v;
-    else if (k === "html") n.innerHTML = v;
-    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
-    else if (v !== false && v != null) n.setAttribute(k, v === true ? "" : v);
+  if (accounts) {
+    $("cta-note").textContent = "Free, with no account needed. Sign in to keep your ticks on every device.";
+    $("fact-sync").lastChild.textContent = "Sign in and your ticks, marks and lights follow you to every device.";
+    if (!signedIn) { $("signin").hidden = false; $("nav-signin").hidden = false; }
   }
-  for (const c of kids.flat()) if (c != null && c !== false) n.append(c.nodeType ? c : document.createTextNode(c));
-  return n;
-}
-const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
-const fmtDate = d => new Date(d + "T00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short" });
-let toastTimer = null;
-function toast(msg, undo) {
-  document.querySelector(".toast")?.remove(); clearTimeout(toastTimer);
-  const t = el("div", { class: "toast", role: "status" }, msg, undo ? el("button", { type: "button", onclick: () => { undo(); t.remove(); } }, "Undo") : null);
-  document.body.append(t); toastTimer = setTimeout(() => t.remove(), 4000);
-}
+  if (!returning) return;
 
-/* ---------- render ---------- */
-function renderStats() {
-  let done = 0, wk = 0; const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
-  for (const id in state.done) { done++; if (state.done[id] >= weekAgo) wk++; }
-  document.getElementById("stats").replaceChildren(
-    el("span", {}, el("b", {}, String(done)), done === 1 ? " paper done" : " papers done"),
-    el("span", {}, el("b", {}, String(wk)), " in the last 7 days"),
-    ...(syncMsg ? [el("span", {}, syncMsg)] : []));
-}
-
-function renderCards() {
-  const ids = subjects();
-  const cards = ids.map(id => {
-    const s = SUB[id], x = tally(id, "all"); const pct = x.curTotal ? Math.round(100 * x.curDone / x.curTotal) : 0;
-    return el("button", { class: "card", type: "button", "aria-current": String(id === ui.active), onclick: () => openSubject(id) },
-      el("span", { class: "cname" }, short(s.name)),
-      el("span", { class: "line" }, el("span", { class: "pct" }, pct + "%"),
-        el("span", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + pct + "%" })),
-        el("span", { class: "frac" }, x.curDone + " / " + x.curTotal)),
-      el("span", { class: "cnum" }, el("span", {}, x.allDone + " done in total"), x.avg != null ? el("span", {}, "avg " + x.avg) : null));
-  });
-  cards.push(el("button", { class: "card add", type: "button", onclick: openPicker }, "+ Add or remove subjects"));
-  document.getElementById("cards").replaceChildren(...cards);
-}
-
-function chip(p, fromY) {
-  const isDone = !!state.done[p.id]; const m = state.marks[p.id];
-  return el("button", { class: "chip" + (p.kind === "hsc" ? " hscchip" : ""), type: "button", "aria-pressed": String(isDone), "data-id": p.id,
-    title: p.name + (p.sol ? " \u00b7 has solutions" : "") + (p.year && p.year < fromY ? " \u00b7 before " + fromY : ""),
-    onclick: () => toggle(p) },
-    el("span", { class: "ck", "aria-hidden": "true", html: CHECK }),
-    p.sol ? [el("span", { class: "dot", "aria-hidden": "true" }), el("span", { class: "sr" }, "(has solutions)")] : null,
-    el("span", { class: "t" }, p.chip),
-    p.tag ? el("span", { class: "k" }, p.tag) : null,
-    isDone && m ? el("span", { class: "m" }, m) : null);
-}
-
-function toggle(p) {
-  const was = state.done[p.id];
-  if (was) delete state.done[p.id]; else state.done[p.id] = today();
-  persist(); refresh();
-  toast((was ? "Unticked " : "Ticked ") + p.name, () => { if (was) state.done[p.id] = was; else delete state.done[p.id]; persist(); refresh(); });
-}
-
-function yearRows(list, fromY, labelFor) {
-  const by = new Map();
-  for (const p of list) { const y = p.year || 0; if (!by.has(y)) by.set(y, []); by.get(y).push(p); }
-  return [...by.keys()].sort((a, b) => b - a).map(y => {
-    const ps = by.get(y).sort((a, b) => a.chip.localeCompare(b.chip));
-    const d = ps.filter(p => state.done[p.id]).length;
-    return el("div", { class: "yrow" },
-      el("div", { class: "ylab" + (y && y < fromY ? " old" : "") }, el("b", {}, y ? String(y) : "Other"), el("span", {}, d + "/" + ps.length)),
-      el("div", { class: "chips" }, ps.map(p => chip(p, fromY))));
-  });
-}
-
-function schoolRows(list, fromY, mixed) {
-  const by = new Map();
-  for (const p of list) { const k = p.school || "Other"; if (!by.has(k)) by.set(k, []); by.get(k).push(p); }
-  return [...by.keys()].sort((a, b) => a.localeCompare(b)).map(k => {
-    const ps = by.get(k).sort((a, b) => (b.year - a.year) || a.kind.localeCompare(b.kind) || a.name.localeCompare(b.name));
-    const d = ps.filter(p => state.done[p.id]).length;
-    return el("div", { class: "srow" },
-      el("div", { class: "slab" }, el("b", {}, k), el("span", {}, d + "/" + ps.length)),
-      el("div", { class: "chips" }, ps.map(p => {
-        let label = p.year ? String(p.year) : p.chip;
-        const rest = p.year ? p.chip.replace(k, "").trim() : "";
-        if (rest && rest !== k) label += " " + rest;
-        return chip(Object.assign({}, p, { chip: label, tag: mixed || p.kind === "y11" ? TYPE_SHORT[p.sub || p.kind] : "" }), fromY);
-      })));
-  });
-}
-
-function renderView() {
-  const box = document.getElementById("view");
-  const id = ui.active; const s = SUB[id];
-  if (!s) { box.replaceChildren(); return; }
-  const p = papersOf(id);
-  if (!p) { box.replaceChildren(el("div", { class: "panel" }, el("p", { class: "empty", style: "padding:18px" }, "Loading " + s.name + "\u2026"))); return; }
-  const fromY = fromYear(id), x = tally(id), pct = x.curTotal ? Math.round(100 * x.curDone / x.curTotal) : 0;
-  const q = ui.query.trim().toLowerCase();
-  const keep = pp => (ui.all || pp.year >= fromY || pp.custom) && (!q || pp.name.toLowerCase().includes(q)) && (!ui.solOnly || pp.sol || pp.custom || pp.kind === "hsc");
-  const all = allOf(id);
-  const counts = {}; for (const t of TYPES) counts[t] = all.filter(pp => pp.kind === t && (ui.all || pp.year >= fromY || pp.custom)).length;
-  if (ui.type !== "all" && !all.some(pp => pp.kind === ui.type)) ui.type = "all";
-  const older = listed(id).filter(pp => pp.year < fromY && inType(pp, ui.type)).length;
-  const typeLabel = ui.type === "all" ? "papers" : TYPE_NAME[ui.type] + (ui.type === "hsc" ? " papers" : "");
-
-  const fromSel = el("select", { id: "from-year", "aria-label": "Count progress from year", onchange: e => { state.from[id] = +e.target.value; persist(); refresh(); } },
-    Array.from({ length: 2026 - 2010 + 1 }, (_, i) => 2026 - i).map(y => el("option", { value: y, selected: y === fromY }, "from " + y)));
-
-  const typeBtns = ["all"].concat(TYPES).filter(t => t === "all" || t === ui.type || counts[t] > 0).map(t =>
-    el("button", { class: "type", type: "button", "aria-pressed": String(ui.type === t), onclick: () => { ui.type = t; save("hsc-type", t); refresh(); } },
-      TYPE_NAME[t], el("span", { class: "n" }, String(t === "all" ? Object.values(counts).reduce((a, b) => a + b, 0) : counts[t]))));
-
-  const sections = [];
-  const label = t => t === "hsc" ? "HSC papers" : t === "trial" ? "Trial papers" : t === "added" ? "Papers you added" : t === "comp" ? "Competition papers" : TYPE_NAME[t] + (t === "hy" || t === "y11hy" ? " exams" : t === "y11" ? "" : " tasks");
-  const render = (list, t, mixed) => ui.group === "school" && t !== "hsc" ? schoolRows(list, fromY, mixed)
-    : t === "hsc" ? [el("div", { class: "chips", style: "padding:6px 18px 14px" }, list.map(pp => chip(Object.assign({}, pp, { chip: pp.year + (pp.chip.length > 3 ? " " + pp.chip.slice(4) : "") }), fromY)))]
-    : yearRows(list.map(pp => (mixed || pp.kind === "y11") && TYPE_SHORT[pp.sub || pp.kind] ? Object.assign({}, pp, { tag: TYPE_SHORT[pp.sub || pp.kind] }) : pp), fromY);
-  const head = (text, list) => el("div", { class: "section-label" }, el("span", {}, text), el("span", {}, list.filter(pp => state.done[pp.id]).length + " / " + list.length));
-  if (ui.type === "all" && ui.group === "school") {
-    // THSC-style: everything a school has, under that school's name
-    const hscL = all.filter(pp => pp.kind === "hsc").filter(keep);
-    if (hscL.length) { sections.push(head("HSC papers", hscL)); sections.push(...render(hscL, "hsc")); }
-    const schoolL = all.filter(pp => pp.kind !== "hsc" && pp.kind !== "added").filter(keep);
-    if (schoolL.length) { sections.push(head(SUB[id].comp ? "By competition" : "By school", schoolL)); sections.push(...render(schoolL, "mixed", true)); }
-    const addL = all.filter(pp => pp.kind === "added").filter(keep);
-    if (addL.length) { sections.push(head("Papers you added", addL)); sections.push(...yearRows(addL, fromY)); }
-    if (!hscL.length && !schoolL.length && !addL.length) sections.push(el("p", { class: "empty", style: "padding-top:16px" }, "Nothing matches." + (!ui.all ? " Try showing older papers." : "")));
-  } else {
-    for (const t of TYPES) {
-      if (!inType({ kind: t }, ui.type)) continue;
-      const src = all.filter(pp => pp.kind === t);
-      if (!src.length) continue;
-      const list = src.filter(keep);
-      sections.push(head(label(t), list));
-      if (TYPE_NOTE[t] && ui.type === t) sections.push(el("p", { class: "section-note" }, TYPE_NOTE[t]));
-      if (!list.length) sections.push(el("p", { class: "empty" }, "Nothing matches." + (!ui.all ? " Try showing older papers." : "")));
-      else sections.push(...render(list, t, false));
-    }
-  }
-  if (!sections.length) sections.push(el("p", { class: "empty", style: "padding-top:16px" }, "THSC doesn't list any papers of this type for " + s.name + "."));
-
-  const links = [[s.comp ? "THSC competitions" : "THSC trials", s.comp ? null : s.tp[0]], ["THSC HSC papers", s.hp[0]]].filter(l => l[1]).map(([t, pth]) => el("a", { href: THSC + encodeURI(s.folder) + "/" + pth + ".html", target: "_blank", rel: "noopener" }, t));
-  if (s.ap) links.push(el("a", { href: THSC + encodeURI(s.ap) + ".html", target: "_blank", rel: "noopener" }, "THSC assessments"));
-  (s.y11p || []).forEach((pth, i) => links.push(el("a", { href: "https://thsconline.github.io/s/" + encodeURI(pth), target: "_blank", rel: "noopener" }, i ? "THSC Year 11 tasks" : "THSC Year 11 exams")));
-  if (s.nesa) links.push(el("a", { href: NESA + s.nesa, target: "_blank", rel: "noopener" }, "NESA HSC papers"));
-
-  const main = el("section", { class: "panel", "aria-labelledby": "v-t" },
-    el("div", { class: "vhead" },
-      el("div", { class: "vtitle" }, el("h2", { id: "v-t" }, s.name),
-        el("span", { class: "sub" }, x.curDone + " of " + x.curTotal + " " + typeLabel + " from " + fromY + " \u00b7 " + pct + "%")),
-      el("div", { class: "meter", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(x.curTotal), "aria-valuenow": String(x.curDone), "aria-label": s.name + " progress" }, el("span", { style: "width:" + pct + "%" })),
-      el("div", { class: "links" }, links)),
-    el("div", { class: "toolbar" },
-    el("div", { class: "types", role: "group", "aria-label": "Paper type" }, typeBtns),
-    el("div", { class: "controls" },
-      el("div", { class: "seg", id: "seg", role: "group", "aria-label": "Group papers", "data-on": ui.shownGroup || ui.group },
-        el("span", { class: "thumb", "aria-hidden": "true" }),
-        [["school", "By school"], ["year", "By year"]].map(([k, t]) => el("button", { type: "button", "aria-pressed": String(ui.group === k), onclick: () => { ui.group = k; save("hsc-group", k); renderView(); } }, t))),
-      el("input", { type: "search", id: "q", placeholder: "Search schools, e.g. James Ruse", "aria-label": "Search papers", value: ui.query,
-        oninput: e => { ui.query = e.target.value; renderView(); const n = document.getElementById("q"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }))),
-    el("div", { class: "opts-row" },
-      el("label", {}, "Progress", fromSel),
-      el("label", { for: "all-yrs" }, el("input", { type: "checkbox", id: "all-yrs", checked: ui.all, onchange: e => { ui.all = e.target.checked; save("hsc-all", ui.all); renderView(); } }), "Show papers before " + fromY + (older ? " (" + older + ")" : "")),
-      el("label", { for: "sol-only" }, el("input", { type: "checkbox", id: "sol-only", checked: ui.solOnly, onchange: e => { ui.solOnly = e.target.checked; renderView(); } }), "With solutions only")),
-
-    el("div", { class: "legend" },
-      el("span", {}, el("i", { style: "background:var(--done)" }), "done"),
-      el("span", {}, el("i", { style: "background:var(--accent);border-radius:50%;width:7px;height:7px" }), "THSC lists solutions"),
-      el("span", {}, "Tap a paper to tick it")),
-    sections,
-    addBox(id),
-    DATA[id].failed ? el("p", { class: "empty" }, "The paper list didn't load. Reload the page to try again.") : null);
-
-  box.replaceChildren(el("div", { class: "view" }, main, logPanel(id)));
-  if (ui.shownGroup !== ui.group) {
-    ui.shownGroup = ui.group;
-    requestAnimationFrame(() => requestAnimationFrame(() => { const sg = document.getElementById("seg"); if (sg) sg.dataset.on = ui.group; }));
-  }
-}
-
-function applyPalette() {}
-
-function addBox(id) {
-  const yearSel = el("select", { id: "add-year", "aria-label": "Year" }, Array.from({ length: 15 }, (_, i) => 2026 - i).map(y => el("option", { value: y }, String(y))));
-  const typeSel = el("select", { id: "add-type", "aria-label": "Type" }, ["Trial", "Half yearly", "AT1", "AT2", "AT3", "AT4", "Other"].map(t => el("option", { value: t }, t)));
-  const nameIn = el("input", { id: "add-name", class: "name-input", placeholder: "School or paper name", "aria-label": "Paper name", maxlength: "80" });
-  const removable = customOf(id);
-  return el("details", { class: "addbox" }, el("summary", {}, "Add a paper that isn't listed"),
-    el("form", { class: "add", onsubmit: e => {
-      e.preventDefault(); const nm = nameIn.value.trim();
-      if (!nm) { nameIn.focus(); nameIn.placeholder = "Type a school or paper name first"; return; }
-      const y = +yearSel.value, ty = typeSel.value;
-      state.custom.push({ id: id + "-c-" + Date.now().toString(36), subject: id, name: nm + " " + y + (ty === "Other" ? "" : " " + ty), year: y, type: ty });
-      ui.type = ui.type === "all" ? "all" : "added";
-      persist(); refresh(); toast("Added " + nm);
-    } }, el("label", { class: "fl", for: "add-year" }, "Year", yearSel), el("label", { class: "fl", for: "add-type" }, "Type", typeSel),
-      el("label", { class: "fl name-input", for: "add-name" }, "School or paper", nameIn), el("button", { class: "btn primary", type: "submit" }, "Add")),
-    removable.length ? el("div", { class: "chips", style: "padding:0 18px 18px" }, removable.map(c => el("button", { class: "chip", type: "button", title: "Remove " + c.name,
-      onclick: () => { const keep = state.custom.find(z => z.id === c.id); state.custom = state.custom.filter(z => z.id !== c.id); persist(); refresh();
-        toast("Removed " + c.name, () => { state.custom.push(keep); persist(); refresh(); }); } }, "Remove " + c.name))) : null);
-}
-
-function logPanel(id) {
-  const done = allOf(id).filter(p => state.done[p.id]).sort((a, b) => state.done[b.id].localeCompare(state.done[a.id]) || a.name.localeCompare(b.name));
-  return el("aside", { class: "panel log", "aria-label": "Completed papers" },
-    el("h3", { class: "meta-label" }, "Completed"),
-    el("p", { class: "hint" }, "Most recent first. Add your mark out of 100, or however the paper is marked."),
-    done.length ? el("ul", {}, done.map(p => el("li", {},
-      el("span", { class: "n" }, p.name),
-      el("input", { class: "mark", id: "mk-" + p.id.replace(/[^\w-]/g, "_"), inputmode: "decimal", placeholder: "mark", "aria-label": "Mark for " + p.name, value: state.marks[p.id] || "",
-        onchange: e => { const v = e.target.value.trim(); if (v) state.marks[p.id] = v; else delete state.marks[p.id]; persist(); renderCards(); refreshChips(); } }),
-      el("span", { class: "d" }, "Done " + fmtDate(state.done[p.id]))))) : el("p", { class: "none" }, "Nothing ticked in this subject yet.", el("br"), "Tap a paper to log it here."));
-}
-
-function refreshChips() {
-  const p = papersOf(ui.active); if (!p) return;
-  document.querySelectorAll("#view .chip[data-id]").forEach(c => {
-    const pp = allOf(ui.active).find(z => z.id === c.dataset.id); if (pp) c.replaceWith(chip(pp, fromYear(ui.active)));
-  });
-}
-
-function refresh() {
-  const y = window.scrollY; const logScroll = document.querySelector(".log ul")?.scrollTop;
-  renderStats(); renderCards(); renderView();
-  window.scrollTo(0, y); const l = document.querySelector(".log ul"); if (l && logScroll) l.scrollTop = logScroll;
-}
-
-async function openSubject(id) {
-  ui.active = id; ui.query = ""; save("hsc-tab2", id);
-  try { if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id); } catch (e) {}
-  renderCards(); renderView();
-  await ensure(id); if (ui.active === id) { renderCards(); renderView(); }
-}
-
-/* ---------- subject picker ---------- */
-function openPicker() {
-  const chosen = new Set(subjects());
-  const body = document.getElementById("pk-body");
-  body.replaceChildren(...GROUPS.flatMap(([g, ids]) => [el("h4", {}, g), el("div", { class: "opts" }, ids.filter(i => SUB[i]).map(i => {
-    const s = SUB[i];
-    return el("label", { class: "opt" }, el("input", { type: "checkbox", value: i, checked: chosen.has(i), onchange: updCount }),
-      el("span", {}, s.name, el("small", {}, [s.h ? s.h + " HSC" : "", s.t ? s.t + (s.comp ? " papers" : " trials") : "", s.a ? s.a + " assessments" : "", s.y ? s.y + " Year 11" : ""].filter(Boolean).join(" \u00b7 "))));
-  }))]));
-  function updCount() { const n = body.querySelectorAll("input:checked").length; document.getElementById("pk-count").textContent = n + (n === 1 ? " subject" : " subjects") + " selected"; document.getElementById("pk-save").disabled = n === 0; }
-  updCount();
-  const d = document.getElementById("picker");
-  if (d.showModal) d.showModal(); else d.setAttribute("open", "");
-}
-document.getElementById("pick-btn").addEventListener("click", openPicker);
-document.getElementById("pk-cancel").addEventListener("click", () => document.getElementById("picker").close());
-document.getElementById("pk-form").addEventListener("submit", async e => {
-  const ids = [...document.querySelectorAll("#pk-body input:checked")].map(i => i.value);
-  if (!ids.length) { e.preventDefault(); return; }
-  const order = GROUPS.flatMap(g => g[1]);
-  state.subjects = ids.sort((a, b) => order.indexOf(a) - order.indexOf(b)); persist();
-  if (!ids.includes(ui.active)) ui.active = ids[0];
-  await Promise.all(ids.map(ensure)); refresh(); openSubject(ui.active);
-});
-
-/* ---------- start ---------- */
-window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (SUB[h] && h !== ui.active && subjects().includes(h)) openSubject(h); });
-async function boot() {
-  { const h = location.hash.slice(1); if (SUB[h] && subjects().includes(h)) ui.active = h; }
-  applyPalette(); ui.type = load("hsc-type", "all"); ui.group = load("hsc-group", "school"); ui.all = load("hsc-all", true);
-  if (!subjects().includes(ui.active)) ui.active = subjects()[0];
-  renderStats(); renderCards(); renderView();
-  await Promise.all(subjects().map(ensure));
-  refresh();
-}
-boot();
-
-/* ---------- accounts (Supabase) ----------
-   config.js is written at build time from Vercel env vars. Without it the site runs in guest mode:
-   ticks stay in this browser's localStorage, exactly as before, and none of the account UI shows. */
-const CFG = window.TRACKER_CONFIG || {};
-let sb = null, sbUser = null, authMode = "signin", authEmail = "", resendAt = 0, lastSync = null;
-const ICON = {
-  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
-  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg>',
-  key: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M16 7l3 3"/></svg>',
-  google: '<svg viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.29-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>'
-};
-
-function loadScript(src) {
-  return new Promise((ok, bad) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = bad; document.head.append(s); });
-}
-function cleanState(d) {
-  d = d || {};
-  return { done: Object.assign({}, d.done), marks: Object.assign({}, d.marks), custom: Array.isArray(d.custom) ? d.custom.slice() : [],
-    subjects: Array.isArray(d.subjects) ? d.subjects.slice() : null, from: Object.assign({}, d.from) };
-}
-const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length);
-
-// Guest ticks join the account without losing anything on either side. Where both have a value,
-// the account keeps its own (marks, start years); a paper ticked in both keeps the earlier date.
-function mergeStates(acc, loc) {
-  const m = cleanState(acc);
-  for (const id in loc.done) if (!m.done[id] || loc.done[id] < m.done[id]) m.done[id] = loc.done[id];
-  for (const id in loc.marks) if (!(id in m.marks)) m.marks[id] = loc.marks[id];
-  const have = new Set(m.custom.map(c => c.id));
-  for (const c of loc.custom) if (!have.has(c.id)) m.custom.push(c);
-  if (loc.subjects) m.subjects = m.subjects ? m.subjects.concat(loc.subjects.filter(id => !m.subjects.includes(id))) : loc.subjects.slice();
-  for (const id in loc.from) if (!(id in m.from)) m.from[id] = loc.from[id];
-  return m;
-}
-
-// Which account (if any) the copy in localStorage belongs to, and whether it has edits not yet uploaded.
-const OWNER = "hsc-owner", DIRTY = "hsc-dirty";
-function markDirty() { if (docRef) save(DIRTY, true); }
-
-async function useAccount(user) {
-  if (sbUser && user && sbUser.id === user.id && docRef) { sbUser = user; renderAcct(); return; }
-  sbUser = user;
-  const uid = user.id;
-  docRef = { set: async s => {
-    const { error } = await sb.from("progress").upsert({ user_id: uid, state: s, updated_at: new Date().toISOString() });
-    if (error) throw error;
-    // Only clear the flag if nothing changed while this upload was in flight
-    if (JSON.stringify(s) === JSON.stringify(state)) try { localStorage.removeItem(DIRTY); } catch (e) {}
-    lastSync = new Date();
-  } };
-  syncMsg = "Syncing…"; renderAcct(); renderStats();
-  const owner = load(OWNER, null), dirty = load(DIRTY, false), local = cleanState(state);
-  try {
-    const { data, error } = await sb.from("progress").select("state").eq("user_id", uid).maybeSingle();
-    if (error) throw error;
-    const remote = data && data.state ? cleanState(data.state) : null;
-    let push = false, added = 0;
-    if (owner === uid) {
-      // This browser already follows this account: the account copy wins, unless edits here never made it up
-      if (dirty || !remote) { state = local; push = true; }
-      else state = remote;
-    } else if (!owner && hasLocal(local)) {
-      // Guest progress from before signing in: fold it into the account
-      added = Object.keys(local.done).filter(id => !(remote && remote.done[id])).length;
-      state = remote ? mergeStates(remote, local) : local; push = true;
-    } else state = remote || cleanState({});
-    save("hsc-log", state); save(OWNER, uid);
-    if (push) { await flush(); if (added) toast(added === 1 ? "Added 1 paper from this browser to your account" : "Added " + added + " papers from this browser to your account"); }
-    else { lastSync = new Date(); syncMsg = "Synced to your account"; }
-  } catch (e) { syncMsg = "Couldn't reach your account, saved on this device"; markDirty(); save(OWNER, uid); }
-  if (!subjects().includes(ui.active)) ui.active = subjects()[0];
-  await Promise.all(subjects().map(ensure));
-  renderAcct(); refresh();
-  if (document.getElementById("auth").open && authMode === "account") authView("account");
-}
-
-function leaveAccount() {
-  clearTimeout(saveTimer);
-  sbUser = null; docRef = null; lastSync = null;
-  // Shared computers: don't leave the last person's ticks behind
-  state = cleanState({});
-  try { ["hsc-log", OWNER, DIRTY].forEach(k => localStorage.removeItem(k)); } catch (e) {}
-  syncMsg = "";
-  renderAcct(); refresh();
-}
-
-const initial = u => ((u && (u.user_metadata?.full_name || u.user_metadata?.name || u.email)) || "?").trim().charAt(0).toUpperCase();
-const provider = u => (u && u.app_metadata && u.app_metadata.provider) || "email";
-function renderAcct() {
-  const b = document.getElementById("acct-btn");
-  b.hidden = !sb;
-  if (!sb) return;
-  b.classList.toggle("on", !!sbUser);
-  if (!sbUser) { b.replaceChildren("Sign in"); b.removeAttribute("aria-label"); return; }
-  const ok = !/Couldn't/.test(syncMsg);
-  b.replaceChildren(el("span", { class: "acct-av", "aria-hidden": "true" }, initial(sbUser)), "Account", el("span", { class: "acct-dot" + (ok ? "" : " warn"), "aria-hidden": "true" }));
-  b.setAttribute("aria-label", "Account, signed in as " + (sbUser.email || "you"));
-}
-
-/* ----- the sign-in sheet ----- */
-const $ = id => document.getElementById(id);
-function field(label, attrs, extra) {
-  const id = attrs.id, hint = attrs.hint; delete attrs.hint;
-  const kids = [el("span", {}, el("label", { for: id }, label), extra || null), el("span", { class: "au-in" + (attrs.type === "password" ? " pw" : "") }, el("input", Object.assign({ "aria-describedby": hint ? id + "-hint" : null }, attrs)),
-    attrs.type === "password" ? el("button", { type: "button", class: "au-eye", "aria-controls": id, "aria-pressed": "false", onclick: e => togglePw(e.currentTarget, id) }, "Show") : null)];
-  if (hint) kids.push(el("p", { class: "au-hint", id: id + "-hint" }, hint));
-  return el("div", { class: "au-field" }, kids);
-}
-function togglePw(btn, id) {
-  const i = $(id), show = i.type === "password";
-  i.type = show ? "text" : "password"; btn.textContent = show ? "Hide" : "Show"; btn.setAttribute("aria-pressed", String(show)); i.focus();
-}
-// Rough strength: length plus variety. Only a nudge; Supabase enforces its own rules.
-function strength(pw) {
-  if (!pw) return 0;
-  let s = pw.length >= 8 ? 1 : 0;
-  if (pw.length >= 12) s++;
-  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) s++;
-  if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) s++;
-  if (pw.length >= 16) s++;
-  return Math.max(pw.length ? 1 : 0, Math.min(4, s));
-}
-function newPwField(label) {
-  const f = field(label, { type: "password", id: "au-pw", autocomplete: "new-password", minlength: "8", required: true, hint: "At least 8 characters." });
-  const meter = el("div", { class: "au-meter", "aria-hidden": "true", "data-s": "0" }, el("i"), el("i"), el("i"), el("i"));
-  f.insertBefore(meter, f.lastChild);
-  const i = f.querySelector("input"), hint = f.querySelector(".au-hint");
-  i.addEventListener("input", () => {
-    const s = strength(i.value); meter.dataset.s = String(s);
-    hint.className = "au-hint";
-    hint.textContent = !i.value ? "At least 8 characters." : i.value.length < 8 ? (8 - i.value.length) + " more character" + (i.value.length === 7 ? "" : "s") + " needed."
-      : ["", "Okay. Longer is stronger.", "Good.", "Strong.", "Very strong."][s];
-  });
-  return f;
-}
-function capsWatch(input) {
-  const show = e => { const h = $("au-caps"); if (h && e.getModifierState) h.hidden = !e.getModifierState("CapsLock"); };
-  input.addEventListener("keydown", show); input.addEventListener("keyup", show);
-}
-function setMsg(m, kind) { const n = $("au-msg"); n.replaceChildren(...[].concat(m || [])); n.className = "au-msg" + (kind ? " " + kind : ""); }
-function busy(on, label) {
-  const go = $("au-go"); go.disabled = on;
-  if (on) go.replaceChildren(el("span", { class: "spin", "aria-hidden": "true" }), label || "One moment…");
-  else go.textContent = go.dataset.label || "Continue";
-}
-function setGo(label, hidden) { const go = $("au-go"); go.dataset.label = label; go.textContent = label; go.hidden = !!hidden; go.disabled = false; }
-function head(icon, title, sub) {
-  const mark = $("au-mark"); mark.className = "au-mark"; mark.innerHTML = ICON[icon] || "";
-  $("au-t").textContent = title; $("au-sub").replaceChildren(...[].concat(sub));
-}
-const foot = (...k) => $("au-foot").replaceChildren(...k.filter(Boolean));
-const link = (text, fn, attrs) => el("button", Object.assign({ type: "button", class: "linkbtn", onclick: fn }, attrs || {}), text);
-const guestCount = () => Object.keys(state.done).length;
-
-function authView(mode, opts) {
-  opts = opts || {};
-  authMode = mode;
-  const body = $("au-body"), seg = $("au-seg");
-  setMsg(opts.msg || "", opts.kind);
-  const tabs = mode === "signin" || mode === "signup";
-  seg.hidden = !tabs;
-  if (tabs) { seg.dataset.on = mode; seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.m === mode))); }
-  foot();
-
-  if (mode === "account") {
-    head("", sbUser.user_metadata?.full_name || "Your account", ["Signed in as ", el("b", {}, sbUser.email || "your account")]);
-    const mark = $("au-mark"); mark.className = "au-mark avatar"; mark.textContent = initial(sbUser);
-    const p = provider(sbUser);
-    const ok = !/Couldn't/.test(syncMsg);
-    body.replaceChildren(
-      el("dl", { class: "au-rows" },
-        el("div", {}, el("dt", {}, "Sign-in method"), el("dd", {}, p === "google" ? "Google" : "Email and password")),
-        el("div", {}, el("dt", {}, "Papers done"), el("dd", {}, String(Object.keys(state.done).length))),
-        el("div", {}, el("dt", {}, "Sync"), el("dd", {}, ok ? (lastSync ? "Up to date, " + lastSync.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" }) : "On") : "Waiting, saved on this device"))),
-      el("div", { class: "au-actions" },
-        p === "email" ? el("button", { type: "button", class: "btn", onclick: () => authView("changepw") }, "Change password") : null,
-        ok ? null : el("button", { type: "button", class: "btn", onclick: () => { syncMsg = "Syncing…"; renderStats(); flush().then(() => { renderAcct(); authView("account"); }); } }, "Try syncing again"),
-        el("button", { type: "button", class: "btn danger", id: "au-out", onclick: signOut }, "Sign out")));
-    setGo("Done", true);
-    foot(el("p", { class: "au-note" }, "Signing out removes your ticks from this browser. They stay safe in your account."));
-    return;
-  }
-  if (mode === "recover" || mode === "changepw") {
-    head("key", mode === "recover" ? "Choose a new password" : "Change password",
-      mode === "recover" ? "You opened a password reset link. Pick a new password to finish." : "Pick a new password for " + (sbUser?.email || "your account") + ".");
-    body.replaceChildren(newPwField("New password"));
-    setGo("Save password");
-    if (mode === "changepw") foot(link("Back", () => authView("account")));
-    return;
-  }
-  if (mode === "reset") {
-    head("key", "Reset your password", "Enter the email you signed up with and we'll send you a link to choose a new password.");
-    body.replaceChildren(field("Email", { type: "email", id: "au-email", autocomplete: "email", inputmode: "email", required: true, placeholder: "you@example.com", value: authEmail }));
-    setGo("Send reset link");
-    foot(link("Back to sign in", () => authView("signin")));
-    return;
-  }
-  if (mode === "sent" || mode === "confirm") {
-    const confirm = mode === "confirm";
-    head("mail", "Check your email", confirm
-      ? ["We sent a link to ", el("b", {}, authEmail), ". Open it on any device to finish creating your account."]
-      : ["If ", el("b", {}, authEmail), " has an account, a link to reset your password is on its way."]);
-    body.replaceChildren(el("p", { class: "au-note" }, "It can take a minute. Check your junk or spam folder too."));
-    setGo("Back to sign in");
-    const again = link("Resend email", () => resend(confirm ? "signup" : "reset"), { id: "au-resend" });
-    foot(again, link("Use a different email", () => authView(confirm ? "signup" : "reset")));
-    tickResend();
-    return;
-  }
-
-  const up = mode === "signup";
-  head("check", up ? "Create your account" : "Welcome back",
-    up ? "Save your ticks to an account so they follow you to every device." : "Sign in to see your ticks on any device.");
-  const n = guestCount();
-  body.replaceChildren(...[
-    CFG.google ? el("button", { type: "button", class: "btn au-google", onclick: google }, el("span", { html: ICON.google, style: "display:grid" }), "Continue with Google") : null,
-    CFG.google ? el("div", { class: "au-or", role: "separator" }, "or") : null,
-    field("Email", { type: "email", id: "au-email", autocomplete: "email", inputmode: "email", required: true, placeholder: "you@example.com", value: authEmail }),
-    up ? newPwField("Password")
-       : field("Password", { type: "password", id: "au-pw", autocomplete: "current-password", required: true }, link("Forgot password?", () => { authEmail = val("au-email") || authEmail; authView("reset"); })),
-    up ? null : el("p", { class: "au-hint warn", id: "au-caps", hidden: true }, "Caps Lock is on."),
-  ].filter(Boolean));
-  if (!up) capsWatch($("au-pw"));
-  setGo(up ? "Create account" : "Sign in");
-  if (n) foot(el("p", { class: "au-note" }, "The " + n + (n === 1 ? " paper" : " papers") + " you've ticked in this browser will be added to your account."));
-  else if (up) foot(el("p", { class: "au-note" }, "We only use your email to sign you in and to reset your password."));
-}
-
-function openAuth(mode) {
-  authView(mode || (sbUser ? "account" : "signin"));
-  const d = $("auth");
-  if (!d.open) { if (d.showModal) d.showModal(); else d.setAttribute("open", ""); }
-  focusFirst();
-}
-function focusFirst() {
-  const f = $("au-body").querySelector("input");
-  if (!f) { $("au-close").focus(); return; }
-  (f.id === "au-email" && f.value && $("au-pw") ? $("au-pw") : f).focus();
-}
-const closeAuth = () => $("auth").close();
-const val = id => ($(id)?.value || "").trim();
-const here = () => location.origin + location.pathname;
-
-// Turn Supabase's errors into plain English. Codes are from supabase-js v2 (error.code); messages are a fallback for older servers.
-function friendly(err) {
-  const c = (err && err.code) || "", m = (err && err.message) || "", s = err && err.status;
-  if (c === "invalid_credentials" || /Invalid login credentials/i.test(m)) return "That email and password don't match. Check for typos, or reset your password.";
-  if (c === "email_not_confirmed" || /Email not confirmed/i.test(m)) return ["Confirm your email first: open the link we sent you. ", link("Send it again", () => resend("signup"))];
-  if (c === "user_already_exists" || c === "email_exists" || /already registered|already been registered/i.test(m)) return ["There's already an account with this email. ", link("Sign in instead", () => authView("signin"))];
-  if (c === "same_password" || /should be different/i.test(m)) return "That's already your password. Choose a new one.";
-  if (c === "weak_password" || /^Password should/i.test(m)) return "Choose a stronger password. " + (m.replace(/^Password should/i, "It should") || "");
-  if (c === "email_address_invalid" || /invalid format|Unable to validate email/i.test(m)) return "That email address doesn't look right.";
-  if (c === "signup_disabled" || /Signups not allowed/i.test(m)) return "New accounts are turned off on this site right now.";
-  if (/rate|too many/i.test(c + " " + m) || s === 429) return "Too many tries in a short time. Wait a few minutes, then try again.";
-  if (c === "otp_expired" || /expired|invalid/i.test(m) && /link|token|otp/i.test(m)) return "That link has expired or was already used. Ask for a new one.";
-  if (err && (err.name === "AuthRetryableFetchError" || err instanceof TypeError || s === 0)) return "Can't reach the sign-in service. Check your internet connection and try again.";
-  return m || "Something went wrong. Try again.";
-}
-function bad(inputId, msg) {
-  setMsg(msg, "err");
-  const i = $(inputId); if (i) { i.setAttribute("aria-invalid", "true"); i.focus(); i.addEventListener("input", () => i.removeAttribute("aria-invalid"), { once: true }); }
-}
-
-function tickResend() {
-  const b = $("au-resend"); if (!b) return;
-  const left = Math.ceil((resendAt - Date.now()) / 1000);
-  b.disabled = left > 0; b.textContent = left > 0 ? "Resend in " + left + "s" : "Resend email";
-  if (left > 0) setTimeout(tickResend, 1000);
-}
-async function resend(kind) {
-  if (!authEmail) authEmail = val("au-email");
-  if (!authEmail) { authView("signin"); return; }
-  if (Date.now() < resendAt) return;
-  resendAt = Date.now() + 60000; tickResend();
-  try {
-    const { error } = kind === "reset"
-      ? await sb.auth.resetPasswordForEmail(authEmail, { redirectTo: here() })
-      : await sb.auth.resend({ type: "signup", email: authEmail, options: { emailRedirectTo: here() } });
-    if (error) throw error;
-    if (authMode !== "confirm" && authMode !== "sent") authView(kind === "reset" ? "sent" : "confirm");
-    setMsg("Sent. Check your inbox.", "ok");
-  } catch (err) { setMsg(friendly(err), "err"); }
-}
-
-async function google() {
-  setMsg("");
-  const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: here() } });
-  if (error) setMsg(friendly(error), "err");
-}
-async function signOut() {
-  const b = $("au-out"); if (b) b.disabled = true;
-  clearTimeout(saveTimer);
-  if (docRef && load(DIRTY, false)) { try { await flush(); } catch (e) {} }
-  await sb.auth.signOut({ scope: "local" });
-  leaveAccount(); closeAuth(); toast("Signed out");
-}
-
-async function submitAuth(e) {
-  e.preventDefault();
-  if ($("au-go").disabled) return;
-  if (authMode === "sent" || authMode === "confirm") { authView("signin"); focusFirst(); return; }
-  if (authMode === "account") { closeAuth(); return; }
-  const email = val("au-email"), pw = $("au-pw")?.value || "";
-  if ($("au-email")) {
-    authEmail = email;
-    if (!email) return bad("au-email", "Enter your email address.");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad("au-email", "That email address doesn't look right.");
-  }
-  if (authMode === "signin" && !pw) return bad("au-pw", "Enter your password.");
-  if ((authMode === "signup" || authMode === "recover" || authMode === "changepw") && pw.length < 8) return bad("au-pw", "Use at least 8 characters for your password.");
-  setMsg("");
-  busy(true, { signin: "Signing in…", signup: "Creating account…", reset: "Sending…" }[authMode] || "Saving…");
-  try {
-    if (authMode === "signin") {
-      const { error } = await sb.auth.signInWithPassword({ email, password: pw });
-      if (error) throw error;
-      closeAuth(); toast("Signed in as " + email);
-    } else if (authMode === "signup") {
-      const { data, error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: here() } });
-      if (error) throw error;
-      // With email confirmation on, Supabase hides whether an address is taken: it answers with a user that has no identities
-      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) throw { code: "user_already_exists" };
-      if (data.session) { closeAuth(); toast("Account created. Your ticks now sync."); }
-      else { resendAt = Date.now() + 60000; authView("confirm"); }
-    } else if (authMode === "reset") {
-      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: here() });
-      if (error) throw error;
-      resendAt = Date.now() + 60000; authView("sent");
-    } else if (authMode === "recover" || authMode === "changepw") {
-      const { error } = await sb.auth.updateUser({ password: pw });
-      if (error) throw error;
-      closeAuth(); toast("Password updated");
-    }
-  } catch (err) {
-    const f = friendly(err);
-    if (authMode === "signin" && /don't match/.test(f)) { setMsg(f, "err"); const p = $("au-pw"); p.value = ""; p.setAttribute("aria-invalid", "true"); p.focus(); }
-    else setMsg(f, "err");
-  } finally { if ($("au-go").disabled) busy(false); }
-}
-
-$("acct-btn").addEventListener("click", () => openAuth());
-$("au-close").addEventListener("click", closeAuth);
-$("au-form").addEventListener("submit", submitAuth);
-$("au-seg").addEventListener("click", e => {
-  const b = e.target.closest("button[data-m]"); if (!b || b.dataset.m === authMode) return;
-  authEmail = val("au-email") || authEmail; authView(b.dataset.m); focusFirst();
-});
-// Clicking the dimmed backdrop closes the sheet (clicks inside land on the form, not the dialog itself)
-$("auth").addEventListener("click", e => { if (e.target === e.currentTarget) closeAuth(); });
-// Edits made just before closing the tab are uploaded on the next visit if this doesn't finish
-window.addEventListener("pagehide", () => { if (docRef && load(DIRTY, false)) { clearTimeout(saveTimer); flush(); } });
-
-// Don't leave sign-in tokens (or a bare "#") sitting in the address bar or history
-function tidyUrl() {
-  if (location.href.endsWith("#") || /access_token|refresh_token|error_description|[#&]type=/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search);
-}
-
-(async () => {
-  if (!CFG.supabaseUrl || !CFG.supabaseKey) return;
-  // Links from emails land back here with details in the address. Read them before Supabase tidies the URL.
-  const q = new URLSearchParams(location.hash.slice(1) + "&" + location.search.slice(1));
-  const linkErr = q.get("error_description") || q.get("error");
-  const linkType = q.get("type");
-  try {
-    if (!window.supabase) await loadScript("vendor/supabase.js");
-    sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "implicit" } });
-    renderAcct();
-    sb.auth.onAuthStateChange((event, session) => {
-      // Supabase warns against awaiting its own calls inside this callback, so hand off to a fresh task
-      setTimeout(() => {
-        tidyUrl();
-        if (event === "PASSWORD_RECOVERY") openAuth("recover");
-        if (session && session.user) {
-          const fresh = !sbUser;
-          useAccount(session.user);
-          if (fresh && event === "SIGNED_IN" && linkType === "signup") toast("Email confirmed. You're signed in.");
-        } else if (event === "SIGNED_OUT" && sbUser) leaveAccount();
-      }, 0);
-    });
-    await sb.auth.getSession(); tidyUrl();
-    if (linkErr) {
-      history.replaceState(null, "", location.pathname);
-      openAuth("signin");
-      setMsg(friendly({ code: q.get("error_code") || "", message: linkErr.replace(/\+/g, " ") }), "err");
-    }
-  } catch (e) { sb = null; renderAcct(); }
+  // Returning student: straight back to their tracker
+  ["go", "go-2"].forEach(function (id) { $(id).textContent = "Open your tracker"; });
+  $("cta-note").hidden = true;
+  $("how-link").hidden = true;
+  $("back").hidden = false;
+  $("back-who").hidden = !signedIn;
+  var weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10), wk = 0;
+  for (var id in done) if (done[id] >= weekAgo) wk++;
+  var subs = st.subjects && st.subjects.length ? st.subjects.length : 4;
+  function num(v, label) { var s = document.createElement("span"), b = document.createElement("b"); b.textContent = v; s.append(b, label); return s; }
+  $("back-nums").replaceChildren(num(n, n === 1 ? "paper done" : "papers done"), num(wk, "in the last 7 days"), num(subs, subs === 1 ? "subject" : "subjects"));
+  var c = { r: 0, a: 0, g: 0 }, names = { r: "red", a: "amber", g: "green" }, col = { r: "--tl-r", a: "--tl-a", g: "--tl-g" }, any = false;
+  for (var k in rag) if (c[rag[k]] !== undefined && (!st.subjects || st.subjects.indexOf(k) >= 0)) { c[rag[k]]++; any = true; }
+  if (any) $("back-tl").replaceChildren.apply($("back-tl"), ["r", "a", "g"].map(function (k) {
+    var s = document.createElement("span"), i = document.createElement("i"), b = document.createElement("b");
+    i.style.background = "var(" + col[k] + ")"; b.textContent = c[k]; s.append(i, b, " " + names[k]); return s;
+  }));
+  else $("back-tl").textContent = "No traffic lights set yet. Tap the lights on a subject to add them.";
 })();
 </script>
 </body>
