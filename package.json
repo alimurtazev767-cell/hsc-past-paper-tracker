@@ -1,0 +1,11 @@
+{
+  "name": "hsc-past-paper-log",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Track the HSC past papers you've completed",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "node build.mjs && npx --yes http-server dist -p 5173 -c-1"
+  },
+  "engines": { "node": ">=20" }
+}
