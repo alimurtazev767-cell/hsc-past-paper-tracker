@@ -454,19 +454,77 @@ footer.notes { color: var(--muted); }
   .card { padding: 14px 12px; }
 }
 
-/* ---- website: account sign-in ---- */
-.auth-body { display: grid; gap: 14px; padding: 18px 20px; }
-.auth-body label { display: grid; gap: 6px; font-size: 13px; font-weight: 500; color: var(--muted); }
-.auth-body input { padding: 10px 12px; min-height: 44px; background: var(--well); border: 1px solid transparent; box-shadow: var(--recess); border-radius: 9px; color: var(--fg); }
-.auth-body input:focus { border-color: rgb(255 255 255 / .22); outline: none; }
-.auth-body p { margin: 0; font-size: 14px; color: var(--muted); }
-.auth-msg { min-height: 1.4em; font-size: 13px; color: var(--muted); }
-.auth-msg.err { color: var(--danger); }
-.linkbtn { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font-size: 13px; justify-self: start; }
+/* ---- website: accounts ---- */
+#auth { width: min(420px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; overscroll-behavior: contain; }
+.au { position: relative; display: grid; gap: 16px; padding: 30px 28px 24px; }
+.au-x { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--well); color: var(--muted); cursor: pointer; display: grid; place-items: center; transition: color .2s ease, background-color .2s ease; }
+.au-x:hover { color: var(--fg); background: var(--slate); }
+.au-x svg { width: 12px; height: 12px; }
+.au-head { display: grid; justify-items: center; gap: 6px; text-align: center; padding-top: 4px; }
+.au-mark { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: var(--sheen), var(--slate); box-shadow: inset 0 1px 0 rgb(255 255 255 / .1), 0 0 0 .5px rgb(255 255 255 / .12), 0 6px 18px rgb(0 0 0 / .5); margin-bottom: 8px; color: #FFFFFF; }
+.au-mark svg { width: 24px; height: 24px; }
+.au-mark.avatar { border-radius: 50%; font: 600 22px var(--display); }
+.au h2 { font: 700 1.45rem/1.2 var(--display); letter-spacing: -0.02em; margin: 0; }
+.au-sub { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.45; text-wrap: pretty; max-width: 32ch; }
+.au-sub b { color: var(--fg); font-weight: 600; overflow-wrap: anywhere; }
+.au .seg { display: grid; width: 100%; }
+.au .seg button { padding: 7px 10px; font-size: 13.5px; border: 0; cursor: pointer; }
+.au .seg[data-on="signup"] .thumb { transform: translateX(100%); }
+.au-body { display: grid; gap: 12px; }
+.au-field { display: grid; gap: 6px; }
+.au-field > span { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; font-weight: 500; color: var(--muted); }
+.au-in { position: relative; display: block; }
+.au-in input { width: 100%; padding: 12px 14px; min-height: 48px; background: var(--well); border: 1px solid transparent; box-shadow: var(--recess); border-radius: 11px; color: var(--fg); font-size: 16px; transition: border-color .2s ease; }
+.au-in input:hover { border-color: rgb(255 255 255 / .08); }
+.au-in input:focus { border-color: rgb(255 255 255 / .28); outline: none; }
+.au-in input::placeholder { color: #636366; }
+.au-in input[aria-invalid="true"] { border-color: rgb(248 113 113 / .6); }
+.au-in.pw input { padding-right: 64px; }
+.au-eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: 0; background: transparent; color: var(--muted); font-size: 12.5px; font-weight: 600; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.au-eye:hover { color: var(--fg); background: rgb(255 255 255 / .06); }
+.au-hint { font-size: 12.5px; color: var(--muted); margin: 0; min-height: 1.3em; }
+.au-hint.warn { color: #FBBF24; }
+.au-meter { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.au-meter i { height: 4px; border-radius: 99px; background: var(--well); box-shadow: var(--recess); transition: background-color .25s ease; }
+.au-meter[data-s="1"] i:nth-child(-n+1) { background: #F87171; }
+.au-meter[data-s="2"] i:nth-child(-n+2) { background: #FBBF24; }
+.au-meter[data-s="3"] i:nth-child(-n+3) { background: #A3E635; }
+.au-meter[data-s="4"] i { background: #4ADE80; }
+.au-go { width: 100%; justify-content: center; min-height: 48px !important; font-size: 15px; font-weight: 600 !important; border-radius: 12px !important; }
+.au-go[disabled] { opacity: .55; cursor: default; }
+.au-go .spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgb(0 0 0 / .2); border-top-color: #000; animation: au-spin .7s linear infinite; }
+@keyframes au-spin { to { transform: rotate(360deg); } }
+.au-google { width: 100%; justify-content: center; min-height: 48px; border-radius: 12px !important; font-size: 15px; }
+.au-google svg { width: 18px; height: 18px; }
+.au-or { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+.au-or::before, .au-or::after { content: ""; height: 1px; background: var(--rule-2); }
+.au-msg { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--muted); padding: 10px 12px; border-radius: 10px; background: var(--well); }
+.au-msg:empty { display: none; }
+.au-msg.err { color: #FCA5A5; background: rgb(248 113 113 / .1); }
+.au-msg.ok { color: #86EFAC; background: rgb(74 222 128 / .08); }
+.au-msg .linkbtn { color: inherit; font-size: inherit; }
+.au-foot { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; font-size: 13px; color: var(--muted); text-align: center; }
+.au-foot:empty { display: none; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; font-size: 13px; }
 .linkbtn:hover { color: var(--fg); }
-.auth-alt { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
-#auth .dlg { grid-template-rows: auto auto auto; }
-#auth { width: min(440px, calc(100vw - 32px)); }
+.linkbtn[disabled] { opacity: .5; cursor: default; text-decoration: none; }
+.au-note { margin: 0; font-size: 12.5px; color: var(--muted); text-align: center; line-height: 1.45; }
+.au-rows { display: grid; border-radius: 12px; background: var(--well); box-shadow: var(--recess); }
+.au-rows > div { display: flex; justify-content: space-between; gap: 12px; padding: 12px 14px; font-size: 14px; }
+.au-rows > div + div { border-top: 1px solid rgb(255 255 255 / .05); }
+.au-rows dt { color: var(--muted); margin: 0; }
+.au-rows dd { margin: 0; text-align: right; overflow-wrap: anywhere; min-width: 0; }
+.au-actions { display: grid; gap: 8px; }
+.au-actions .btn { width: 100%; justify-content: center; min-height: 46px; border-radius: 12px; }
+.btn.danger { color: #FCA5A5; }
+.btn.danger:hover { border-color: rgb(248 113 113 / .4); }
+/* header account button: an avatar once signed in */
+.acct-btn.on { padding: 4px 12px 4px 4px; border-radius: 999px; gap: 8px; }
+.acct-av { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--sheen), var(--slate); font: 600 14px var(--display); color: #FFF; box-shadow: inset 0 1px 0 rgb(255 255 255 / .1); flex: none; }
+.acct-btn .acct-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ADE80; flex: none; }
+.acct-btn .acct-dot.warn { background: #FBBF24; }
+@media (max-width: 420px) { .au { padding: 26px 18px 20px; } }
+@media (prefers-reduced-motion: reduce) { .au-go .spin { animation-duration: 2s; } }
 /* Ticked papers keep their size: the tick sits as a small badge on the corner instead of adding width */
 .chip { position: relative; }
 .chip[aria-pressed="true"] .ck { display: grid; place-items: center; position: absolute; top: -6px; right: -6px; width: 17px; height: 17px; border-radius: 50%; background: #070708; color: #FFFFFF; box-shadow: 0 0 0 1.5px #F5F5F7; pointer-events: none; }
@@ -481,7 +539,7 @@ footer.notes { color: var(--muted); }
     <div class="titlerow">
       <h1>HSC Past Paper Log</h1>
       <div class="top-actions">
-        <button class="btn" type="button" id="acct-btn" hidden>Sign in</button>
+        <button class="btn acct-btn" type="button" id="acct-btn" hidden>Sign in</button>
         <button class="btn" type="button" id="pick-btn">Choose subjects</button>
       </div>
     </div>
@@ -509,11 +567,15 @@ footer.notes { color: var(--muted); }
   </form>
 </dialog>
 
-<dialog id="auth" aria-labelledby="au-t">
-  <form class="dlg" id="au-form" novalidate>
-    <header><h2 id="au-t">Sign in</h2><p id="au-sub">Sign in to keep your ticks on every device. Without an account they stay in this browser only.</p></header>
-    <div class="auth-body" id="au-body"></div>
-    <footer><span class="auth-msg" id="au-msg" role="status"></span><span style="display:flex;gap:8px"><button class="btn ghost" type="button" id="au-close">Close</button><button class="btn primary" type="submit" id="au-go">Sign in</button></span></footer>
+<dialog id="auth" aria-labelledby="au-t" aria-describedby="au-sub">
+  <form class="au" id="au-form" novalidate>
+    <button class="au-x" type="button" id="au-close" aria-label="Close"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
+    <div class="au-head"><div class="au-mark" id="au-mark" aria-hidden="true"></div><h2 id="au-t">Sign in</h2><p class="au-sub" id="au-sub"></p></div>
+    <div class="seg" id="au-seg" role="group" aria-label="Sign in or create an account" data-on="signin"><span class="thumb" aria-hidden="true"></span><button type="button" data-m="signin" aria-pressed="true">Sign in</button><button type="button" data-m="signup" aria-pressed="false">Create account</button></div>
+    <div class="au-body" id="au-body"></div>
+    <p class="au-msg" id="au-msg" role="status" aria-live="polite"></p>
+    <button class="btn primary au-go" type="submit" id="au-go">Sign in</button>
+    <div class="au-foot" id="au-foot"></div>
   </form>
 </dialog>
 
@@ -601,6 +663,7 @@ let saveTimer = null, saving = false, pending = false;
 function persist() {
   save("hsc-log", state);
   if (!docRef) return;
+  save("hsc-dirty", true);
   clearTimeout(saveTimer); saveTimer = setTimeout(flush, 600);
 }
 async function flush() {
@@ -608,7 +671,7 @@ async function flush() {
   saving = true;
   try { await docRef.set(JSON.parse(JSON.stringify(state))); syncMsg = "Synced to your account"; }
   catch (e) { syncMsg = "Couldn't sync just now, saved on this device"; }
-  saving = false; renderStats();
+  saving = false; renderStats(); renderAcct();
   if (pending) { pending = false; flush(); }
 }
 
@@ -890,9 +953,15 @@ boot();
 
 /* ---------- accounts (Supabase) ----------
    config.js is written at build time from Vercel env vars. Without it the site runs in guest mode:
-   ticks stay in this browser's localStorage, exactly as before. */
+   ticks stay in this browser's localStorage, exactly as before, and none of the account UI shows. */
 const CFG = window.TRACKER_CONFIG || {};
-let sb = null, sbUser = null, authMode = "signin";
+let sb = null, sbUser = null, authMode = "signin", authEmail = "", resendAt = 0, lastSync = null;
+const ICON = {
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg>',
+  key: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M16 7l3 3"/></svg>',
+  google: '<svg viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.29-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>'
+};
 
 function loadScript(src) {
   return new Promise((ok, bad) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = bad; document.head.append(s); });
@@ -902,137 +971,349 @@ function cleanState(d) {
   return { done: Object.assign({}, d.done), marks: Object.assign({}, d.marks), custom: Array.isArray(d.custom) ? d.custom.slice() : [],
     subjects: Array.isArray(d.subjects) ? d.subjects.slice() : null, from: Object.assign({}, d.from) };
 }
-const hasLocal = () => Object.keys(state.done).length || state.custom.length || Object.keys(state.marks).length || state.subjects;
+const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length);
+
+// Guest ticks join the account without losing anything on either side. Where both have a value,
+// the account keeps its own (marks, start years); a paper ticked in both keeps the earlier date.
+function mergeStates(acc, loc) {
+  const m = cleanState(acc);
+  for (const id in loc.done) if (!m.done[id] || loc.done[id] < m.done[id]) m.done[id] = loc.done[id];
+  for (const id in loc.marks) if (!(id in m.marks)) m.marks[id] = loc.marks[id];
+  const have = new Set(m.custom.map(c => c.id));
+  for (const c of loc.custom) if (!have.has(c.id)) m.custom.push(c);
+  if (loc.subjects) m.subjects = m.subjects ? m.subjects.concat(loc.subjects.filter(id => !m.subjects.includes(id))) : loc.subjects.slice();
+  for (const id in loc.from) if (!(id in m.from)) m.from[id] = loc.from[id];
+  return m;
+}
+
+// Which account (if any) the copy in localStorage belongs to, and whether it has edits not yet uploaded.
+const OWNER = "hsc-owner", DIRTY = "hsc-dirty";
+function markDirty() { if (docRef) save(DIRTY, true); }
 
 async function useAccount(user) {
-  if (sbUser && user && sbUser.id === user.id && docRef) return;
+  if (sbUser && user && sbUser.id === user.id && docRef) { sbUser = user; renderAcct(); return; }
   sbUser = user;
   const uid = user.id;
   docRef = { set: async s => {
     const { error } = await sb.from("progress").upsert({ user_id: uid, state: s, updated_at: new Date().toISOString() });
     if (error) throw error;
+    // Only clear the flag if nothing changed while this upload was in flight
+    if (JSON.stringify(s) === JSON.stringify(state)) try { localStorage.removeItem(DIRTY); } catch (e) {}
+    lastSync = new Date();
   } };
   syncMsg = "Syncing…"; renderAcct(); renderStats();
+  const owner = load(OWNER, null), dirty = load(DIRTY, false), local = cleanState(state);
   try {
     const { data, error } = await sb.from("progress").select("state").eq("user_id", uid).maybeSingle();
     if (error) throw error;
-    if (data && data.state) { state = cleanState(data.state); save("hsc-log", state); syncMsg = "Synced to your account"; }
-    else if (hasLocal()) { await flush(); toast("Your ticks from this browser are now saved to your account"); }
-    else syncMsg = "Synced to your account";
-  } catch (e) { syncMsg = "Couldn't reach your account, saved on this device"; }
+    const remote = data && data.state ? cleanState(data.state) : null;
+    let push = false, added = 0;
+    if (owner === uid) {
+      // This browser already follows this account: the account copy wins, unless edits here never made it up
+      if (dirty || !remote) { state = local; push = true; }
+      else state = remote;
+    } else if (!owner && hasLocal(local)) {
+      // Guest progress from before signing in: fold it into the account
+      added = Object.keys(local.done).filter(id => !(remote && remote.done[id])).length;
+      state = remote ? mergeStates(remote, local) : local; push = true;
+    } else state = remote || cleanState({});
+    save("hsc-log", state); save(OWNER, uid);
+    if (push) { await flush(); if (added) toast(added === 1 ? "Added 1 paper from this browser to your account" : "Added " + added + " papers from this browser to your account"); }
+    else { lastSync = new Date(); syncMsg = "Synced to your account"; }
+  } catch (e) { syncMsg = "Couldn't reach your account, saved on this device"; markDirty(); save(OWNER, uid); }
   if (!subjects().includes(ui.active)) ui.active = subjects()[0];
   await Promise.all(subjects().map(ensure));
   renderAcct(); refresh();
+  if (document.getElementById("auth").open && authMode === "account") authView("account");
 }
 
 function leaveAccount() {
   clearTimeout(saveTimer);
-  sbUser = null; docRef = null;
+  sbUser = null; docRef = null; lastSync = null;
   // Shared computers: don't leave the last person's ticks behind
-  state = cleanState({}); try { localStorage.removeItem("hsc-log"); } catch (e) {}
+  state = cleanState({});
+  try { ["hsc-log", OWNER, DIRTY].forEach(k => localStorage.removeItem(k)); } catch (e) {}
   syncMsg = "";
   renderAcct(); refresh();
 }
 
+const initial = u => ((u && (u.user_metadata?.full_name || u.user_metadata?.name || u.email)) || "?").trim().charAt(0).toUpperCase();
+const provider = u => (u && u.app_metadata && u.app_metadata.provider) || "email";
 function renderAcct() {
   const b = document.getElementById("acct-btn");
   b.hidden = !sb;
-  b.textContent = sbUser ? "Account" : "Sign in";
+  if (!sb) return;
+  b.classList.toggle("on", !!sbUser);
+  if (!sbUser) { b.replaceChildren("Sign in"); b.removeAttribute("aria-label"); return; }
+  const ok = !/Couldn't/.test(syncMsg);
+  b.replaceChildren(el("span", { class: "acct-av", "aria-hidden": "true" }, initial(sbUser)), "Account", el("span", { class: "acct-dot" + (ok ? "" : " warn"), "aria-hidden": "true" }));
+  b.setAttribute("aria-label", "Account, signed in as " + (sbUser.email || "you"));
 }
 
-function field(label, attrs) { return el("label", {}, label, el("input", attrs)); }
-function authView(mode) {
+/* ----- the sign-in sheet ----- */
+const $ = id => document.getElementById(id);
+function field(label, attrs, extra) {
+  const id = attrs.id, hint = attrs.hint; delete attrs.hint;
+  const kids = [el("span", {}, el("label", { for: id }, label), extra || null), el("span", { class: "au-in" + (attrs.type === "password" ? " pw" : "") }, el("input", Object.assign({ "aria-describedby": hint ? id + "-hint" : null }, attrs)),
+    attrs.type === "password" ? el("button", { type: "button", class: "au-eye", "aria-controls": id, "aria-pressed": "false", onclick: e => togglePw(e.currentTarget, id) }, "Show") : null)];
+  if (hint) kids.push(el("p", { class: "au-hint", id: id + "-hint" }, hint));
+  return el("div", { class: "au-field" }, kids);
+}
+function togglePw(btn, id) {
+  const i = $(id), show = i.type === "password";
+  i.type = show ? "text" : "password"; btn.textContent = show ? "Hide" : "Show"; btn.setAttribute("aria-pressed", String(show)); i.focus();
+}
+// Rough strength: length plus variety. Only a nudge; Supabase enforces its own rules.
+function strength(pw) {
+  if (!pw) return 0;
+  let s = pw.length >= 8 ? 1 : 0;
+  if (pw.length >= 12) s++;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) s++;
+  if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) s++;
+  if (pw.length >= 16) s++;
+  return Math.max(pw.length ? 1 : 0, Math.min(4, s));
+}
+function newPwField(label) {
+  const f = field(label, { type: "password", id: "au-pw", autocomplete: "new-password", minlength: "8", required: true, hint: "At least 8 characters." });
+  const meter = el("div", { class: "au-meter", "aria-hidden": "true", "data-s": "0" }, el("i"), el("i"), el("i"), el("i"));
+  f.insertBefore(meter, f.lastChild);
+  const i = f.querySelector("input"), hint = f.querySelector(".au-hint");
+  i.addEventListener("input", () => {
+    const s = strength(i.value); meter.dataset.s = String(s);
+    hint.className = "au-hint";
+    hint.textContent = !i.value ? "At least 8 characters." : i.value.length < 8 ? (8 - i.value.length) + " more character" + (i.value.length === 7 ? "" : "s") + " needed."
+      : ["", "Okay. Longer is stronger.", "Good.", "Strong.", "Very strong."][s];
+  });
+  return f;
+}
+function capsWatch(input) {
+  const show = e => { const h = $("au-caps"); if (h && e.getModifierState) h.hidden = !e.getModifierState("CapsLock"); };
+  input.addEventListener("keydown", show); input.addEventListener("keyup", show);
+}
+function setMsg(m, kind) { const n = $("au-msg"); n.replaceChildren(...[].concat(m || [])); n.className = "au-msg" + (kind ? " " + kind : ""); }
+function busy(on, label) {
+  const go = $("au-go"); go.disabled = on;
+  if (on) go.replaceChildren(el("span", { class: "spin", "aria-hidden": "true" }), label || "One moment…");
+  else go.textContent = go.dataset.label || "Continue";
+}
+function setGo(label, hidden) { const go = $("au-go"); go.dataset.label = label; go.textContent = label; go.hidden = !!hidden; go.disabled = false; }
+function head(icon, title, sub) {
+  const mark = $("au-mark"); mark.className = "au-mark"; mark.innerHTML = ICON[icon] || "";
+  $("au-t").textContent = title; $("au-sub").replaceChildren(...[].concat(sub));
+}
+const foot = (...k) => $("au-foot").replaceChildren(...k.filter(Boolean));
+const link = (text, fn, attrs) => el("button", Object.assign({ type: "button", class: "linkbtn", onclick: fn }, attrs || {}), text);
+const guestCount = () => Object.keys(state.done).length;
+
+function authView(mode, opts) {
+  opts = opts || {};
   authMode = mode;
-  const t = document.getElementById("au-t"), sub = document.getElementById("au-sub"), go = document.getElementById("au-go"), body = document.getElementById("au-body");
-  setMsg("");
-  go.hidden = false; go.disabled = false;
-  const alt = [];
+  const body = $("au-body"), seg = $("au-seg");
+  setMsg(opts.msg || "", opts.kind);
+  const tabs = mode === "signin" || mode === "signup";
+  seg.hidden = !tabs;
+  if (tabs) { seg.dataset.on = mode; seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.m === mode))); }
+  foot();
+
   if (mode === "account") {
-    t.textContent = "Your account"; sub.textContent = "Your ticks sync to this account on every device you sign in on.";
-    go.textContent = "Sign out";
-    body.replaceChildren(el("p", {}, "Signed in as ", el("b", { style: "color:var(--fg)" }, sbUser.email || "your account")));
+    head("", sbUser.user_metadata?.full_name || "Your account", ["Signed in as ", el("b", {}, sbUser.email || "your account")]);
+    const mark = $("au-mark"); mark.className = "au-mark avatar"; mark.textContent = initial(sbUser);
+    const p = provider(sbUser);
+    const ok = !/Couldn't/.test(syncMsg);
+    body.replaceChildren(
+      el("dl", { class: "au-rows" },
+        el("div", {}, el("dt", {}, "Sign-in method"), el("dd", {}, p === "google" ? "Google" : "Email and password")),
+        el("div", {}, el("dt", {}, "Papers done"), el("dd", {}, String(Object.keys(state.done).length))),
+        el("div", {}, el("dt", {}, "Sync"), el("dd", {}, ok ? (lastSync ? "Up to date, " + lastSync.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" }) : "On") : "Waiting, saved on this device"))),
+      el("div", { class: "au-actions" },
+        p === "email" ? el("button", { type: "button", class: "btn", onclick: () => authView("changepw") }, "Change password") : null,
+        ok ? null : el("button", { type: "button", class: "btn", onclick: () => { syncMsg = "Syncing…"; renderStats(); flush().then(() => { renderAcct(); authView("account"); }); } }, "Try syncing again"),
+        el("button", { type: "button", class: "btn danger", id: "au-out", onclick: signOut }, "Sign out")));
+    setGo("Done", true);
+    foot(el("p", { class: "au-note" }, "Signing out removes your ticks from this browser. They stay safe in your account."));
     return;
   }
-  if (mode === "recover") {
-    t.textContent = "Choose a new password"; sub.textContent = "You opened a password reset link. Pick a new password to finish.";
-    go.textContent = "Save password";
-    body.replaceChildren(field("New password", { type: "password", id: "au-pw", autocomplete: "new-password", minlength: "8", required: true }));
+  if (mode === "recover" || mode === "changepw") {
+    head("key", mode === "recover" ? "Choose a new password" : "Change password",
+      mode === "recover" ? "You opened a password reset link. Pick a new password to finish." : "Pick a new password for " + (sbUser?.email || "your account") + ".");
+    body.replaceChildren(newPwField("New password"));
+    setGo("Save password");
+    if (mode === "changepw") foot(link("Back", () => authView("account")));
     return;
   }
   if (mode === "reset") {
-    t.textContent = "Reset your password"; sub.textContent = "We'll email you a link to choose a new password.";
-    go.textContent = "Send reset link";
-    body.replaceChildren(field("Email", { type: "email", id: "au-email", autocomplete: "email", required: true }),
-      el("button", { type: "button", class: "linkbtn", onclick: () => authView("signin") }, "Back to sign in"));
+    head("key", "Reset your password", "Enter the email you signed up with and we'll send you a link to choose a new password.");
+    body.replaceChildren(field("Email", { type: "email", id: "au-email", autocomplete: "email", inputmode: "email", required: true, placeholder: "you@example.com", value: authEmail }));
+    setGo("Send reset link");
+    foot(link("Back to sign in", () => authView("signin")));
     return;
   }
+  if (mode === "sent" || mode === "confirm") {
+    const confirm = mode === "confirm";
+    head("mail", "Check your email", confirm
+      ? ["We sent a link to ", el("b", {}, authEmail), ". Open it on any device to finish creating your account."]
+      : ["If ", el("b", {}, authEmail), " has an account, a link to reset your password is on its way."]);
+    body.replaceChildren(el("p", { class: "au-note" }, "It can take a minute. Check your junk or spam folder too."));
+    setGo("Back to sign in");
+    const again = link("Resend email", () => resend(confirm ? "signup" : "reset"), { id: "au-resend" });
+    foot(again, link("Use a different email", () => authView(confirm ? "signup" : "reset")));
+    tickResend();
+    return;
+  }
+
   const up = mode === "signup";
-  t.textContent = up ? "Create an account" : "Sign in";
-  sub.textContent = "Sign in to keep your ticks on every device. Without an account they stay in this browser only.";
-  go.textContent = up ? "Create account" : "Sign in";
-  alt.push(el("button", { type: "button", class: "linkbtn", onclick: () => authView(up ? "signin" : "signup") }, up ? "I already have an account" : "Create an account"));
-  if (!up) alt.push(el("button", { type: "button", class: "linkbtn", onclick: () => authView("reset") }, "Forgot password?"));
+  head("check", up ? "Create your account" : "Welcome back",
+    up ? "Save your ticks to an account so they follow you to every device." : "Sign in to see your ticks on any device.");
+  const n = guestCount();
   body.replaceChildren(...[
-    CFG.google ? el("button", { type: "button", class: "btn", style: "justify-content:center", onclick: google }, "Continue with Google") : null,
-    field("Email", { type: "email", id: "au-email", autocomplete: "email", required: true }),
-    field("Password", { type: "password", id: "au-pw", autocomplete: up ? "new-password" : "current-password", minlength: up ? "8" : null, required: true }),
-    el("div", { class: "auth-alt" }, alt)].filter(Boolean));
+    CFG.google ? el("button", { type: "button", class: "btn au-google", onclick: google }, el("span", { html: ICON.google, style: "display:grid" }), "Continue with Google") : null,
+    CFG.google ? el("div", { class: "au-or", role: "separator" }, "or") : null,
+    field("Email", { type: "email", id: "au-email", autocomplete: "email", inputmode: "email", required: true, placeholder: "you@example.com", value: authEmail }),
+    up ? newPwField("Password")
+       : field("Password", { type: "password", id: "au-pw", autocomplete: "current-password", required: true }, link("Forgot password?", () => { authEmail = val("au-email") || authEmail; authView("reset"); })),
+    up ? null : el("p", { class: "au-hint warn", id: "au-caps", hidden: true }, "Caps Lock is on."),
+  ].filter(Boolean));
+  if (!up) capsWatch($("au-pw"));
+  setGo(up ? "Create account" : "Sign in");
+  if (n) foot(el("p", { class: "au-note" }, "The " + n + (n === 1 ? " paper" : " papers") + " you've ticked in this browser will be added to your account."));
+  else if (up) foot(el("p", { class: "au-note" }, "We only use your email to sign you in and to reset your password."));
 }
-function setMsg(m, err) { const n = document.getElementById("au-msg"); n.textContent = m; n.className = "auth-msg" + (err ? " err" : ""); }
+
 function openAuth(mode) {
   authView(mode || (sbUser ? "account" : "signin"));
-  const d = document.getElementById("auth");
+  const d = $("auth");
   if (!d.open) { if (d.showModal) d.showModal(); else d.setAttribute("open", ""); }
-  document.getElementById("au-email")?.focus();
+  focusFirst();
 }
-const closeAuth = () => document.getElementById("auth").close();
-const val = id => (document.getElementById(id)?.value || "").trim();
+function focusFirst() {
+  const f = $("au-body").querySelector("input");
+  if (!f) { $("au-close").focus(); return; }
+  (f.id === "au-email" && f.value && $("au-pw") ? $("au-pw") : f).focus();
+}
+const closeAuth = () => $("auth").close();
+const val = id => ($(id)?.value || "").trim();
 const here = () => location.origin + location.pathname;
 
+// Turn Supabase's errors into plain English. Codes are from supabase-js v2 (error.code); messages are a fallback for older servers.
+function friendly(err) {
+  const c = (err && err.code) || "", m = (err && err.message) || "", s = err && err.status;
+  if (c === "invalid_credentials" || /Invalid login credentials/i.test(m)) return "That email and password don't match. Check for typos, or reset your password.";
+  if (c === "email_not_confirmed" || /Email not confirmed/i.test(m)) return ["Confirm your email first: open the link we sent you. ", link("Send it again", () => resend("signup"))];
+  if (c === "user_already_exists" || c === "email_exists" || /already registered|already been registered/i.test(m)) return ["There's already an account with this email. ", link("Sign in instead", () => authView("signin"))];
+  if (c === "same_password" || /should be different/i.test(m)) return "That's already your password. Choose a new one.";
+  if (c === "weak_password" || /^Password should/i.test(m)) return "Choose a stronger password. " + (m.replace(/^Password should/i, "It should") || "");
+  if (c === "email_address_invalid" || /invalid format|Unable to validate email/i.test(m)) return "That email address doesn't look right.";
+  if (c === "signup_disabled" || /Signups not allowed/i.test(m)) return "New accounts are turned off on this site right now.";
+  if (/rate|too many/i.test(c + " " + m) || s === 429) return "Too many tries in a short time. Wait a few minutes, then try again.";
+  if (c === "otp_expired" || /expired|invalid/i.test(m) && /link|token|otp/i.test(m)) return "That link has expired or was already used. Ask for a new one.";
+  if (err && (err.name === "AuthRetryableFetchError" || err instanceof TypeError || s === 0)) return "Can't reach the sign-in service. Check your internet connection and try again.";
+  return m || "Something went wrong. Try again.";
+}
+function bad(inputId, msg) {
+  setMsg(msg, "err");
+  const i = $(inputId); if (i) { i.setAttribute("aria-invalid", "true"); i.focus(); i.addEventListener("input", () => i.removeAttribute("aria-invalid"), { once: true }); }
+}
+
+function tickResend() {
+  const b = $("au-resend"); if (!b) return;
+  const left = Math.ceil((resendAt - Date.now()) / 1000);
+  b.disabled = left > 0; b.textContent = left > 0 ? "Resend in " + left + "s" : "Resend email";
+  if (left > 0) setTimeout(tickResend, 1000);
+}
+async function resend(kind) {
+  if (!authEmail) authEmail = val("au-email");
+  if (!authEmail) { authView("signin"); return; }
+  if (Date.now() < resendAt) return;
+  resendAt = Date.now() + 60000; tickResend();
+  try {
+    const { error } = kind === "reset"
+      ? await sb.auth.resetPasswordForEmail(authEmail, { redirectTo: here() })
+      : await sb.auth.resend({ type: "signup", email: authEmail, options: { emailRedirectTo: here() } });
+    if (error) throw error;
+    if (authMode !== "confirm" && authMode !== "sent") authView(kind === "reset" ? "sent" : "confirm");
+    setMsg("Sent. Check your inbox.", "ok");
+  } catch (err) { setMsg(friendly(err), "err"); }
+}
+
 async function google() {
+  setMsg("");
   const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: here() } });
-  if (error) setMsg(error.message, true);
+  if (error) setMsg(friendly(error), "err");
+}
+async function signOut() {
+  const b = $("au-out"); if (b) b.disabled = true;
+  clearTimeout(saveTimer);
+  if (docRef && load(DIRTY, false)) { try { await flush(); } catch (e) {} }
+  await sb.auth.signOut({ scope: "local" });
+  leaveAccount(); closeAuth(); toast("Signed out");
 }
 
 async function submitAuth(e) {
   e.preventDefault();
-  const go = document.getElementById("au-go");
-  const email = val("au-email"), pw = document.getElementById("au-pw")?.value || "";
-  if (authMode === "account") { go.disabled = true; await sb.auth.signOut({ scope: "local" }); closeAuth(); toast("Signed out"); return; }
-  if (authMode !== "recover" && !/^\S+@\S+\.\S+$/.test(email)) { setMsg("Enter your email address.", true); return; }
-  if ((authMode === "signup" || authMode === "recover") && pw.length < 8) { setMsg("Use at least 8 characters for your password.", true); return; }
-  if (authMode === "signin" && !pw) { setMsg("Enter your password.", true); return; }
-  go.disabled = true; setMsg("One moment…");
+  if ($("au-go").disabled) return;
+  if (authMode === "sent" || authMode === "confirm") { authView("signin"); focusFirst(); return; }
+  if (authMode === "account") { closeAuth(); return; }
+  const email = val("au-email"), pw = $("au-pw")?.value || "";
+  if ($("au-email")) {
+    authEmail = email;
+    if (!email) return bad("au-email", "Enter your email address.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad("au-email", "That email address doesn't look right.");
+  }
+  if (authMode === "signin" && !pw) return bad("au-pw", "Enter your password.");
+  if ((authMode === "signup" || authMode === "recover" || authMode === "changepw") && pw.length < 8) return bad("au-pw", "Use at least 8 characters for your password.");
+  setMsg("");
+  busy(true, { signin: "Signing in…", signup: "Creating account…", reset: "Sending…" }[authMode] || "Saving…");
   try {
     if (authMode === "signin") {
       const { error } = await sb.auth.signInWithPassword({ email, password: pw });
       if (error) throw error;
-      closeAuth(); toast("Signed in");
+      closeAuth(); toast("Signed in as " + email);
     } else if (authMode === "signup") {
       const { data, error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: here() } });
       if (error) throw error;
-      if (data.session) { closeAuth(); toast("Account created"); }
-      else { setMsg("Check your email for a link to confirm your account, then sign in."); go.hidden = true; }
+      // With email confirmation on, Supabase hides whether an address is taken: it answers with a user that has no identities
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) throw { code: "user_already_exists" };
+      if (data.session) { closeAuth(); toast("Account created. Your ticks now sync."); }
+      else { resendAt = Date.now() + 60000; authView("confirm"); }
     } else if (authMode === "reset") {
       const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: here() });
       if (error) throw error;
-      setMsg("If that email has an account, a reset link is on its way."); go.hidden = true;
-    } else if (authMode === "recover") {
+      resendAt = Date.now() + 60000; authView("sent");
+    } else if (authMode === "recover" || authMode === "changepw") {
       const { error } = await sb.auth.updateUser({ password: pw });
       if (error) throw error;
       closeAuth(); toast("Password updated");
     }
   } catch (err) {
-    setMsg(err && err.message ? err.message : "Something went wrong. Try again.", true);
-  } finally { go.disabled = false; }
+    const f = friendly(err);
+    if (authMode === "signin" && /don't match/.test(f)) { setMsg(f, "err"); const p = $("au-pw"); p.value = ""; p.setAttribute("aria-invalid", "true"); p.focus(); }
+    else setMsg(f, "err");
+  } finally { if ($("au-go").disabled) busy(false); }
 }
 
-document.getElementById("acct-btn").addEventListener("click", () => openAuth());
-document.getElementById("au-close").addEventListener("click", closeAuth);
-document.getElementById("au-form").addEventListener("submit", submitAuth);
+$("acct-btn").addEventListener("click", () => openAuth());
+$("au-close").addEventListener("click", closeAuth);
+$("au-form").addEventListener("submit", submitAuth);
+$("au-seg").addEventListener("click", e => {
+  const b = e.target.closest("button[data-m]"); if (!b || b.dataset.m === authMode) return;
+  authEmail = val("au-email") || authEmail; authView(b.dataset.m); focusFirst();
+});
+// Clicking the dimmed backdrop closes the sheet (clicks inside land on the form, not the dialog itself)
+$("auth").addEventListener("click", e => { if (e.target === e.currentTarget) closeAuth(); });
+// Edits made just before closing the tab are uploaded on the next visit if this doesn't finish
+window.addEventListener("pagehide", () => { if (docRef && load(DIRTY, false)) { clearTimeout(saveTimer); flush(); } });
+
+// Don't leave sign-in tokens (or a bare "#") sitting in the address bar or history
+function tidyUrl() {
+  if (location.href.endsWith("#") || /access_token|refresh_token|error_description|[#&]type=/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search);
+}
 
 (async () => {
   if (!CFG.supabaseUrl || !CFG.supabaseKey) return;
+  // Links from emails land back here with details in the address. Read them before Supabase tidies the URL.
+  const q = new URLSearchParams(location.hash.slice(1) + "&" + location.search.slice(1));
+  const linkErr = q.get("error_description") || q.get("error");
+  const linkType = q.get("type");
   try {
     if (!window.supabase) await loadScript("vendor/supabase.js");
     sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "implicit" } });
@@ -1040,11 +1321,21 @@ document.getElementById("au-form").addEventListener("submit", submitAuth);
     sb.auth.onAuthStateChange((event, session) => {
       // Supabase warns against awaiting its own calls inside this callback, so hand off to a fresh task
       setTimeout(() => {
+        tidyUrl();
         if (event === "PASSWORD_RECOVERY") openAuth("recover");
-        if (session && session.user) useAccount(session.user);
-        else if (event === "SIGNED_OUT") leaveAccount();
+        if (session && session.user) {
+          const fresh = !sbUser;
+          useAccount(session.user);
+          if (fresh && event === "SIGNED_IN" && linkType === "signup") toast("Email confirmed. You're signed in.");
+        } else if (event === "SIGNED_OUT" && sbUser) leaveAccount();
       }, 0);
     });
+    await sb.auth.getSession(); tidyUrl();
+    if (linkErr) {
+      history.replaceState(null, "", location.pathname);
+      openAuth("signin");
+      setMsg(friendly({ code: q.get("error_code") || "", message: linkErr.replace(/\+/g, " ") }), "err");
+    }
   } catch (e) { sb = null; renderAcct(); }
 })();
 </script>
