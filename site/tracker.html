@@ -31,7 +31,7 @@
   --tl-r: #D92D20; --tl-a: #E08A00; --tl-g: #12A150; --tl-off: #33415C;
   --danger: #B3261E;
   --sans: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --lift: 0 1px 2px rgb(0 0 0 / .06), 0 6px 16px -12px rgb(0 0 0 / .2);
+  --lift: 0 1px 0 rgb(11 31 69 / .05);
   color-scheme: light;
 }
 
@@ -97,13 +97,20 @@ h1 { font: 800 clamp(1.5rem, 3vw, 2rem)/1.1 var(--sans); letter-spacing: -0.02em
 .card .cname { font: 600 15px/1.25 var(--sans); min-width: 0; }
 .card .line { display: flex; align-items: center; gap: 10px; }
 .card .pct { font: 800 20px var(--sans); letter-spacing: -0.02em; min-width: 3.2ch; }
+.mroute { flex: 1; display: flex; align-items: center; justify-content: space-between; position: relative; height: 14px; }
+.mroute::before { content: ""; position: absolute; left: 4px; right: 4px; top: 50%; height: 2px; transform: translateY(-50%); background: color-mix(in srgb, var(--line) 45%, transparent); }
+.mroute i { position: relative; width: 10px; height: 10px; border-radius: 50%; background: var(--panel); box-shadow: inset 0 0 0 2px var(--line); }
+.mroute i.done { background: var(--line); }
+.mroute i.next { width: 14px; height: 14px; box-shadow: inset 0 0 0 3.5px var(--line); }
+.cnext { font-size: 13.5px; font-weight: 700; white-space: nowrap; }
+.card .cnum b { color: var(--ink); }
 .card .line .meter { flex: 1; background: linear-gradient(color-mix(in srgb, var(--line) 40%, transparent), color-mix(in srgb, var(--line) 40%, transparent)) center / 100% 2px no-repeat; }
 .card .frac { font-size: 12.5px; color: var(--ink-3); }
 .card .cnum { display: flex; justify-content: space-between; gap: 6px; min-height: 1.4em; font-size: 12.5px; color: var(--ink-3); }
 
 /* Meter as a line under construction: thin planned track, solid built line in the subject's colour */
 .meter { height: 8px; border-radius: 999px; background: linear-gradient(var(--rule-2), var(--rule-2)) center / 100% 2px no-repeat; overflow: hidden; }
-.meter > span { display: block; height: 100%; border-radius: inherit; background: var(--line); transition: width .35s ease; }
+.meter > span { display: block; height: 100%; border-radius: inherit; background: var(--line); }
 
 /* Subject view */
 .view { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
@@ -123,19 +130,40 @@ h2 { font: 800 1.6rem/1.15 var(--sans); letter-spacing: -0.02em; margin: 0; text
 .route-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; font-size: 13.5px; color: var(--ink-2); }
 .route-head b { font-weight: 700; color: var(--ink); }
 .route-head .nx-name { font-size: 15px; }
+/* The selected stop: your own assessment, its practice and its modules */
+.stop { display: grid; gap: 10px; padding: 12px 16px; border-radius: 10px; background: var(--well); border: 1px solid var(--rule); margin-top: 4px; }
+.sp-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; }
+.sp-head h3 { margin: 0; font: 700 16px/1.3 var(--sans); display: flex; align-items: center; gap: 10px; }
+.sp-tag { font-size: 12.5px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--line); color: var(--on); }
+.sp-tag.done { background: var(--ink); color: #FFFFFF; }
+.sp-done { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; cursor: pointer; min-height: 36px; }
+.sp-fields { display: flex; flex-wrap: wrap; gap: 10px 16px; }
+.sp-fields { align-items: end; }
+.sp-help { margin: -4px 0 0; font-size: 13px; color: var(--ink-3); }
+.sp-fields label:not(.sp-done) { display: grid; gap: 4px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.sp-fields input { min-height: 36px; padding: 6px 10px; border: 1px solid var(--rule-2); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 14px; }
+.sp-fields input[type=text] { width: 9em; }
+.sp-fields input:hover { border-color: var(--ink-3); }
+.sp-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; font-size: 14px; color: var(--ink-2); padding-top: 10px; border-top: 1px solid var(--rule); }
+.sp-row b { color: var(--ink); }
+.sp-row .btn { min-height: 34px; padding: 5px 12px; font-size: 13.5px; }
 .route { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); margin: 2px -4px 0; }
-.stn { position: relative; display: grid; grid-template-rows: 28px auto; justify-items: center; align-items: center; gap: 4px; padding: 0 2px 2px; border: 0; background: none; color: var(--ink-2); cursor: pointer; border-radius: 8px; min-width: 0; }
+.stn { position: relative; display: grid; grid-template-rows: 28px auto auto; justify-items: center; align-items: center; gap: 4px; padding: 0 2px 2px; border: 0; background: none; color: var(--ink-2); cursor: pointer; border-radius: 8px; min-width: 0; }
 .stn::before { content: ""; position: absolute; top: 14px; left: 0; right: 0; height: 6px; transform: translateY(-50%); background: linear-gradient(var(--rule-2), var(--rule-2)) center / 100% 2px no-repeat; }
 .stn.past::before { background: var(--line); }
 .stn.next::before { background: linear-gradient(var(--line), var(--line)) left center / 50% 6px no-repeat, linear-gradient(var(--rule-2), var(--rule-2)) right center / 50% 2px no-repeat; }
 .stn:first-child::before { left: 50%; }
+.stn.next:first-child::before { background: linear-gradient(var(--rule-2), var(--rule-2)) center / 100% 2px no-repeat; }
 .stn:last-child::before { right: 50%; }
 .stn:only-child::before { display: none; }
 .stn .pin { grid-row: 1; position: relative; width: 22px; height: 22px; border-radius: 50%; background: var(--panel); box-shadow: inset 0 0 0 4px var(--line); display: grid; place-items: center; color: var(--on); transition: background-color .15s ease, transform .15s ease; }
 .stn .pin svg { width: 12px; height: 12px; }
 .stn.done .pin { background: var(--line); box-shadow: inset 0 0 0 2px var(--panel), 0 0 0 2px var(--line); }
 .stn:hover .pin { transform: scale(1.12); }
-.stn .yl { grid-row: 2; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.stn .yw { grid-row: 3; font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+.stn[aria-pressed="true"] .yl { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.stn[aria-pressed="true"] .pin { outline: 3px solid color-mix(in srgb, var(--line) 30%, transparent); outline-offset: 2px; }
+.stn .yl { grid-row: 2; font-size: 14px !important; color: var(--ink) !important; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
 .stn.done .yl { color: var(--ink); }
 .stn.next .pin { width: 28px; height: 28px; box-shadow: inset 0 0 0 5px var(--line); }
 .stn.next .yl { color: var(--ink); font-weight: 800; }
@@ -150,7 +178,7 @@ h2 { font: 800 1.6rem/1.15 var(--sans); letter-spacing: -0.02em; margin: 0; text
 .type[aria-pressed="true"] .n { color: var(--band-2); }
 .controls { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; padding: 0 24px; }
 .controls label { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; font-size: 13.5px; color: var(--ink-2); cursor: pointer; }
-.controls input[type=search] { flex: 1 1 14em; min-width: 0; padding: 7px 10px; min-height: 36px; }
+.controls input[type=search] { flex: 1 1 12em; min-width: 0; padding: 7px 10px; min-height: 36px; }
 .controls input[type=search], form.add input, form.add select, .log .mark { background: var(--panel); border: 1px solid var(--rule-2); border-radius: 8px; color: var(--ink); transition: border-color .15s ease; }
 .controls input[type=search]:hover, form.add input:hover, .log .mark:hover { border-color: var(--ink-3); }
 .controls input[type=search]:focus, form.add input:focus, .log .mark:focus { border-color: var(--ink); }
@@ -163,7 +191,7 @@ h2 { font: 800 1.6rem/1.15 var(--sans); letter-spacing: -0.02em; margin: 0; text
 .opts-row { display: flex; flex-wrap: wrap; gap: 4px 20px; align-items: center; padding: 12px 24px 0; }
 .opts-row label { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; font-size: 13.5px; color: var(--ink-2); cursor: pointer; }
 input[type=checkbox] { accent-color: var(--ink); width: 16px; height: 16px; }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 14px 24px 4px; font-size: 13.5px; color: var(--ink-2); max-width: calc(75ch + 48px); }
+.legend { margin: 0; padding: 14px 24px; font-size: 14px; color: var(--ink-2); max-width: calc(75ch + 48px); }
 
 /* Paper lists: chips snap to timetable columns */
 .section-label { padding: 22px 24px 8px; display: flex; justify-content: space-between; gap: 8px; }
@@ -178,6 +206,16 @@ input[type=checkbox] { accent-color: var(--ink); width: 16px; height: 16px; }
 .srow .slab { display: grid; padding-top: 6px; min-width: 0; }
 .srow .slab b { font-size: 14.5px; font-weight: 600; overflow-wrap: anywhere; }
 .ylab span, .srow .slab span { font-size: 12.5px; color: var(--ink-3); }
+.sl-l { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; }
+.pick-school { display: inline-flex; align-items: center; gap: 8px; font: 500 14px var(--sans); color: var(--ink-2); }
+.getpapers { padding: 16px 20px 18px; border-top: 1px solid var(--rule); display: grid; gap: 8px; }
+.getpapers .meta-label { margin: 0; }
+.pick-school label { font-weight: 600; color: var(--ink); }
+.pick-school select { min-height: 34px; padding: 4px 8px; border: 1px solid var(--rule-2); border-radius: 8px; background: var(--panel); color: var(--ink); max-width: 18em; }
+.pick-school .hint { font-size: 13px; color: var(--ink-3); }
+.mine { margin-left: 8px; font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--ink); color: #FFFFFF; vertical-align: 1px; }
+.skip { position: absolute; left: -9999px; }
+.skip:focus { position: static; display: inline-block; margin: 8px 24px; padding: 6px 10px; background: var(--ink); color: #FFFFFF; border-radius: 6px; }
 .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 6px; min-width: 0; }
 .chips.pad { padding: 6px 24px 16px; }
 .chip { position: relative; background: var(--panel); border: 1px solid var(--rule-2); color: var(--ink); border-radius: 8px; padding: 6px 10px; min-height: 40px; font-size: 14px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-width: 0; text-align: left; transition: background-color .15s ease, border-color .15s ease, color .15s ease, transform .1s ease-out; }
@@ -240,7 +278,7 @@ dialog[open]::backdrop { animation: fade-in .2s ease; }
 .dlg-actions { display: flex; gap: 8px; }
 
 /* Footer and toast */
-footer.notes { color: var(--ink-2); font-size: 13px; max-width: 75ch; }
+footer.notes { color: var(--ink-2); font-size: 13.5px; max-width: 68ch; }
 footer.notes p { margin: 0 0 6px; }
 footer.notes a { color: var(--ink); text-underline-offset: 2px; }
 footer.notes summary { cursor: pointer; width: fit-content; }
@@ -358,8 +396,21 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
 .grp + .grp { margin-top: 14px; }
 .gh { margin: 0 0 8px; font-size: 13.5px; font-weight: 700; color: var(--ink-2); text-wrap: pretty; }
 .dps { display: grid; gap: 6px; }
-.dp { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: start; text-align: left; width: 100%; padding: 10px 12px; min-height: 44px; border-radius: 10px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); font-size: 14.5px; line-height: 1.45; cursor: pointer; transition: background-color .15s ease, border-color .15s ease; }
-.dp:hover { border-color: var(--rule-2); background: var(--well); }
+.dp { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); font-size: 14.5px; line-height: 1.45; transition: background-color .15s ease, border-color .15s ease; }
+.dp-lamps { display: inline-flex; gap: 2px; padding: 2px; border-radius: 999px; background: var(--panel); border: 1px solid var(--rule-2); }
+.dl { width: 30px; height: 26px; border: 0; border-radius: 999px; background: transparent; display: grid; place-items: center; cursor: pointer; }
+.dl i { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 2px currentColor; background: transparent; transition: background-color .15s ease, transform .1s ease-out; }
+.dl:hover i { transform: scale(1.25); }
+.dl-r { color: var(--tl-r); } .dl-a { color: var(--tl-a); } .dl-g { color: var(--tl-g); }
+.dl[aria-pressed="true"] i { background: currentColor; }
+.dl:hover i { background: color-mix(in srgb, currentColor 35%, transparent); }
+.dl[aria-pressed="true"]:hover i { background: currentColor; }
+.dl[aria-pressed="true"]:hover i { transform: none; }
+.band .dl:focus-visible, .dl:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.firstrun { margin: 18px 24px 4px; padding: 16px 18px; border-radius: 10px; background: var(--well); border: 1px solid var(--rule); display: grid; gap: 10px; }
+.firstrun h3 { margin: 0; font: 700 16px var(--sans); }
+.firstrun p { margin: 0; font-size: 14px; color: var(--ink-2); max-width: 70ch; }
+.firstrun .untag { padding: 0; }
 .dp-ck { width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px var(--rule-2); color: transparent; transition: background-color .15s ease, box-shadow .15s ease; }
 .dp-ck svg { width: 12px; height: 12px; }
 .dp-t { min-width: 0; overflow-wrap: anywhere; text-wrap: pretty; }
@@ -373,9 +424,6 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
 .dp[data-rag="r"] { background: #FDEFED; border-color: #F1B9B3; }
 .dp[data-rag="a"] { background: #FFF5E2; border-color: #EDC98A; }
 .dp[data-rag="g"] { background: #E8F6EE; border-color: #A6D9BA; }
-.dp[data-rag="r"] .dp-ck { background: var(--tl-r); box-shadow: none; }
-.dp[data-rag="a"] .dp-ck { background: var(--tl-a); box-shadow: none; }
-.dp[data-rag="g"] .dp-ck { background: var(--tl-g); box-shadow: none; color: #FFFFFF; }
 .dp-tag { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 700; }
 .dp[data-rag="r"] .dp-tag { color: #A3231A; } .dp[data-rag="a"] .dp-tag { color: #8A5300; } .dp[data-rag="g"] .dp-tag { color: #146A38; }
 .meter.stack { display: flex; }
@@ -406,6 +454,13 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
   .wrap { gap: 22px; padding-block: 20px 64px; }
   .band-in { padding-top: 18px; }
   .seg.mode-seg { justify-self: stretch; }
+  .titlerow { flex-wrap: nowrap; }
+  h1 { font-size: 1.35rem; }
+  .band .home-btn { padding: 6px 10px; min-height: 36px; }
+  .stn .yw { display: none; }
+  .firstrun { margin-inline: 16px; }
+  .dp { grid-template-columns: minmax(0, 1fr); }
+  .dp-lamps { justify-self: start; }
   .seg.mode-seg button { flex: 1; }
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .card { padding: 12px; }
@@ -508,7 +563,7 @@ const DEFAULT_SUBJECTS = ["ext1", "ext2", "chem", "phys"];
 const SUB = Object.fromEntries(INDEX.map(s => [s.id, s]));
 const short = n => n.replace("Mathematics", "Maths").replace("Earth and Environmental Science", "Earth & Env Science");
 
-let state = { done: {}, marks: {}, custom: [], subjects: null, from: {}, rag: {}, syl: {}, sylTerm: {}, sylSubs: null };
+let state = { done: {}, marks: {}, custom: [], subjects: null, from: {}, rag: {}, syl: {}, sylTerm: {}, sylSubs: null, route: {}, school: "" };
 let ui = { active: null, query: "", all: false, solOnly: false, type: "all", group: "school", mode: "papers", sylActive: null, sylUpTo: "all", sylQuery: "", sylHide: false, pickerFor: "papers" };
 const TYPES = ["hsc", "trial", "hy", "at1", "at2", "at3", "at4", "comp", "added"];
 const TYPE_NAME = { all: "All", hsc: "HSC", trial: "Trials", hy: "Half yearly", at1: "AT1", at2: "AT2", at3: "AT3", at4: "AT4", y11: "Year 11", y11hy: "Year 11 half yearly", y11pt1: "Year 11 task 1", y11pt2: "Year 11 task 2", y11pt3: "Year 11 task 3", comp: "Competitions", added: "Added by you" };
@@ -622,6 +677,9 @@ function toast(msg, undo) {
   document.body.append(t); arm();
 }
 document.addEventListener("keydown", e => {
+  if (e.key === "/" && !e.metaKey && !e.ctrlKey && !(e.target instanceof Element && e.target.closest("input, select, textarea, dialog"))) {
+    const q = document.getElementById(ui.mode === "syl" ? "sq" : "q"); if (q) { e.preventDefault(); q.focus(); } return;
+  }
   if (!lastUndo || e.key.toLowerCase() !== "z" || !(e.metaKey || e.ctrlKey) || e.shiftKey) return;
   if (e.target instanceof Element && e.target.closest("input, select, textarea, dialog")) return;
   e.preventDefault(); lastUndo();
@@ -653,16 +711,6 @@ const RAG = ["r", "a", "g"];
 const RAG_NAME = { r: "Red", a: "Amber", g: "Green" };
 const RAG_MEAN = { r: "Needs work", a: "Getting there", g: "Confident" };
 const ragOf = id => { const c = (state.rag || {})[id]; return RAG.includes(c) ? c : null; };
-// Only a hint, shown as a faint ring when the student hasn't picked: the share of this subject's HSC papers (from its start year) ticked off.
-function suggestRag(id) {
-  if (!allOf(id).some(p => state.done[p.id])) return null;
-  const f = fromYear(id);
-  let list = listed(id).filter(p => p.kind === "hsc" && p.year >= f), what = "HSC papers from " + f;
-  if (!list.length) { list = listed(id).filter(p => p.year >= f); what = "papers from " + f; }
-  if (!list.length) return null;
-  const done = list.filter(p => state.done[p.id]).length, r = done / list.length;
-  return { c: r < 1 / 3 ? "r" : r < 2 / 3 ? "a" : "g", why: done + " of " + list.length + " " + what + " done" };
-}
 function setRag(id, c) {
   const was = ragOf(id);
   state.rag = Object.assign({}, state.rag);
@@ -676,7 +724,7 @@ function renderRagSum() {
   const ids = subjects(), n = { r: 0, a: 0, g: 0 }; let none = 0;
   ids.forEach(id => { const c = ragOf(id); if (c) n[c]++; else none++; });
   const box = document.getElementById("rag-sum");
-  if (none === ids.length) { box.replaceChildren(el("span", {}, "Tap the lights on a subject to rate how confident you feel")); return; }
+  if (none === ids.length) { box.replaceChildren(el("span", {}, "Use the lights on a subject to rate how confident you feel")); return; }
   box.replaceChildren(...RAG.map(k => el("span", { class: "rsum rs-" + k }, el("i", { "aria-hidden": "true" }), el("b", {}, String(n[k])), " " + RAG_NAME[k].toLowerCase())),
     none ? el("span", { class: "rsum" }, el("b", {}, String(none)), " not set") : "");
 }
@@ -685,16 +733,15 @@ function renderCards() {
   if (ui.mode === "syl") return renderSylCards();
   const ids = subjects();
   const cards = ids.map(id => {
-    const s = SUB[id], x = tally(id, "all"); const pct = x.curTotal ? Math.round(100 * x.curDone / x.curTotal) : 0;
-    const c = ragOf(id), sg = c ? null : suggestRag(id);
+    const s = SUB[id], x = tally(id, "all"), nx = nextStop(id);
+    const wk = allOf(id).filter(pp => state.done[pp.id] && state.done[pp.id] >= weekAgo()).length;
+    const c = ragOf(id);
     const says = c ? RAG_NAME[c] + ", " + RAG_MEAN[c].toLowerCase() : "not set";
     return el("div", { class: "cwrap", style: lineStyle(id, ids) }, el("button", { class: "card", type: "button", "data-key": "card-" + id, "aria-current": String(id === ui.active), onclick: () => openSubject(id) },
       el("span", { class: "chead" }, badge(id, short(s.name)), el("span", { class: "cname" }, short(s.name))),
-      el("span", { class: "line" }, el("span", { class: "pct" }, pct + "%"),
-        el("span", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + pct + "%" })),
-        el("span", { class: "frac" }, x.curDone + " / " + x.curTotal)),
-      el("span", { class: "cnum" }, x.avg != null ? "Average mark " + x.avg : "")),
-      el("button", { class: "rag", type: "button", "data-key": "rag-" + id, title: "Confidence: " + says + ". Tap to change.", "aria-label": "How confident you feel in " + s.name + ": " + says + ". Tap to change.", onclick: () => cycleRag(id) }, ragLights(c)));
+      el("span", { class: "line" }, miniRoute(id), el("span", { class: "cnext" }, nx ? "Next: " + nx.name : "All stops passed")),
+      el("span", { class: "cnum" }, el("span", {}, el("b", {}, String(x.allDone)), x.allDone === 1 ? " paper done" : " papers done", wk ? " \u00b7 " + wk + " this week" : ""), x.avg != null ? el("span", {}, "avg " + x.avg) : null)),
+      el("button", { class: "rag", type: "button", "data-key": "rag-" + id, title: "Confidence: " + says + ". Select to change.", "aria-label": "How confident you feel in " + s.name + ": " + says + ". Select to change.", onclick: () => cycleRag(id) }, ragLights(c)));
   });
   document.getElementById("cards").replaceChildren(...cards);
   renderRagSum();
@@ -727,19 +774,29 @@ function yearRows(list, fromY, labelFor) {
     const ps = by.get(y).sort((a, b) => a.chip.localeCompare(b.chip));
     const d = ps.filter(p => state.done[p.id]).length;
     return el("div", { class: "yrow" },
-      el("div", { class: "ylab" + (y && y < fromY ? " old" : "") }, el("b", {}, y ? String(y) : "Other"), el("span", {}, d + "/" + ps.length)),
+      el("div", { class: "ylab" + (y && y < fromY ? " old" : "") }, el("b", {}, y ? String(y) : "Other"), el("span", {}, d + " of " + ps.length)),
       el("div", { class: "chips" }, ps.map(p => chip(p, fromY))));
   });
+}
+
+// One select pins the student's own school to the top of every subject's school list
+function schoolPick(list) {
+  const names = [...new Set(list.map(pp => pp.school).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  if (state.school && !names.includes(state.school)) names.unshift(state.school);
+  return el("div", { class: "pick-school" }, el("label", { for: "my-school" }, "Your school"),
+    el("select", { id: "my-school", onchange: e => { state.school = e.target.value; persist(); refresh(); } },
+      el("option", { value: "" }, "Not set"), names.map(n => el("option", { value: n, selected: n === state.school }, n))),
+    el("span", { class: "sr" }, "Your school moves to the top of the list in every subject."));
 }
 
 function schoolRows(list, fromY, mixed) {
   const by = new Map();
   for (const p of list) { const k = p.school || "Other"; if (!by.has(k)) by.set(k, []); by.get(k).push(p); }
-  return [...by.keys()].sort((a, b) => a.localeCompare(b)).map(k => {
+  return [...by.keys()].sort((a, b) => (b === state.school) - (a === state.school) || a.localeCompare(b)).map(k => {
     const ps = by.get(k).sort((a, b) => (b.year - a.year) || a.kind.localeCompare(b.kind) || a.name.localeCompare(b.name));
     const d = ps.filter(p => state.done[p.id]).length;
     return el("div", { class: "srow" },
-      el("div", { class: "slab" }, el("b", {}, k), el("span", {}, d + "/" + ps.length)),
+      el("div", { class: "slab" }, el("b", {}, k, k === state.school ? el("span", { class: "mine" }, "Your school") : null), el("span", {}, d + " of " + ps.length)),
       el("div", { class: "chips" }, ps.map(p => {
         let label = p.year ? String(p.year) : p.chip;
         const rest = p.year ? p.chip.replace(k, "").trim() : "";
@@ -749,21 +806,103 @@ function schoolRows(list, fromY, mixed) {
   });
 }
 
-// The HSC line: this subject's HSC papers from its start year as stations, oldest to newest.
-// Each station is the tick button for that paper; the first unticked one is the next stop.
-function routeOf(id, fromY) {
-  const st = listed(id).filter(pp => pp.kind === "hsc" && pp.year >= fromY).sort((a, b) => a.year - b.year || a.name.localeCompare(b.name));
-  if (!st.length) return null;
-  const done = st.filter(pp => state.done[pp.id]).length, next = st.find(pp => !state.done[pp.id]);
+// The Year 12 route: every subject runs AT1 (Term 4) > AT2 (Term 1) > AT3 (Term 2) > Trials (Term 3) > HSC.
+// Each stop is the student's own assessment: sat or not, date, mark. Past papers are practice for a stop; syllabus modules tagged to its term are the track before it.
+const HSC_YEAR = (d => d.getMonth() >= 9 ? d.getFullYear() + 1 : d.getFullYear())(new Date());
+const STOPS = [
+  { k: "at1", name: "AT1", when: "Term 4 " + (HSC_YEAR - 1), term: "t4" },
+  { k: "at2", name: "AT2", when: "Term 1 " + HSC_YEAR, term: "t1" },
+  { k: "at3", name: "AT3", when: "Term 2 " + HSC_YEAR, term: "t2" },
+  { k: "trial", name: "Trials", when: "Term 3 " + HSC_YEAR, term: "t3" },
+  { k: "hsc", name: "HSC", when: "Oct to Nov " + HSC_YEAR, term: null }];
+const PRACTICE_NAME = { at1: "AT1 papers", at2: "AT2 papers", at3: "AT3 papers", trial: "trial papers", hsc: "HSC papers" };
+const fmtLong = d => new Date(d + "T00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short" });
+function stopsOf(id) { const r = (state.route || {})[id] || {}; return STOPS.map(st => Object.assign({}, st, r[st.k] || {})); }
+const nextStop = id => stopsOf(id).find(st => !st.done) || null;
+function setStop(id, k, patch) {
+  state.route = Object.assign({}, state.route);
+  const r = Object.assign({}, state.route[id]), cur = Object.assign({}, r[k], patch);
+  for (const f in cur) if (cur[f] === "" || cur[f] === false || cur[f] == null) delete cur[f];
+  if (Object.keys(cur).length) r[k] = cur; else delete r[k];
+  if (Object.keys(r).length) state.route[id] = r; else delete state.route[id];
+  persist(); refresh();
+}
+// Practice for a stop: papers of that type the student has ticked, out of those listed from the subject's start year
+function practiceOf(id, k) {
+  if (!SUB[id] || !papersOf(id)) return null;
+  const f = fromYear(id), list = allOf(id).filter(pp => pp.kind === k && (pp.year >= f || pp.custom));
+  return { done: list.filter(pp => state.done[pp.id]).length, total: list.length };
+}
+// Syllabus modules the student tagged with this stop's term (or everything for the HSC)
+function modulesFor(id, st) {
+  const d = SYLD[id]; if (!d || !d.modules) return null;
+  const mods = st.term ? d.modules.filter(m => termOf(m.id) === st.term) : d.modules;
+  return mods.map(m => Object.assign({ m }, modTally(m)));
+}
+const stopWhen = st => st.date ? fmtLong(st.date) : st.when;
+const weekAgo = () => new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+// The route at card size: five stops, filled once sat, the next one ringed
+function miniRoute(id) {
+  const stops = stopsOf(id), next = stops.find(st => !st.done);
+  return el("span", { class: "mroute", "aria-hidden": "true" }, stops.map(st => el("i", { class: (st.done ? "done" : "") + (st === next ? " next" : "") })));
+}
+function routeOf(id) {
+  const stops = stopsOf(id), next = stops.find(st => !st.done), ni = next ? stops.indexOf(next) : stops.length;
+  if (!ui.stopSel) ui.stopSel = {};
+  const sel = stops.find(st => st.k === ui.stopSel[id]) || next || stops[stops.length - 1];
+  const passed = stops.filter(st => st.done).length;
   return el("div", { class: "route-wrap" },
-    el("div", { class: "route-head" }, el("span", { id: "rt-l" }, next ? el("b", { class: "nx-name" }, "Next stop: " + next.name) : el("b", { class: "nx-name" }, "Every HSC paper since " + fromY + " done")), el("span", {}, el("b", {}, done + " of " + st.length), " stations passed")),
-    el("div", { class: "route", role: "group", "aria-labelledby": "rt-l" }, st.map(pp => {
-      const dn = !!state.done[pp.id], nx = pp === next, past = !next || st.indexOf(pp) < st.indexOf(next);
-      return el("button", { type: "button", class: "stn" + (dn ? " done" : "") + (nx ? " next" : "") + (past ? " past" : ""), "data-key": "stn-" + pp.id, "aria-pressed": String(dn),
-        "aria-label": pp.name + (nx ? ", next stop" : ""), title: pp.name + (pp.sol ? " \u00b7 has solutions" : ""), onclick: () => toggle(pp) },
-        el("span", { class: "pin", "aria-hidden": "true", html: dn ? CHECK : "" }),
-        el("span", { class: "yl", "aria-hidden": "true" }, pp.year + (pp.chip.length > 3 ? " " + pp.chip.slice(4) : "")));
-    })));
+    el("div", { class: "route-head" },
+      el("span", { id: "rt-l" }, el("b", { class: "nx-name" }, next ? "Next stop: " + next.name + " · " + stopWhen(next) : "Every stop passed. Well done.")),
+      el("span", {}, el("b", {}, passed + " of " + stops.length), " stops passed")),
+    el("div", { class: "route", role: "group", "aria-labelledby": "rt-l" }, stops.map((st, i) =>
+      el("button", { type: "button", class: "stn" + (st.done ? " done" : "") + (st === next ? " next" : "") + (i < ni ? " past" : ""), "data-key": "stn-" + st.k,
+        "aria-pressed": String(st === sel), "aria-controls": "stop-panel",
+        "aria-label": st.name + ", " + stopWhen(st) + (st.done ? ", sat" + (st.mark ? ", mark " + st.mark : "") : st === next ? ", next stop" : ""),
+        onclick: () => { ui.stopSel[id] = st.k; renderView(); } },
+        el("span", { class: "pin", "aria-hidden": "true", html: st.done ? CHECK : "" }),
+        el("span", { class: "yl", "aria-hidden": "true" }, st.name),
+        el("span", { class: "yw", "aria-hidden": "true" }, stopWhen(st))))),
+    stopPanel(id, sel, sel === next));
+}
+function stopPanel(id, st, isNext) {
+  const pr = practiceOf(id, st.k), mods = modulesFor(id, st);
+  const inSyl = ui.mode === "syl", hasSyl = (SYLIX || []).some(x => x.id === id);
+  const fid = "st-" + st.k;
+  const practice = pr ? el("div", { class: "sp-row" },
+      el("span", {}, el("b", {}, pr.done + " of " + pr.total), " " + PRACTICE_NAME[st.k] + " done as practice"),
+      pr.total ? el("button", { type: "button", class: "btn", "data-key": "go-" + st.k, onclick: () => showPractice(id, st.k) }, "Show " + PRACTICE_NAME[st.k]) : null)
+    : null;
+  let modLine = null;
+  if (mods) {
+    const g = mods.reduce((a, x) => a + x.done, 0), t = mods.reduce((a, x) => a + x.total, 0);
+    modLine = el("div", { class: "sp-row" },
+      mods.length ? el("span", {}, el("b", {}, g + " of " + t), " dot points green in " + (st.term ? mods.length + (mods.length === 1 ? " module" : " modules") + " tagged " + TERM_NAME[st.term] : "all of Year 12"))
+        : el("span", {}, "No modules tagged " + TERM_NAME[st.term] + " yet."),
+      inSyl ? (st.term ? el("button", { type: "button", class: "btn", "data-key": "mods-" + st.k, onclick: () => { ui.sylUpTo = st.term; save("hsc-syl-upto", st.term); renderSylView(); } }, mods.length ? "Show these modules" : "Tag modules") : null)
+        : el("button", { type: "button", class: "btn", "data-key": "mods-" + st.k, onclick: () => openSylFor(id, st.term) }, mods.length ? "Show modules" : "Tag modules"));
+  } else if (hasSyl && !inSyl) {
+    modLine = el("div", { class: "sp-row" }, el("span", {}, "Syllabus dot points for this subject are in the Syllabus view."),
+      el("button", { type: "button", class: "btn", "data-key": "mods-" + st.k, onclick: () => openSylFor(id, st.term) }, "Open syllabus"));
+  }
+  return el("div", { class: "stop", id: "stop-panel", role: "region", "aria-label": st.name + " details" },
+    el("div", { class: "sp-head" },
+      el("h3", {}, st.name, isNext ? el("span", { class: "sp-tag" }, "Next stop") : st.done ? el("span", { class: "sp-tag done" }, "Sat") : null),
+      el("div", { class: "sp-fields" },
+      el("label", { for: fid + "-date" }, "Date", el("input", { type: "date", id: fid + "-date", value: st.date || "", onchange: e => setStop(id, st.k, { date: e.target.value }) })),
+      el("label", { for: fid + "-mark" }, "Your mark", el("input", { type: "text", id: fid + "-mark", inputmode: "decimal", maxlength: "12", placeholder: "e.g. 42/50", value: st.mark || "", onchange: e => setStop(id, st.k, { mark: e.target.value.trim() }) })),
+        el("label", { class: "sp-done", for: fid + "-done" }, el("input", { type: "checkbox", id: fid + "-done", checked: !!st.done, onchange: e => setStop(id, st.k, { done: e.target.checked }) }), "I've sat this"))),
+    st.date || st.done ? null : el("p", { class: "sp-help" }, "Add the date from your school's assessment calendar when you get it."),
+    practice, modLine);
+}
+function showPractice(id, k) {
+  ui.type = k; save("hsc-type", k); ui.query = "";
+  const go = () => document.getElementById("papers")?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  if (ui.mode === "syl") { ui.active = id; setMode("papers").then(() => requestAnimationFrame(go)); } else { refresh(); requestAnimationFrame(go); }
+}
+async function openSylFor(id, term) {
+  ui.sylActive = id; if (term) { ui.sylUpTo = term; save("hsc-syl-upto", term); }
+  await setMode("syl");
 }
 
 function renderView() { keepFocus(drawView); }
@@ -784,7 +923,7 @@ function drawView() {
   const typeLabel = ui.type === "all" ? "papers" : TYPE_NAME[ui.type] + (ui.type === "hsc" ? " papers" : "");
 
   const fromSel = el("select", { id: "from-year", "aria-label": "Count progress from year", onchange: e => { state.from[id] = +e.target.value; persist(); refresh(); } },
-    Array.from({ length: 2026 - 2010 + 1 }, (_, i) => 2026 - i).map(y => el("option", { value: y, selected: y === fromY }, String(y))));
+    Array.from({ length: HSC_YEAR - 1 - 2010 + 1 }, (_, i) => HSC_YEAR - 1 - i).map(y => el("option", { value: y, selected: y === fromY }, String(y))));
 
   const typeBtns = ["all"].concat(TYPES).filter(t => t === "all" || t === ui.type || counts[t] > 0).map(t =>
     el("button", { class: "type", type: "button", "data-key": "type-" + t, "aria-pressed": String(ui.type === t), onclick: () => { ui.type = t; save("hsc-type", t); refresh(); } },
@@ -795,14 +934,14 @@ function drawView() {
   const render = (list, t, mixed) => ui.group === "school" && t !== "hsc" ? schoolRows(list, fromY, mixed)
     : t === "hsc" ? [el("div", { class: "chips pad" }, list.map(pp => chip(Object.assign({}, pp, { chip: pp.year + (pp.chip.length > 3 ? " " + pp.chip.slice(4) : "") }), fromY)))]
     : yearRows(list.map(pp => (mixed || pp.kind === "y11") && TYPE_SHORT[pp.sub || pp.kind] ? Object.assign({}, pp, { tag: TYPE_SHORT[pp.sub || pp.kind] }) : pp), fromY);
-  const head = (text, list) => el("div", { class: "section-label" }, el("span", {}, text), el("span", {}, list.filter(pp => state.done[pp.id]).length + " / " + list.length));
+  const head = (text, list) => el("div", { class: "section-label" }, el("span", {}, text), el("span", {}, list.filter(pp => state.done[pp.id]).length + " of " + list.length + " done"));
   if (ui.type === "all" && ui.group === "school") {
     // THSC-style: everything a school has, under that school's name
     // Recent HSC papers ride the line at the top; only older ones (or search hits) get a section here
     const hscL = all.filter(pp => pp.kind === "hsc").filter(keep).filter(pp => q || pp.year < fromY);
     if (hscL.length) { sections.push(head(q ? "HSC papers" : "Older HSC papers", hscL)); sections.push(...render(hscL, "hsc")); }
     const schoolL = all.filter(pp => pp.kind !== "hsc" && pp.kind !== "added").filter(keep);
-    if (schoolL.length) { sections.push(head(SUB[id].comp ? "By competition" : "By school", schoolL)); sections.push(...render(schoolL, "mixed", true)); }
+    if (schoolL.length) { sections.push(SUB[id].comp ? head("By competition", schoolL) : el("div", { class: "section-label" }, el("span", { class: "sl-l" }, "By school", schoolPick(schoolL)), el("span", {}, schoolL.filter(pp => state.done[pp.id]).length + " of " + schoolL.length + " done"))); sections.push(...render(schoolL, "mixed", true)); }
     const addL = all.filter(pp => pp.kind === "added").filter(keep);
     if (addL.length) { sections.push(head("Papers you added", addL)); sections.push(...yearRows(addL, fromY)); }
     if (!hscL.length && !schoolL.length && !addL.length) sections.push(el("p", { class: "empty", style: "padding-top:16px" }, "Nothing matches." + (!ui.all ? " Try showing older papers." : "")));
@@ -825,34 +964,35 @@ function drawView() {
   (s.y11p || []).forEach((pth, i) => links.push(el("a", { href: "https://thsconline.github.io/s/" + encodeURI(pth), target: "_blank", rel: "noopener" }, i ? "THSC Year 11 tasks" : "THSC Year 11 exams")));
   if (s.nesa) links.push(el("a", { href: NESA + s.nesa, target: "_blank", rel: "noopener" }, "NESA HSC papers"));
 
-  const rc = ragOf(id), rs = rc ? null : suggestRag(id);
+  const rc = ragOf(id);
   const conf = el("div", { class: "conf" },
-    el("span", { class: "conf-l", id: "conf-l" }, "How confident do you feel?"),
-    el("div", { class: "ragseg", role: "group", "aria-labelledby": "conf-l" }, RAG.map(k => el("button", { type: "button", class: "rs-" + k, "data-key": "ragseg-" + k, "aria-pressed": String(rc === k),
-      title: RAG_NAME[k] + (rc === k ? ". Tap again to clear." : ""), onclick: () => setRag(id, rc === k ? null : k) }, el("i", { "aria-hidden": "true" }), RAG_MEAN[k]))),
-    el("span", { class: "conf-hint" }, rc ? "Your " + RAG_NAME[rc].toLowerCase() + " light. Tap it again to clear." : "Your call. It isn't worked out for you."));
+    el("span", { class: "conf-l", id: "conf-l" }, "Confidence"),
+    el("div", { class: "ragseg", role: "group", "aria-labelledby": "conf-l", "aria-describedby": "conf-h", title: "Your call. It isn't worked out for you." }, RAG.map(k => el("button", { type: "button", class: "rs-" + k, "data-key": "ragseg-" + k, "aria-pressed": String(rc === k),
+      title: RAG_NAME[k] + (rc === k ? ". Choose again to clear." : ""), onclick: () => setRag(id, rc === k ? null : k) }, el("i", { "aria-hidden": "true" }), RAG_MEAN[k]))),
+    el("span", { class: "sr", id: "conf-h" }, rc ? "Your " + RAG_NAME[rc].toLowerCase() + " light. Choose it again to clear." : "Your call. It isn't worked out for you."));
 
   const main = el("section", { class: "panel", "aria-labelledby": "v-t" },
     el("div", { class: "vhead" },
       el("div", { class: "vtitle" }, el("div", { class: "vname" }, badge(id, short(s.name), true), el("h2", { id: "v-t" }, s.name)),
-        el("span", { class: "sub" }, x.curDone + " of " + x.curTotal + " " + typeLabel + " since ", fromSel, " \u00b7 " + pct + "%")),
-      routeOf(id, fromY),
-      el("div", { class: "vrow" }, conf, el("div", { class: "links" }, links))),
-    el("div", { class: "toolbar" },
+        conf),
+      routeOf(id)),
+    el("a", { class: "skip", href: "#log" }, "Skip to completed papers"),
+    el("div", { class: "toolbar", id: "papers" },
     el("div", { class: "types", role: "group", "aria-label": "Paper type" }, typeBtns),
     el("div", { class: "controls" },
       el("div", { class: "seg", id: "seg", role: "group", "aria-label": "Group papers", "data-on": ui.shownGroup || ui.group },
         el("span", { class: "thumb", "aria-hidden": "true" }),
         [["school", "By school"], ["year", "By year"]].map(([k, t]) => el("button", { type: "button", "data-key": "group-" + k, "aria-pressed": String(ui.group === k), onclick: () => { ui.group = k; save("hsc-group", k); renderView(); } }, t))),
-      el("input", { type: "search", id: "q", placeholder: "Search schools", "aria-label": "Search papers", value: ui.query,
+      el("input", { type: "search", id: "q", placeholder: "Search schools or papers  ( / )", "aria-label": "Search papers", value: ui.query,
         oninput: e => { ui.query = e.target.value; renderView(); const n = document.getElementById("q"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }),
-      older ? el("label", { for: "all-yrs" }, el("input", { type: "checkbox", id: "all-yrs", checked: ui.all, onchange: e => { ui.all = e.target.checked; save("hsc-all", ui.all); renderView(); } }), "Show older papers (" + older + ")") : null,
-      el("label", { for: "sol-only" }, el("input", { type: "checkbox", id: "sol-only", checked: ui.solOnly, onchange: e => { ui.solOnly = e.target.checked; renderView(); } }), "Only with solutions", el("span", { class: "dot", "aria-hidden": "true" })))),
+      el("label", { for: "from-year" }, "From", fromSel),
+      older ? el("label", { for: "all-yrs" }, el("input", { type: "checkbox", id: "all-yrs", checked: ui.all, onchange: e => { ui.all = e.target.checked; save("hsc-all", ui.all); renderView(); } }), "Older papers (" + older + ")") : null,
+      el("label", { for: "sol-only" }, el("input", { type: "checkbox", id: "sol-only", checked: ui.solOnly, onchange: e => { ui.solOnly = e.target.checked; renderView(); } }), "With solutions", el("span", { class: "dot", "aria-hidden": "true" })))),
     sections,
     addBox(id),
-    DATA[id].failed ? el("p", { class: "empty" }, "The paper list didn't load. Reload the page to try again.") : null);
+    DATA[id].failed ? el("p", { class: "empty" }, "The paper list didn't load. Check your connection, then ", el("button", { type: "button", class: "linkbtn", onclick: () => { delete DATA[id]; openSubject(id); } }, "try again"), ".") : null);
 
-  box.replaceChildren(el("div", { class: "view", style: lineStyle(id, subjects()) }, main, logPanel(id)));
+  box.replaceChildren(el("div", { class: "view", style: lineStyle(id, subjects()) }, main, logPanel(id, links)));
   if (ui.shownGroup !== ui.group) {
     ui.shownGroup = ui.group;
     requestAnimationFrame(() => requestAnimationFrame(() => { const sg = document.getElementById("seg"); if (sg) sg.dataset.on = ui.group; }));
@@ -860,7 +1000,7 @@ function drawView() {
 }
 
 function addBox(id) {
-  const yearSel = el("select", { id: "add-year", "aria-label": "Year" }, Array.from({ length: 15 }, (_, i) => 2026 - i).map(y => el("option", { value: y }, String(y))));
+  const yearSel = el("select", { id: "add-year", "aria-label": "Year" }, Array.from({ length: 15 }, (_, i) => HSC_YEAR - 1 - i).map(y => el("option", { value: y }, String(y))));
   const typeSel = el("select", { id: "add-type", "aria-label": "Type" }, ["Trial", "Half yearly", "AT1", "AT2", "AT3", "AT4", "Other"].map(t => el("option", { value: t }, t)));
   const nameIn = el("input", { id: "add-name", class: "name-input", placeholder: "School or paper name", "aria-label": "Paper name", maxlength: "80" });
   const removable = customOf(id);
@@ -879,16 +1019,17 @@ function addBox(id) {
         toast("Removed " + c.name, () => { state.custom.push(keep); persist(); refresh(); }); } }, "Remove " + c.name))) : null);
 }
 
-function logPanel(id) {
+function logPanel(id, links) {
   const done = allOf(id).filter(p => state.done[p.id]).sort((a, b) => state.done[b.id].localeCompare(state.done[a.id]) || a.name.localeCompare(b.name));
-  return el("aside", { class: "panel log", "aria-label": "Completed papers" },
+  return el("aside", { class: "panel log", id: "log", tabindex: "-1", "aria-label": "Completed papers" },
     el("h3", { class: "meta-label" }, "Completed"),
     el("p", { class: "hint" }, "Most recent first. Add your mark out of 100, or however the paper is marked."),
     done.length ? el("ul", {}, done.map(p => el("li", {},
       el("span", { class: "n" }, p.name),
       el("input", { class: "mark", id: "mk-" + p.id.replace(/[^\w-]/g, "_"), inputmode: "decimal", placeholder: "mark", "aria-label": "Mark for " + p.name, value: state.marks[p.id] || "",
         onchange: e => { const v = e.target.value.trim(); if (v) state.marks[p.id] = v; else delete state.marks[p.id]; persist(); renderCards(); refreshChips(); } }),
-      el("span", { class: "d" }, "Done " + fmtDate(state.done[p.id]))))) : el("p", { class: "none" }, "Nothing ticked in this subject yet.", el("br"), "Tap a paper to log it here."));
+      el("span", { class: "d" }, "Done " + fmtDate(state.done[p.id]))))) : el("p", { class: "none" }, "Nothing ticked in this subject yet.", el("br"), "Tick a paper to log it here."),
+    links && links.length ? el("div", { class: "getpapers" }, el("h3", { class: "meta-label" }, "Get the papers"), el("div", { class: "links" }, links)) : null);
 }
 
 function refreshChips() {
@@ -1006,7 +1147,6 @@ function renderSylStats() {
   for (const id of sylSubjects()) { const t = sylTally(id); done += t.done; total += t.total; }
   document.getElementById("stats").replaceChildren(
     el("span", {}, el("b", {}, String(done)), " of ", el("b", {}, String(total)), " dot points green"),
-    el("span", {}, el("b", {}, pctOf(done, total) + "%"), " overall"),
     ...(syncMsg ? [el("span", {}, syncMsg)] : []));
 }
 
@@ -1015,28 +1155,28 @@ function renderSylCards() {
   for (const id of sylSubjects()) { const t = sylTally(id); for (const k in all) all[k] += t[k]; }
   const unset = all.total - all.done - all.a - all.r;
   document.getElementById("rag-sum").replaceChildren(...(all.done + all.a + all.r === 0
-    ? [el("span", {}, "Tap a dot point to give it a red, amber or green light")]
+    ? [el("span", {}, "Give each dot point a red, amber or green light")]
     : RAG.map(k => el("span", { class: "rsum rs-" + k }, el("i", { "aria-hidden": "true" }), el("b", {}, String(k === "g" ? all.done : all[k])), " " + RAG_NAME[k].toLowerCase()))
         .concat(unset ? [el("span", { class: "rsum" }, el("b", {}, String(unset)), " not set")] : [])));
   const cards = sylSubjects().map(id => {
-    const s = SYLSUB()[id], x = sylTally(id), pct = pctOf(x.done, x.total);
+    const s = SYLSUB()[id], x = sylTally(id), nx = nextStop(id);
     return el("div", { class: "cwrap", style: lineStyle(id, sylSubjects()) }, el("button", { class: "card", type: "button", "data-key": "sylcard-" + id, "aria-current": String(id === ui.sylActive), onclick: () => openSyl(id) },
       el("span", { class: "chead" }, badge(id, short(s.name)), el("span", { class: "cname" }, short(s.name))),
-      el("span", { class: "line" }, el("span", { class: "pct" }, pct + "%"),
-        ragMeter(x, short(s.name)),
-        el("span", { class: "frac" }, x.done + " / " + x.total)),
-      el("span", { class: "cnum" }, el("span", {}, s.modules.length + (s.modules.length === 1 ? " module" : " modules")), el("span", {}, "dot points"))));
+      el("span", { class: "line" }, miniRoute(id), el("span", { class: "cnext" }, nx ? "Next: " + nx.name : "All stops passed")),
+      el("span", { class: "cnum" }, el("span", {}, el("b", {}, String(x.done)), " of " + x.total + " dot points green"))));
   });
   document.getElementById("cards").replaceChildren(...cards);
 }
 
 function setSylTerm(mid, t) { if (!state.sylTerm) state.sylTerm = {}; if (t) state.sylTerm[mid] = t; else delete state.sylTerm[mid]; persist(); refresh(); }
-// Tap cycles a dot point: not set > red > amber > green > not set
-function cycleDot(d) {
+function setDot(d, c) {
   if (!state.syl) state.syl = {};
-  const c = dotRag(d.id), next = c === null ? "r" : c === "r" ? "a" : c === "a" ? "g" : null;
-  if (next) state.syl[d.id] = next; else delete state.syl[d.id];
+  const was = dotRag(d.id);
+  if (c === was) c = null;
+  if (c) state.syl[d.id] = c; else delete state.syl[d.id];
   persist(); refresh();
+  const short = d.t.length > 48 ? d.t.slice(0, 46) + "\u2026" : d.t;
+  toast((c ? RAG_NAME[c] + ": " : "Cleared: ") + short, () => { if (was) state.syl[d.id] = was; else delete state.syl[d.id]; persist(); refresh(); });
 }
 function setModule(m, on) {
   const before = unitsOf(m).filter(u => dotRag(u.id)).map(u => [u.id, state.syl[u.id]]);
@@ -1053,13 +1193,13 @@ function termSelect(m) {
 }
 
 function dotButton(d, q) {
-  const c = dotRag(d.id), next = c === null ? "red" : c === "r" ? "amber" : c === "a" ? "green" : "not set";
-  return el("button", { class: "dp", type: "button", "data-rag": c || null, "data-id": d.id, title: "Tap to make it " + next, onclick: () => cycleDot(d) },
-    el("span", { class: "dp-ck", "aria-hidden": "true", html: CHECK }),
-    // d.m (and d.subm for sub-points) is the same text with its maths as MathML; d.t and d.sub are the plain-text forms used for search
+  const c = dotRag(d.id);
+  return el("div", { class: "dp", "data-rag": c || null },
     el("span", { class: "dp-t" }, d.m ? el("span", { html: d.m }) : mark(d.t, q),
-      c ? el("span", { class: "dp-tag" }, RAG_NAME[c] + " · " + RAG_MEAN[c]) : el("span", { class: "sr" }, "Not set"),
-      (d.sub || []).length ? el("span", { class: "dp-sub" }, d.sub.map((s, i) => d.subm && d.subm[i] ? el("span", { html: d.subm[i] }) : el("span", {}, mark(s, q)))) : null));
+      (d.sub || []).length ? el("span", { class: "dp-sub" }, d.sub.map((s, i) => d.subm && d.subm[i] ? el("span", { html: d.subm[i] }) : el("span", {}, mark(s, q)))) : null),
+    el("span", { class: "dp-lamps", role: "group", "aria-label": "Your light for: " + d.t }, RAG.map(k =>
+      el("button", { type: "button", class: "dl dl-" + k, "data-key": "dl-" + k + "-" + d.id, "aria-pressed": String(c === k), title: RAG_NAME[k] + ": " + RAG_MEAN[k] + (c === k ? ". Choose again to clear." : ""), onclick: () => setDot(d, k) },
+        el("i", { "aria-hidden": "true" }), el("span", { class: "sr" }, RAG_NAME[k] + ", " + RAG_MEAN[k])))));
 }
 // Highlight the search words inside a dot point
 function mark(text, q) {
@@ -1078,7 +1218,7 @@ function moduleBlock(m, q) {
   return el("section", { class: "mod", id: "m-" + m.id, "aria-labelledby": "mh-" + m.id },
     el("div", { class: "mhead" },
       el("div", { class: "mtitle" }, el("h3", { id: "mh-" + m.id }, m.name),
-        el("span", { class: "mcount" }, t.done + " / " + t.total + " green · " + pct + "%")),
+        el("span", { class: "mcount" }, t.done + " of " + t.total + " green")),
       ragMeter(t, m.name), ragCounts(t),
       el("div", { class: "mctl" }, termSelect(m),
         el("button", { class: "linkbtn", type: "button", "data-key": "modall-" + m.id, onclick: () => setModule(m, t.done < t.total) }, t.done < t.total ? "Make all green" : "Clear module"))),
@@ -1090,11 +1230,11 @@ function renderSylView() { keepFocus(drawSylView); }
 function drawSylView() {
   const box = document.getElementById("view");
   const id = ui.sylActive, ix = SYLSUB()[id];
-  if (ui.sylFailed) { box.replaceChildren(el("div", { class: "panel" }, el("p", { class: "empty", style: "padding-top:18px" }, "The syllabus list didn't load. Reload the page to try again."))); return; }
+  if (ui.sylFailed) { box.replaceChildren(el("div", { class: "panel" }, el("p", { class: "empty", style: "padding-top:18px" }, "The syllabus list didn't load. Check your connection, then ", el("button", { type: "button", class: "linkbtn", onclick: () => location.reload() }, "try again"), "."))); return; }
   if (!ix) { box.replaceChildren(); if (SYLIX && sylSubjects().length) openSyl(sylSubjects()[0]); return; }
   const d = SYLD[id];
   if (!d) { box.replaceChildren(el("div", { class: "panel" }, el("p", { class: "empty", style: "padding-top:18px" }, "Loading " + ix.name + "…"))); return; }
-  if (d.failed) { box.replaceChildren(el("div", { class: "panel" }, el("p", { class: "empty", style: "padding-top:18px" }, "The " + ix.name + " syllabus didn't load. Reload the page to try again."))); return; }
+  if (d.failed) { box.replaceChildren(el("div", { class: "panel" }, el("p", { class: "empty", style: "padding-top:18px" }, "The " + ix.name + " syllabus didn't load. Check your connection, then ", el("button", { type: "button", class: "linkbtn", onclick: () => { delete SYLD[id]; openSyl(id); } }, "try again"), "."))); return; }
   const q = (ui.sylQuery || "").trim().toLowerCase();
   const x = sylTally(id), pct = pctOf(x.done, x.total);
   const shown = d.modules.filter(m => inFilter(m.id)), untagged = d.modules.filter(m => !termOf(m.id));
@@ -1110,6 +1250,11 @@ function drawSylView() {
       ? "Showing the modules you tagged " + TERM_NAME[ui.sylUpTo] + " or earlier. " + cov[0] + " of their " + cov[1] + " dot points are green (" + pctOf(cov[0], cov[1]) + "%)."
       : "No modules are tagged " + TERM_NAME[ui.sylUpTo] + " or earlier yet. Pick the term you learnt each module below."));
   }
+  if (!untagged.length || d.modules.some(m => termOf(m.id)) || ui.sylTagSkip) {} else body.push(el("div", { class: "firstrun" },
+    el("h3", {}, "Start by tagging your modules"),
+    el("p", {}, "Choose the term you learn each module. Tagged modules join that stop on your route, so AT1 shows the Term 4 modules you need."),
+    el("div", { class: "untag" }, untagged.map(m => el("div", { class: "urow" }, el("span", {}, m.name), termSelect(m)))),
+    el("button", { type: "button", class: "linkbtn", onclick: () => { ui.sylTagSkip = true; renderSylView(); } }, "Skip for now")));
   const blocks = shown.map(m => moduleBlock(m, q)).filter(Boolean);
   body.push(...blocks);
   if (!blocks.length && (q || ui.sylHide) && shown.length) body.push(el("p", { class: "empty", style: "padding-top:16px" }, q ? "No dot points match “" + ui.sylQuery.trim() + "”." : "Every dot point here is green."));
@@ -1120,16 +1265,16 @@ function drawSylView() {
 
   const main = el("section", { class: "panel", "aria-labelledby": "v-t" },
     el("div", { class: "vhead" },
-      el("div", { class: "vtitle" }, el("div", { class: "vname" }, badge(id, short(ix.name), true), el("h2", { id: "v-t" }, ix.name)), el("span", { class: "sub" }, x.done + " of " + x.total + " dot points green · " + pct + "%")),
-      ragMeter(x, ix.name + " syllabus"), ragCounts(x),
-      el("div", { class: "links" }, el("a", { href: d.url, target: "_blank", rel: "noopener" }, d.title + " on NESA"))),
+      el("div", { class: "vtitle" }, el("div", { class: "vname" }, badge(id, short(ix.name), true), el("h2", { id: "v-t" }, ix.name)), el("span", { class: "sub" }, x.done + " of " + x.total + " dot points green")),
+      routeOf(id),
+      el("div", { class: "vrow" }, ragCounts(x), el("div", { class: "links" }, el("a", { href: d.url, target: "_blank", rel: "noopener" }, d.title + " on NESA")))),
+    el("p", { class: "legend" }, "Give each dot point a light: red for needs work, amber for getting there, green for confident. Tag each module with the term you learn it, and it joins that stop on your route."),
     el("div", { class: "toolbar" },
       el("div", { class: "types", role: "group", "aria-label": "Show content learnt up to" }, pills),
       el("div", { class: "controls" },
-        el("input", { type: "search", id: "sq", placeholder: "Search dot points", "aria-label": "Search dot points", value: ui.sylQuery || "",
+        el("input", { type: "search", id: "sq", placeholder: "Search dot points  ( / )", "aria-label": "Search dot points", value: ui.sylQuery || "",
           oninput: e => { ui.sylQuery = e.target.value; renderSylView(); const n = document.getElementById("sq"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }),
         el("label", { for: "syl-hide" }, el("input", { type: "checkbox", id: "syl-hide", checked: !!ui.sylHide, onchange: e => { ui.sylHide = e.target.checked; renderSylView(); } }), "Hide green"))),
-    el("div", { class: "legend" }, el("span", {}, "Tap a dot point to set its light: red for needs work, amber for getting there, green for confident. Tap again to move it on. Tag each module with the term you learnt it, then pick a term above to see everything up to then.")),
     body);
   box.replaceChildren(el("div", { class: "view", style: lineStyle(id, sylSubjects()) }, main, sylSide(d)));
 }
@@ -1137,12 +1282,12 @@ function drawSylView() {
 function sylSide(d) {
   return el("aside", { class: "panel log syl-side", "aria-label": "Modules" },
     el("h3", { class: "meta-label" }, "Modules"),
-    el("p", { class: "hint" }, "Your progress in each module. Tap one to jump to it."),
+    el("p", { class: "hint" }, "Your progress in each module. Choose one to jump to it."),
     el("ul", {}, d.modules.map(m => { const t = modTally(m), p = pctOf(t.done, t.total);
       return el("li", {}, el("button", { type: "button", class: "mjump", "data-key": "jump-" + m.id, onclick: () => { if (!inFilter(m.id)) { ui.sylUpTo = "all"; save("hsc-syl-upto", "all"); renderSylView(); } document.getElementById("m-" + m.id)?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); } },
         el("span", { class: "n" }, m.name),
-        el("span", { class: "mm" }, ragMeter(t, m.name), el("span", { class: "d" }, p + "%")),
-        el("span", { class: "d" }, (termOf(m.id) ? TERM_NAME[termOf(m.id)] : "No term set") + " · " + t.done + " / " + t.total)));
+        el("span", { class: "mm" }, ragMeter(t, m.name)),
+        el("span", { class: "d" }, (termOf(m.id) ? TERM_NAME[termOf(m.id)] : "No term set") + " · " + t.done + " of " + t.total + " green")));
     })),
     el("p", { class: "hint syl-src" }, "From the " + d.title + ", checked " + d.checked + ". © NSW Education Standards Authority."));
 }
@@ -1222,9 +1367,10 @@ function cleanState(d) {
   d = d || {};
   return { done: Object.assign({}, d.done), marks: Object.assign({}, d.marks), custom: Array.isArray(d.custom) ? d.custom.slice() : [],
     subjects: Array.isArray(d.subjects) ? d.subjects.slice() : null, from: Object.assign({}, d.from), rag: Object.assign({}, d.rag),
-    syl: Object.fromEntries(Object.entries(d.syl || {}).filter(([, v]) => v === 1 || ["r", "a", "g"].includes(v)).map(([k, v]) => [k, v === 1 ? "g" : v])), sylTerm: Object.assign({}, d.sylTerm), sylSubs: Array.isArray(d.sylSubs) ? d.sylSubs.slice() : null };
+    syl: Object.fromEntries(Object.entries(d.syl || {}).filter(([, v]) => v === 1 || ["r", "a", "g"].includes(v)).map(([k, v]) => [k, v === 1 ? "g" : v])), sylTerm: Object.assign({}, d.sylTerm), sylSubs: Array.isArray(d.sylSubs) ? d.sylSubs.slice() : null,
+    route: JSON.parse(JSON.stringify(d.route && typeof d.route === "object" ? d.route : {})), school: typeof d.school === "string" ? d.school : "" };
 }
-const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length || Object.keys(s.syl).length || Object.keys(s.sylTerm).length || (s.sylSubs && s.sylSubs.length);
+const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length || Object.keys(s.syl).length || Object.keys(s.sylTerm).length || (s.sylSubs && s.sylSubs.length) || Object.keys(s.route).length || !!s.school;
 
 // Guest ticks join the account without losing anything on either side. Where both have a value,
 // the account keeps its own (marks, start years); a paper ticked in both keeps the earlier date.
@@ -1239,6 +1385,8 @@ function mergeStates(acc, loc) {
   for (const id in loc.rag) if (!(id in m.rag)) m.rag[id] = loc.rag[id];
   for (const id in loc.syl) if (!(id in m.syl)) m.syl[id] = loc.syl[id];
   for (const id in loc.sylTerm) if (!(id in m.sylTerm)) m.sylTerm[id] = loc.sylTerm[id];
+  for (const id in loc.route) m.route[id] = Object.assign({}, loc.route[id], m.route[id]);
+  if (!m.school && loc.school) m.school = loc.school;
   if (loc.sylSubs) m.sylSubs = m.sylSubs ? m.sylSubs.concat(loc.sylSubs.filter(id => !m.sylSubs.includes(id))) : loc.sylSubs.slice();
   return m;
 }
