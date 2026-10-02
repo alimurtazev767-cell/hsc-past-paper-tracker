@@ -25,10 +25,10 @@
   --ink: #0B1F45; --ink-2: #4A5874; --ink-3: #66728A;
   --rule: #D5DBE5; --rule-2: #BCC5D3;
   --band: #0B1F45; --band-2: #B9C4D8;
-  --tl-r: #D92D20; --tl-a: #E08A00; --tl-g: #12A150; --tl-off: #33415C;
+  --tl-r: #D92D20; --tl-a: #B86E00; --tl-g: #12A150; --tl-off: #33415C;
   --line: #0079AD; --on: #FFFFFF;
   --sans: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --lift: 0 1px 2px rgb(0 0 0 / .06), 0 6px 16px -12px rgb(0 0 0 / .2);
+  --lift: 0 1px 0 rgb(11 31 69 / .05);
   color-scheme: light;
 }
 * { box-sizing: border-box; }
@@ -86,12 +86,12 @@ h1 { margin: 0; font: 800 clamp(2.6rem, 6.4vw, 4.6rem)/1 var(--sans); letter-spa
 .map-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--rule); }
 .map-head b { font-size: 16px; }
 .map-head span { font-size: 13.5px; color: var(--ink-3); }
-.mline { display: grid; grid-template-columns: 30px 130px minmax(0, 1fr) auto 3.4em; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.mline { display: grid; grid-template-columns: 30px 130px minmax(0, 1fr) auto 6.5em; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
 .mline:last-child { border-bottom: 0; }
 .lb { width: 30px; height: 30px; border-radius: 50%; background: var(--line); color: var(--on); display: grid; place-items: center; font: 800 12px/1 var(--sans); letter-spacing: .02em; }
 .mname { font-weight: 600; font-size: 15px; }
-.mpct { font-weight: 800; font-size: 18px; text-align: right; }
-.route { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.mpct { font-weight: 700; font-size: 14.5px; text-align: right; white-space: nowrap; }
+.route { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .stn { position: relative; display: grid; grid-template-rows: 24px auto; justify-items: center; align-items: center; gap: 2px; }
 .stn::before { content: ""; position: absolute; top: 12px; left: 0; right: 0; height: 6px; transform: translateY(-50%); background: linear-gradient(var(--rule-2), var(--rule-2)) center / 100% 2px no-repeat; }
 .stn.past::before { background: var(--line); }
@@ -102,7 +102,7 @@ h1 { margin: 0; font: 800 clamp(2.6rem, 6.4vw, 4.6rem)/1 var(--sans); letter-spa
 .pin svg { width: 11px; height: 11px; }
 .stn.done .pin { background: var(--line); box-shadow: inset 0 0 0 2px var(--panel), 0 0 0 2px var(--line); }
 .stn.next .pin { width: 24px; height: 24px; box-shadow: inset 0 0 0 5px var(--line); }
-.yl { font-size: 12px; font-weight: 600; color: var(--ink-3); }
+.yl { font-size: 12.5px; font-weight: 700; color: var(--ink-3); }
 .stn.done .yl, .stn.next .yl { color: var(--ink); }
 .lights { display: inline-flex; gap: 4px; padding: 4px 6px; border-radius: 999px; background: var(--band); }
 .lights i { width: 8px; height: 8px; border-radius: 50%; background: var(--tl-off); }
@@ -138,7 +138,7 @@ footer.notes p { margin: 0; }
 footer.notes a { color: var(--ink); text-underline-offset: 2px; }
 
 @media (max-width: 860px) {
-  .mline { grid-template-columns: 30px minmax(0, 1fr) auto 3.4em; }
+  .mline { grid-template-columns: 30px minmax(0, 1fr) auto 6.5em; }
   .mline .route { grid-column: 1 / -1; grid-row: 2; }
   .steps { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .steps li { padding: 0 0 0 54px; }
@@ -195,26 +195,26 @@ footer.notes a { color: var(--ink); text-underline-offset: 2px; }
 
 <main class="wrap">
   <figure class="map" aria-label="Example of the tracker">
-    <div class="map-head" aria-hidden="true"><b>Your subjects as lines</b><span>Each station is a year's HSC paper</span></div>
+    <div class="map-head" aria-hidden="true"><b>Your subjects as lines</b><span>Each stop is one of your Year 12 assessments</span></div>
       <div class="mline" style="--line:#F6891F;--on:#0B1F45">
         <span class="lb">X1</span><span class="mname">Maths Ext 1</span>
-        <span class="route"><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2020</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2021</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2022</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2023</span></span><span class="stn next"><span class="pin"></span><span class="yl">2024</span></span><span class="stn "><span class="pin"></span><span class="yl">2025</span></span></span>
-        <span class="lights"><i></i><i></i><i class="g"></i></span><b class="mpct">67%</b>
+        <span class="route"><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">AT1</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">AT2</span></span><span class="stn next"><span class="pin"></span><span class="yl">AT3</span></span><span class="stn "><span class="pin"></span><span class="yl">Trials</span></span><span class="stn "><span class="pin"></span><span class="yl">HSC</span></span></span>
+        <span class="lights"><i></i><i></i><i class="g"></i></span><b class="mpct">Next: AT3</b>
       </div>
       <div class="mline" style="--line:#00824A;--on:#FFFFFF">
         <span class="lb">CH</span><span class="mname">Chemistry</span>
-        <span class="route"><span class="stn past"><span class="pin"></span><span class="yl">2020</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2021</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2022</span></span><span class="stn next"><span class="pin"></span><span class="yl">2023</span></span><span class="stn "><span class="pin"></span><span class="yl">2024</span></span><span class="stn "><span class="pin"></span><span class="yl">2025</span></span></span>
-        <span class="lights"><i></i><i class="a"></i><i></i></span><b class="mpct">43%</b>
+        <span class="route"><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">AT1</span></span><span class="stn next"><span class="pin"></span><span class="yl">AT2</span></span><span class="stn "><span class="pin"></span><span class="yl">AT3</span></span><span class="stn "><span class="pin"></span><span class="yl">Trials</span></span><span class="stn "><span class="pin"></span><span class="yl">HSC</span></span></span>
+        <span class="lights"><i></i><i class="a"></i><i></i></span><b class="mpct">Next: AT2</b>
       </div>
       <div class="mline" style="--line:#B8217F;--on:#FFFFFF">
         <span class="lb">PH</span><span class="mname">Physics</span>
-        <span class="route"><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2020</span></span><span class="stn next"><span class="pin"></span><span class="yl">2021</span></span><span class="stn "><span class="pin"></span><span class="yl">2022</span></span><span class="stn "><span class="pin"></span><span class="yl">2023</span></span><span class="stn "><span class="pin"></span><span class="yl">2024</span></span><span class="stn "><span class="pin"></span><span class="yl">2025</span></span></span>
-        <span class="lights"><i class="r"></i><i></i><i></i></span><b class="mpct">14%</b>
+        <span class="route"><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">AT1</span></span><span class="stn next"><span class="pin"></span><span class="yl">AT2</span></span><span class="stn "><span class="pin"></span><span class="yl">AT3</span></span><span class="stn "><span class="pin"></span><span class="yl">Trials</span></span><span class="stn "><span class="pin"></span><span class="yl">HSC</span></span></span>
+        <span class="lights"><i class="r"></i><i></i><i></i></span><b class="mpct">Next: AT2</b>
       </div>
       <div class="mline" style="--line:#0079AD;--on:#FFFFFF">
         <span class="lb">X2</span><span class="mname">Maths Ext 2</span>
-        <span class="route"><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2020</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2021</span></span><span class="stn next"><span class="pin"></span><span class="yl">2022</span></span><span class="stn "><span class="pin"></span><span class="yl">2023</span></span><span class="stn "><span class="pin"></span><span class="yl">2024</span></span><span class="stn "><span class="pin"></span><span class="yl">2025</span></span></span>
-        <span class="lights"><i></i><i class="a"></i><i></i></span><b class="mpct">33%</b>
+        <span class="route"><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">AT1</span></span><span class="stn next"><span class="pin"></span><span class="yl">AT2</span></span><span class="stn "><span class="pin"></span><span class="yl">AT3</span></span><span class="stn "><span class="pin"></span><span class="yl">Trials</span></span><span class="stn "><span class="pin"></span><span class="yl">HSC</span></span></span>
+        <span class="lights"><i></i><i class="a"></i><i></i></span><b class="mpct">Next: AT2</b>
       </div>
     <figcaption>Made-up numbers, to show what it looks like.</figcaption>
   </figure>
@@ -223,8 +223,8 @@ footer.notes a { color: var(--ink); text-underline-offset: 2px; }
     <h2 class="title" id="how-t">Three stops, then just keep ticking.</h2>
     <ol class="steps">
       <li><span class="n" aria-hidden="true">1</span><h3>Choose your subjects</h3><p>Pick from 32 Year 12 subjects, plus maths competitions. Each one lists the HSC papers and the trial papers and assessment tasks that THSC Online has, grouped by school or by year.</p></li>
-      <li><span class="n" aria-hidden="true">2</span><h3>Tick papers as you do them</h3><p>Tap a paper to mark it done and add your mark if you like. Each subject's HSC papers sit on a line, so you can see your next stop, and the Completed list keeps the dates.</p></li>
-      <li><span class="n" aria-hidden="true">3</span><h3>Set a traffic light</h3><p>Tap the lights on a subject to say how you feel about it. The colour is your call; the tracker never picks it for you.</p>
+      <li><span class="n" aria-hidden="true">2</span><h3>Tick papers as you do them</h3><p>Tick papers as practice and add your mark if you like. Each subject runs on a line through AT1, AT2, AT3, Trials and the HSC, so you always see your next stop.</p></li>
+      <li><span class="n" aria-hidden="true">3</span><h3>Set a traffic light</h3><p>Use the lights on a subject to say how you feel about it. The colour is your call; the tracker never picks it for you.</p>
         <span class="legend"><span><i style="background:var(--tl-r)"></i>Red: needs work</span><span><i style="background:var(--tl-a)"></i>Amber: getting there</span><span><i style="background:var(--tl-g)"></i>Green: confident</span></span></li>
     </ol>
   </section>
@@ -237,7 +237,7 @@ footer.notes a { color: var(--ink); text-underline-offset: 2px; }
       <li><b>Syllabus dot points</b><span>Give each Year 12 dot point its own light in Maths, English, Chemistry, Physics and HMS.</span></li>
       <li><b>Your own papers</b><span>Add a paper that isn't listed, like your school's own trial.</span></li>
       <li id="fact-sync"><b>Saved for you</b><span>Ticks save in this browser, so come back on the same device.</span></li>
-      <li><b>Free</b><span>No ads and nothing to pay. Made for students' private study.</span></li>
+      <li><b>Study timer and calendar</b><span>Time your study by subject and see each week, with your assessment dates on the calendar.</span></li>
     </ul>
   </section>
 
@@ -288,7 +288,7 @@ footer.notes a { color: var(--ink); text-underline-offset: 2px; }
     var s = document.createElement("span"), i = document.createElement("i"), b = document.createElement("b");
     i.style.background = "var(" + col[k] + ")"; b.textContent = c[k]; s.append(i, b, " " + names[k]); return s;
   }));
-  else $("back-tl").textContent = "No traffic lights set yet. Tap the lights on a subject to add them.";
+  else $("back-tl").textContent = "No traffic lights set yet. Use the lights on a subject to add them.";
 })();
 </script>
 </body>
