@@ -570,6 +570,55 @@ footer.notes { color: var(--muted); }
   .rag { top: 4px; right: 2px; }
 }
 @media (prefers-reduced-motion: reduce) { .lights, .lights i, .ragseg button { transition: none; } .rag:active .lights, .ragseg button:active { transform: none; } }
+/* ---- syllabus: Year 12 dot points the student marks as learnt ---- */
+.mode-seg { margin-top: 22px; justify-self: start; min-width: min(320px, 100%); }
+.mode-seg[data-on="syl"] .thumb { transform: translateX(100%); }
+.mode-seg button { padding: 8px 18px; }
+body[data-mode="syl"] footer.notes p:not(.syl-only), body:not([data-mode="syl"]) .syl-only { display: none; }
+.syl-note { margin: 18px 22px 0; }
+.mod { border-top: 1px solid var(--rule); padding: 20px 22px 18px; scroll-margin-top: 150px; }
+.mod:first-of-type { border-top: 0; }
+.mhead { display: grid; gap: 10px; margin-bottom: 12px; }
+.mtitle { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; }
+.mtitle h3 { font: 600 1.08rem/1.3 var(--display); letter-spacing: -0.012em; margin: 0; text-wrap: balance; }
+.mcount { font: 500 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.mhead .meter { height: 4px; }
+.mctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.mterm select, .urow select { padding: 6px 10px; min-height: 36px; border-radius: 9px; background: var(--well); border: 1px solid transparent; box-shadow: var(--recess); color: var(--fg); font-size: 13.5px; }
+.mterm select:hover, .urow select:hover { border-color: rgb(255 255 255 / .08); }
+.grp + .grp { margin-top: 14px; }
+.gh { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--muted); text-wrap: pretty; }
+.dps { display: grid; gap: 6px; }
+.dp { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: start; text-align: left; width: 100%; padding: 10px 12px; min-height: 44px; border-radius: 11px; border: 1px solid transparent; background: var(--well); box-shadow: var(--recess); color: #D1D1D6; font-size: 14.5px; line-height: 1.45; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .1s ease-out; }
+.dp:hover { border-color: rgb(255 255 255 / .12); color: #FFFFFF; }
+.dp:active { transform: scale(.99); }
+.dp-ck { width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px #48484A; color: transparent; transition: background-color .2s ease, box-shadow .2s ease, color .2s ease; }
+.dp-ck svg { width: 12px; height: 12px; }
+.dp-t { min-width: 0; overflow-wrap: anywhere; text-wrap: pretty; }
+.dp-sub { display: grid; gap: 3px; margin-top: 6px; font-size: 13.5px; color: var(--muted); }
+.dp-sub > span { display: block; padding-left: 14px; position: relative; }
+.dp-sub > span::before { content: "\2013"; position: absolute; left: 0; }
+.dp[aria-pressed="true"] { background: rgb(245 245 247 / .1); border-color: rgb(245 245 247 / .22); box-shadow: none; color: #FFFFFF; }
+.dp[aria-pressed="true"] .dp-ck { background: #F5F5F7; color: #000000; box-shadow: none; }
+.dp[aria-pressed="true"] .dp-sub { color: #C7C7CC; }
+.dp mark { background: rgb(255 214 10 / .3); color: inherit; border-radius: 3px; }
+.untag { padding: 0 22px 18px; display: grid; gap: 6px; }
+.urow { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--rule); font-size: 14px; }
+.urow:first-child { border-top: 0; }
+.syl-side li { padding: 0; }
+.mjump { display: grid; gap: 4px; width: 100%; text-align: left; background: none; border: 0; color: inherit; padding: 12px 20px; cursor: pointer; font: inherit; }
+.mjump:hover { background: rgb(255 255 255 / .02); }
+.mjump .mm { display: flex; align-items: center; gap: 10px; }
+.mjump .mm .meter { flex: 1; height: 4px; }
+.syl-side .syl-src { padding-top: 14px; border-top: 1px solid var(--rule); }
+@media (pointer: coarse) { .mterm select, .urow select { min-height: 44px; } }
+@media (max-width: 560px) {
+  .mod { padding: 18px 16px 16px; }
+  .untag { padding: 0 16px 16px; }
+  .syl-note { margin: 16px 16px 0; }
+  .mode-seg { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .dp, .dp-ck { transition: none; } .dp:active { transform: none; } }
 </style>
 </head>
 <body>
@@ -586,6 +635,7 @@ footer.notes { color: var(--muted); }
       </div>
     </div>
     <div class="stats" id="stats"></div>
+    <div class="seg mode-seg" id="mode-seg" role="group" aria-label="What to track" data-on="papers"><span class="thumb" aria-hidden="true"></span><button type="button" data-mode="papers" aria-pressed="true">Past papers</button><button type="button" data-mode="syl" aria-pressed="false">Syllabus</button></div>
   </header>
 
   <section class="group">
@@ -595,6 +645,7 @@ footer.notes { color: var(--muted); }
   <main id="view"></main>
 
   <footer class="notes">
+    <p class="syl-only">Syllabus dot points are the Year 12 (HSC course) content of each subject's syllabus for the 2027 HSC, copied from <a href="https://curriculum.nsw.edu.au/" target="_blank" rel="noopener" style="color:inherit">NESA's NSW Curriculum website</a> and NESA's syllabus documents; each subject links to its source. &copy; NSW Education Standards Authority (NESA) for and on behalf of the Crown in right of the State of New South Wales. The official, up-to-date syllabuses are on NESA's websites; check there if anything here differs. This site isn't made or endorsed by NESA.</p>
     <p>Trial papers and HSC papers up to 2018 are copied from THSC Online's Year 12 pages as listed on 2 October 2026. THSC's HSC lists stop at 2018, so newer HSC papers come from each subject's NESA exam paper page, checked the same day. Software Engineering and Enterprise Computing have only the 2025 NESA paper. Assessment tasks (half yearly and AT1 to AT4) come from THSC's assessment task pages, sorted the way THSC sorts them; THSC has these for 14 subjects.</p>
     <p>Paper names come from <a href="https://thsconline.github.io/s/" target="_blank" rel="noopener" style="color:inherit">THSC Online</a> and <a href="https://www.nsw.gov.au/education-and-training/nesa/curriculum/hsc-exam-papers" target="_blank" rel="noopener" style="color:inherit">NESA</a>. This site only lists names so you can track your practice; get the papers themselves from those sites. Free and non-commercial, for students' private study.</p>
     <p>Each subject's progress counts papers from the year you pick in that subject (defaults: Maths Advanced and the Extensions from 2020, everything else from 2019). Every year THSC lists is shown, as on THSC; untick "Show papers before" to see only recent years. Older papers you tick still count in the totals.</p>
@@ -603,7 +654,7 @@ footer.notes { color: var(--muted); }
 
 <dialog id="picker" aria-labelledby="pk-t">
   <form method="dialog" class="dlg" id="pk-form">
-    <header><h2 id="pk-t">Choose your subjects</h2><p>Only the subjects you pick show up. Unticking a subject hides it but keeps your progress.</p></header>
+    <header><h2 id="pk-t">Choose your subjects</h2><p id="pk-p">Only the subjects you pick show up. Unticking a subject hides it but keeps your progress.</p></header>
     <div class="body" id="pk-body"></div>
     <footer><span id="pk-count"></span><span style="display:flex;gap:8px"><button class="btn ghost" type="button" id="pk-cancel">Cancel</button><button class="btn primary" type="submit" id="pk-save">Save subjects</button></span></footer>
   </form>
@@ -639,8 +690,8 @@ const DEFAULT_SUBJECTS = ["ext1", "ext2", "chem", "phys"];
 const SUB = Object.fromEntries(INDEX.map(s => [s.id, s]));
 const short = n => n.replace("Mathematics", "Maths").replace("Earth and Environmental Science", "Earth & Env Science");
 
-let state = { done: {}, marks: {}, custom: [], subjects: null, from: {}, rag: {} };
-let ui = { active: null, query: "", all: true, solOnly: false, type: "all", group: "school" };
+let state = { done: {}, marks: {}, custom: [], subjects: null, from: {}, rag: {}, syl: {}, sylTerm: {}, sylSubs: null };
+let ui = { active: null, query: "", all: true, solOnly: false, type: "all", group: "school", mode: "papers", sylActive: null, sylUpTo: "all", sylQuery: "", sylHide: false, pickerFor: "papers" };
 const TYPES = ["hsc", "trial", "hy", "at1", "at2", "at3", "at4", "comp", "added"];
 const TYPE_NAME = { all: "All", hsc: "HSC", trial: "Trials", hy: "Half yearly", at1: "AT1", at2: "AT2", at3: "AT3", at4: "AT4", y11: "Year 11", y11hy: "Year 11 half yearly", y11pt1: "Year 11 task 1", y11pt2: "Year 11 task 2", y11pt3: "Year 11 task 3", comp: "Competitions", added: "Added by you" };
 const TYPE_SHORT = { hsc: "HSC", trial: "Trial", hy: "HY", at1: "AT1", at2: "AT2", at3: "AT3", at4: "AT4", y11: "Y11", y11hy: "Y11 HY", y11pt1: "Y11 T1", y11pt2: "Y11 T2", y11pt3: "Y11 T3", comp: "", added: "" };
@@ -660,7 +711,8 @@ const DATA = {};
 function load(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } }
 function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 state = Object.assign(state, load("hsc-log", {}));
-ui.active = load("hsc-tab2", null);
+ui.active = load("hsc-tab2", null); ui.sylActive = load("hsc-syl-tab", null);
+if (!state.syl || typeof state.syl !== "object") state.syl = {}; if (!state.sylTerm || typeof state.sylTerm !== "object") state.sylTerm = {};
 const subjects = () => (state.subjects && state.subjects.length ? state.subjects : DEFAULT_SUBJECTS).filter(id => SUB[id]);
 const fromYear = id => state.from[id] || SUB[id].from;
 
@@ -741,6 +793,7 @@ function toast(msg, undo) {
 
 /* ---------- render ---------- */
 function renderStats() {
+  if (ui.mode === "syl") return renderSylStats();
   let done = 0, wk = 0; const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
   for (const id in state.done) { done++; if (state.done[id] >= weekAgo) wk++; }
   document.getElementById("stats").replaceChildren(
@@ -784,6 +837,7 @@ function renderRagSum() {
 }
 
 function renderCards() {
+  if (ui.mode === "syl") return renderSylCards();
   const ids = subjects();
   const cards = ids.map(id => {
     const s = SUB[id], x = tally(id, "all"); const pct = x.curTotal ? Math.round(100 * x.curDone / x.curTotal) : 0;
@@ -851,6 +905,7 @@ function schoolRows(list, fromY, mixed) {
 }
 
 function renderView() {
+  if (ui.mode === "syl") return renderSylView();
   const box = document.getElementById("view");
   const id = ui.active; const s = SUB[id];
   if (!s) { box.replaceChildren(); return; }
@@ -1013,26 +1068,264 @@ function openPicker() {
   }))]));
   function updCount() { const n = body.querySelectorAll("input:checked").length; document.getElementById("pk-count").textContent = n + (n === 1 ? " subject" : " subjects") + " selected"; document.getElementById("pk-save").disabled = n === 0; }
   updCount();
+  document.getElementById("pk-t").textContent = "Choose your subjects";
+  document.getElementById("pk-p").textContent = "Only the subjects you pick show up. Unticking a subject hides it but keeps your progress.";
+  ui.pickerFor = "papers";
   const d = document.getElementById("picker");
   if (d.showModal) d.showModal(); else d.setAttribute("open", "");
 }
-document.getElementById("pick-btn").addEventListener("click", openPicker);
+document.getElementById("pick-btn").addEventListener("click", () => ui.mode === "syl" ? openSylPicker() : openPicker());
 document.getElementById("pk-cancel").addEventListener("click", () => document.getElementById("picker").close());
 document.getElementById("pk-form").addEventListener("submit", async e => {
   const ids = [...document.querySelectorAll("#pk-body input:checked")].map(i => i.value);
   if (!ids.length) { e.preventDefault(); return; }
+  if (ui.pickerFor === "syl") {
+    const order = SYL_GROUPS.flatMap(g => g[1]);
+    state.sylSubs = ids.sort((a, b) => order.indexOf(a) - order.indexOf(b)); persist();
+    if (!ids.includes(ui.sylActive)) ui.sylActive = ids[0];
+    openSyl(ui.sylActive); refresh(); return;
+  }
   const order = GROUPS.flatMap(g => g[1]);
   state.subjects = ids.sort((a, b) => order.indexOf(a) - order.indexOf(b)); persist();
   if (!ids.includes(ui.active)) ui.active = ids[0];
   await Promise.all(ids.map(ensure)); refresh(); openSubject(ui.active);
 });
 
+/* ---------- syllabus ----------
+   Year 12 (HSC course) content for the syllabus each subject uses for the 2027 HSC, copied from NESA (see data/syllabus/index.json).
+   The student tags each module with the term they learnt it and taps dot points to mark them learnt.
+   Saved in state.syl (learnt dot points), state.sylTerm (module -> term) and state.sylSubs (chosen subjects), so it syncs like the ticks. */
+const SYL_GROUPS = [
+  ["Mathematics", ["std", "adv", "ext1", "ext2"]],
+  ["English", ["engstd", "engadv", "engx1"]],
+  ["Science", ["bio", "chem", "phys"]],
+  ["History and society", ["mod", "anc", "eco", "legal", "bus", "sac", "geo"]],
+  ["Health and community", ["hms", "cafs"]],
+];
+// Year 12 (the HSC course) starts in Term 4, so the terms run in teaching order.
+const TERMS = [["t4", "Term 4"], ["t1", "Term 1"], ["t2", "Term 2"], ["t3", "Term 3"]];
+const TERM_NAME = Object.fromEntries(TERMS);
+const termRank = t => TERMS.findIndex(x => x[0] === t);
+let SYLIX = null; const SYLD = {};
+const SYLSUB = () => Object.fromEntries((SYLIX || []).map(s => [s.id, s]));
+function sylSubjects() {
+  const have = SYLSUB();
+  if (state.sylSubs && state.sylSubs.length) return state.sylSubs.filter(id => have[id]);
+  const fromPapers = subjects().filter(id => have[id]);
+  return fromPapers.length ? fromPapers : (SYLIX || []).slice(0, 4).map(s => s.id);
+}
+async function ensureSylIndex() {
+  if (SYLIX) return SYLIX;
+  try { const r = await fetch("data/syllabus/index.json"); if (!r.ok) throw 0; SYLIX = await r.json(); } catch (e) { SYLIX = []; ui.sylFailed = true; }
+  return SYLIX;
+}
+async function ensureSyl(id) {
+  if (SYLD[id]) return SYLD[id];
+  try { const r = await fetch("data/syllabus/" + id + ".json"); if (!r.ok) throw 0; SYLD[id] = await r.json(); }
+  catch (e) { SYLD[id] = { failed: true, modules: [] }; }
+  return SYLD[id];
+}
+// A module with no dot points (shouldn't happen) still counts as one thing to tick.
+const unitsOf = m => { const d = m.groups.flatMap(g => g.dots); return d.length ? d : [{ id: m.id, t: m.name }]; };
+const learnt = id => !!(state.syl && state.syl[id]);
+const termOf = mid => (state.sylTerm || {})[mid] || "";
+// Shown when the filter is "up to Term X": modules tagged that term or earlier
+const inFilter = mid => ui.sylUpTo === "all" || (termOf(mid) && termRank(termOf(mid)) <= termRank(ui.sylUpTo));
+function sylTally(id) {
+  const ix = SYLSUB()[id]; if (!ix) return { done: 0, total: 0 };
+  let done = 0; for (const k in state.syl) if (k.startsWith(id + "-")) done++;
+  return { done: Math.min(done, ix.n), total: ix.n };
+}
+function modTally(m) { const u = unitsOf(m); return { done: u.filter(x => learnt(x.id)).length, total: u.length }; }
+const pctOf = (a, b) => b ? Math.round(100 * a / b) : 0;
+
+function renderSylStats() {
+  let done = 0, total = 0;
+  for (const id of sylSubjects()) { const t = sylTally(id); done += t.done; total += t.total; }
+  document.getElementById("stats").replaceChildren(
+    el("span", {}, el("b", {}, String(done)), " of ", el("b", {}, String(total)), " dot points learnt"),
+    el("span", {}, el("b", {}, pctOf(done, total) + "%"), " overall"),
+    ...(syncMsg ? [el("span", {}, syncMsg)] : []));
+}
+
+function renderSylCards() {
+  document.getElementById("rag-sum").replaceChildren();
+  const cards = sylSubjects().map(id => {
+    const s = SYLSUB()[id], x = sylTally(id), pct = pctOf(x.done, x.total);
+    return el("div", { class: "cwrap" }, el("button", { class: "card", type: "button", "aria-current": String(id === ui.sylActive), onclick: () => openSyl(id) },
+      el("span", { class: "cname" }, short(s.name)),
+      el("span", { class: "line" }, el("span", { class: "pct" }, pct + "%"),
+        el("span", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + pct + "%" })),
+        el("span", { class: "frac" }, x.done + " / " + x.total)),
+      el("span", { class: "cnum" }, el("span", {}, s.modules.length + (s.modules.length === 1 ? " module" : " modules")), el("span", {}, "dot points"))));
+  });
+  cards.push(el("button", { class: "card add", type: "button", onclick: openSylPicker }, "+ Add or remove subjects"));
+  document.getElementById("cards").replaceChildren(...cards);
+}
+
+function setSylTerm(mid, t) { if (!state.sylTerm) state.sylTerm = {}; if (t) state.sylTerm[mid] = t; else delete state.sylTerm[mid]; persist(); refresh(); }
+function toggleDot(d) {
+  if (!state.syl) state.syl = {};
+  const was = learnt(d.id);
+  if (was) delete state.syl[d.id]; else state.syl[d.id] = 1;
+  persist(); refresh();
+}
+function setModule(m, on) {
+  const before = unitsOf(m).filter(u => learnt(u.id)).map(u => u.id);
+  for (const u of unitsOf(m)) { if (on) state.syl[u.id] = 1; else delete state.syl[u.id]; }
+  persist(); refresh();
+  toast((on ? "Marked all of " : "Cleared ") + m.name, () => { for (const u of unitsOf(m)) delete state.syl[u.id]; before.forEach(i => state.syl[i] = 1); persist(); refresh(); });
+}
+
+function termSelect(m) {
+  return el("label", { class: "mterm" }, el("span", { class: "sr" }, "Term you learnt " + m.name),
+    el("select", { "aria-label": "Term you learnt " + m.name, onchange: e => setSylTerm(m.id, e.target.value) },
+      el("option", { value: "", selected: !termOf(m.id) }, "Set term"),
+      TERMS.map(([k, t]) => el("option", { value: k, selected: termOf(m.id) === k }, t))));
+}
+
+function dotButton(d, q) {
+  const on = learnt(d.id);
+  return el("button", { class: "dp", type: "button", "aria-pressed": String(on), "data-id": d.id, onclick: () => toggleDot(d) },
+    el("span", { class: "dp-ck", "aria-hidden": "true", html: CHECK }),
+    el("span", { class: "dp-t" }, mark(d.t, q),
+      (d.sub || []).length ? el("span", { class: "dp-sub" }, d.sub.map(s => el("span", {}, mark(s, q)))) : null));
+}
+// Highlight the search words inside a dot point
+function mark(text, q) {
+  if (!q) return text;
+  const i = text.toLowerCase().indexOf(q); if (i < 0) return text;
+  return el("span", {}, text.slice(0, i), el("mark", {}, text.slice(i, i + q.length)), text.slice(i + q.length));
+}
+
+function moduleBlock(m, q) {
+  const t = modTally(m), pct = pctOf(t.done, t.total);
+  const match = d => !q || d.t.toLowerCase().includes(q) || (d.sub || []).some(s => s.toLowerCase().includes(q));
+  const keep = d => match(d) && !(ui.sylHide && learnt(d.id));
+  const groups = m.groups.map(g => ({ h: g.h, dots: g.dots.filter(keep) })).filter(g => g.dots.length);
+  if ((q || ui.sylHide) && !groups.length) return null;
+  const solo = !m.groups.some(g => g.dots.length);
+  return el("section", { class: "mod", id: "m-" + m.id, "aria-labelledby": "mh-" + m.id },
+    el("div", { class: "mhead" },
+      el("div", { class: "mtitle" }, el("h3", { id: "mh-" + m.id }, m.name),
+        el("span", { class: "mcount" }, t.done + " / " + t.total + " · " + pct + "%")),
+      el("div", { class: "meter", role: "progressbar", "aria-label": m.name + " progress", "aria-valuemin": "0", "aria-valuemax": String(t.total), "aria-valuenow": String(t.done) }, el("span", { style: "width:" + pct + "%" })),
+      el("div", { class: "mctl" }, termSelect(m),
+        el("button", { class: "linkbtn", type: "button", onclick: () => setModule(m, t.done < t.total) }, t.done < t.total ? "Mark all learnt" : "Clear module"))),
+    solo ? el("div", { class: "dps" }, dotButton({ id: m.id, t: "I've learnt this module" })) :
+    groups.map(g => el("div", { class: "grp" }, g.h ? el("p", { class: "gh" }, g.h) : null, el("div", { class: "dps" }, g.dots.map(d => dotButton(d, q))))));
+}
+
+function renderSylView() {
+  const box = document.getElementById("view");
+  const id = ui.sylActive, ix = SYLSUB()[id];
+  if (ui.sylFailed) { box.replaceChildren(el("div", { class: "panel" }, el("p", { class: "empty", style: "padding:18px" }, "The syllabus list didn't load. Reload the page to try again."))); return; }
+  if (!ix) { box.replaceChildren(); if (SYLIX && sylSubjects().length) openSyl(sylSubjects()[0]); return; }
+  const d = SYLD[id];
+  if (!d) { box.replaceChildren(el("div", { class: "panel" }, el("p", { class: "empty", style: "padding:18px" }, "Loading " + ix.name + "…"))); return; }
+  if (d.failed) { box.replaceChildren(el("div", { class: "panel" }, el("p", { class: "empty", style: "padding:18px" }, "The " + ix.name + " syllabus didn't load. Reload the page to try again."))); return; }
+  const q = (ui.sylQuery || "").trim().toLowerCase();
+  const x = sylTally(id), pct = pctOf(x.done, x.total);
+  const shown = d.modules.filter(m => inFilter(m.id)), untagged = d.modules.filter(m => !termOf(m.id));
+  const cov = shown.reduce((a, m) => { const t = modTally(m); return [a[0] + t.done, a[1] + t.total]; }, [0, 0]);
+  const counts = { all: d.modules.length }; for (const [k] of TERMS) counts[k] = d.modules.filter(m => termOf(m.id) && termRank(termOf(m.id)) <= termRank(k)).length;
+  const pills = [["all", "All of Year 12"]].concat(TERMS.map(([k, t]) => [k, "Up to " + t])).map(([k, t]) =>
+    el("button", { class: "type", type: "button", "aria-pressed": String(ui.sylUpTo === k), onclick: () => { ui.sylUpTo = k; save("hsc-syl-upto", k); renderSylView(); } },
+      t, el("span", { class: "n" }, String(counts[k]))));
+
+  const body = [];
+  if (ui.sylUpTo !== "all") {
+    body.push(el("p", { class: "section-note syl-note" }, shown.length
+      ? "Showing the modules you tagged " + TERM_NAME[ui.sylUpTo] + " or earlier. You've learnt " + cov[0] + " of their " + cov[1] + " dot points (" + pctOf(cov[0], cov[1]) + "%)."
+      : "No modules are tagged " + TERM_NAME[ui.sylUpTo] + " or earlier yet. Pick the term you learnt each module below."));
+  }
+  const blocks = shown.map(m => moduleBlock(m, q)).filter(Boolean);
+  body.push(...blocks);
+  if (!blocks.length && (q || ui.sylHide) && shown.length) body.push(el("p", { class: "empty", style: "padding-top:16px" }, q ? "No dot points match “" + ui.sylQuery.trim() + "”." : "You've learnt every dot point here."));
+  if (ui.sylUpTo !== "all" && untagged.length) {
+    body.push(el("div", { class: "section-label" }, el("span", {}, "Not tagged with a term yet"), el("span", {}, String(untagged.length))),
+      el("div", { class: "untag" }, untagged.map(m => el("div", { class: "urow" }, el("span", {}, m.name), termSelect(m)))));
+  }
+
+  const main = el("section", { class: "panel", "aria-labelledby": "v-t" },
+    el("div", { class: "vhead" },
+      el("div", { class: "vtitle" }, el("h2", { id: "v-t" }, ix.name), el("span", { class: "sub" }, x.done + " of " + x.total + " dot points learnt · " + pct + "%")),
+      el("div", { class: "meter", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(x.total), "aria-valuenow": String(x.done), "aria-label": ix.name + " syllabus progress" }, el("span", { style: "width:" + pct + "%" })),
+      el("div", { class: "links" }, el("a", { href: d.url, target: "_blank", rel: "noopener" }, d.title + " on NESA"))),
+    el("div", { class: "toolbar" },
+      el("div", { class: "types", role: "group", "aria-label": "Show content learnt up to" }, pills),
+      el("div", { class: "controls" },
+        el("input", { type: "search", id: "sq", placeholder: "Search dot points", "aria-label": "Search dot points", value: ui.sylQuery || "",
+          oninput: e => { ui.sylQuery = e.target.value; renderSylView(); const n = document.getElementById("sq"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }),
+        el("label", { for: "syl-hide" }, el("input", { type: "checkbox", id: "syl-hide", checked: !!ui.sylHide, onchange: e => { ui.sylHide = e.target.checked; renderSylView(); } }), "Hide learnt"))),
+    el("div", { class: "legend" }, el("span", {}, "Tap a dot point to mark it learnt. Tag each module with the term you learnt it, then pick a term above to see everything up to then.")),
+    body);
+  box.replaceChildren(el("div", { class: "view" }, main, sylSide(d)));
+}
+
+function sylSide(d) {
+  return el("aside", { class: "panel log syl-side", "aria-label": "Modules" },
+    el("h3", { class: "meta-label" }, "Modules"),
+    el("p", { class: "hint" }, "Your progress in each module. Tap one to jump to it."),
+    el("ul", {}, d.modules.map(m => { const t = modTally(m), p = pctOf(t.done, t.total);
+      return el("li", {}, el("button", { type: "button", class: "mjump", onclick: () => { if (!inFilter(m.id)) { ui.sylUpTo = "all"; save("hsc-syl-upto", "all"); renderSylView(); } document.getElementById("m-" + m.id)?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); } },
+        el("span", { class: "n" }, m.name),
+        el("span", { class: "mm" }, el("span", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + p + "%" })), el("span", { class: "d" }, p + "%")),
+        el("span", { class: "d" }, (termOf(m.id) ? TERM_NAME[termOf(m.id)] : "No term set") + " · " + t.done + " / " + t.total)));
+    })),
+    el("p", { class: "hint syl-src" }, "From the " + d.title + ", checked " + d.checked + ". © NSW Education Standards Authority."));
+}
+
+async function openSyl(id) {
+  ui.sylActive = id; ui.sylQuery = ""; save("hsc-syl-tab", id);
+  try { if (location.hash.slice(1) !== "syl-" + id) history.replaceState(null, "", "#syl-" + id); } catch (e) {}
+  renderSylCards(); renderSylView();
+  await ensureSyl(id); if (ui.sylActive === id && ui.mode === "syl") { renderSylCards(); renderSylView(); }
+}
+
+function openSylPicker() {
+  const chosen = new Set(sylSubjects()), have = SYLSUB();
+  const body = document.getElementById("pk-body");
+  body.replaceChildren(...SYL_GROUPS.map(([g, ids]) => [g, ids.filter(i => have[i])]).filter(([, ids]) => ids.length).flatMap(([g, ids]) => [el("h4", {}, g), el("div", { class: "opts" }, ids.map(i => {
+    const s = have[i];
+    return el("label", { class: "opt" }, el("input", { type: "checkbox", value: i, checked: chosen.has(i), onchange: updCount }),
+      el("span", {}, s.name, el("small", {}, s.modules.length + " modules · " + s.n + " dot points")));
+  }))]));
+  function updCount() { const n = body.querySelectorAll("input:checked").length; document.getElementById("pk-count").textContent = n + (n === 1 ? " subject" : " subjects") + " selected"; document.getElementById("pk-save").disabled = n === 0; }
+  updCount();
+  document.getElementById("pk-t").textContent = "Choose your syllabus subjects";
+  document.getElementById("pk-p").textContent = "Pick the subjects you want to track syllabus content for. Unticking one hides it but keeps what you've marked.";
+  ui.pickerFor = "syl";
+  const dlg = document.getElementById("picker"); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
+}
+
+async function setMode(m) {
+  ui.mode = m; save("hsc-mode", m);
+  document.getElementById("mode-seg").dataset.on = m;
+  document.querySelectorAll("#mode-seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
+  document.body.dataset.mode = m;
+  if (m === "syl") {
+    await ensureSylIndex();
+    if (!sylSubjects().includes(ui.sylActive)) ui.sylActive = sylSubjects()[0];
+    if (ui.sylActive) openSyl(ui.sylActive); else refresh();
+  } else { openSubject(ui.active); refresh(); }
+}
+
 /* ---------- start ---------- */
-window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (SUB[h] && h !== ui.active && subjects().includes(h)) openSubject(h); });
+window.addEventListener("hashchange", async () => {
+  const h = location.hash.slice(1);
+  if (h === "syllabus" || h.startsWith("syl-")) { const sid = h.startsWith("syl-") ? h.slice(4) : ""; if (ui.mode !== "syl") { if (sid) ui.sylActive = sid; await setMode("syl"); } else if (sid && sid !== ui.sylActive && sylSubjects().includes(sid)) openSyl(sid); return; }
+  if (SUB[h] && ui.mode === "syl") { ui.active = h; await setMode("papers"); return; }
+  if (SUB[h] && h !== ui.active && subjects().includes(h)) openSubject(h);
+});
+document.querySelectorAll("#mode-seg button").forEach(b => b.addEventListener("click", () => { if (ui.mode !== b.dataset.mode) setMode(b.dataset.mode); }));
 async function boot() {
   { const h = location.hash.slice(1); if (SUB[h] && subjects().includes(h)) ui.active = h; }
   applyPalette(); ui.type = load("hsc-type", "all"); ui.group = load("hsc-group", "school"); ui.all = load("hsc-all", true);
   if (!subjects().includes(ui.active)) ui.active = subjects()[0];
+  { const h = location.hash.slice(1); if (h === "syllabus" || h.startsWith("syl-")) { ui.mode = "syl"; if (h.startsWith("syl-")) ui.sylActive = h.slice(4); } else if (!SUB[h]) ui.mode = load("hsc-mode", "papers") === "syl" ? "syl" : "papers"; }
+  ui.sylUpTo = load("hsc-syl-upto", "all"); if (ui.sylUpTo !== "all" && termRank(ui.sylUpTo) < 0) ui.sylUpTo = "all";
+  if (ui.mode === "syl") { await setMode("syl"); return; }
   renderStats(); renderCards(); renderView();
   await Promise.all(subjects().map(ensure));
   refresh();
@@ -1057,9 +1350,10 @@ function loadScript(src) {
 function cleanState(d) {
   d = d || {};
   return { done: Object.assign({}, d.done), marks: Object.assign({}, d.marks), custom: Array.isArray(d.custom) ? d.custom.slice() : [],
-    subjects: Array.isArray(d.subjects) ? d.subjects.slice() : null, from: Object.assign({}, d.from), rag: Object.assign({}, d.rag) };
+    subjects: Array.isArray(d.subjects) ? d.subjects.slice() : null, from: Object.assign({}, d.from), rag: Object.assign({}, d.rag),
+    syl: Object.assign({}, d.syl), sylTerm: Object.assign({}, d.sylTerm), sylSubs: Array.isArray(d.sylSubs) ? d.sylSubs.slice() : null };
 }
-const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length;
+const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length || Object.keys(s.syl).length || Object.keys(s.sylTerm).length || (s.sylSubs && s.sylSubs.length);
 
 // Guest ticks join the account without losing anything on either side. Where both have a value,
 // the account keeps its own (marks, start years); a paper ticked in both keeps the earlier date.
@@ -1072,6 +1366,9 @@ function mergeStates(acc, loc) {
   if (loc.subjects) m.subjects = m.subjects ? m.subjects.concat(loc.subjects.filter(id => !m.subjects.includes(id))) : loc.subjects.slice();
   for (const id in loc.from) if (!(id in m.from)) m.from[id] = loc.from[id];
   for (const id in loc.rag) if (!(id in m.rag)) m.rag[id] = loc.rag[id];
+  for (const id in loc.syl) m.syl[id] = 1;
+  for (const id in loc.sylTerm) if (!(id in m.sylTerm)) m.sylTerm[id] = loc.sylTerm[id];
+  if (loc.sylSubs) m.sylSubs = m.sylSubs ? m.sylSubs.concat(loc.sylSubs.filter(id => !m.sylSubs.includes(id))) : loc.sylSubs.slice();
   return m;
 }
 
