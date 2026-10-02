@@ -572,7 +572,26 @@ footer.notes { color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { .lights, .lights i, .ragseg button { transition: none; } .rag:active .lights, .ragseg button:active { transform: none; } }
 /* ---- syllabus: Year 12 dot points, each with the student's own red / amber / green light ---- */
 .mode-seg { margin-top: 22px; justify-self: start; min-width: min(320px, 100%); }
+.mode-seg { grid-template-columns: repeat(3, minmax(0, 1fr)); min-width: min(480px, 100%); }
+.mode-seg .thumb { width: calc((100% - 6px) / 3); }
 .mode-seg[data-on="syl"] .thumb { transform: translateX(100%); }
+.mode-seg[data-on="timer"] .thumb { transform: translateX(200%); }
+.mode-seg button { white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.tab-run { display: inline-flex; align-items: center; gap: 5px; font: 600 12.5px var(--mono); color: #FFFFFF; font-variant-numeric: tabular-nums; }
+.tab-run[hidden] { display: none; }
+.tab-run i { width: 7px; height: 7px; border-radius: 50%; background: #34D399; box-shadow: 0 0 8px rgb(52 211 153 / .7); }
+.tab-run.paused i { background: #FBBF24; box-shadow: none; }
+#timer, #lights { display: none; }
+body[data-mode="timer"] #timer, body[data-mode="syl"] #lights { display: grid; }
+body[data-mode="timer"] #view:empty { display: none; }
+body[data-mode="timer"] footer.notes p { display: none; }
+.lights-panel { padding: 18px 20px 8px; gap: 4px; }
+.lights-panel h2 { font-size: 1.15rem; }
+.lt-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 14px; padding-bottom: 8px; }
+.lt-row { display: grid; grid-template-columns: minmax(8em, 1fr) auto; gap: 6px 14px; align-items: center; padding: 10px 0; border-top: 1px solid var(--rule); }
+.lt-row .nm { font-weight: 600; font-size: 14.5px; }
+.lt-row .conf-hint { grid-column: 1 / -1; }
+.tcard .pct { font-size: 20px; }
 .mode-seg button { padding: 8px 18px; }
 body[data-mode="syl"] footer.notes p:not(.syl-only), body:not([data-mode="syl"]) .syl-only { display: none; }
 .syl-note { margin: 18px 22px 0; }
@@ -633,8 +652,49 @@ body[data-mode="syl"] footer.notes p:not(.syl-only), body:not([data-mode="syl"])
   .untag { padding: 0 16px 16px; }
   .syl-note { margin: 16px 16px 0; }
   .mode-seg { width: 100%; }
+  .mode-seg button { padding: 8px 6px; font-size: 13px; }
+  #tab-timer.running .lbl { display: none; }
+  .lt-row { grid-template-columns: minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) { .dp, .dp-ck { transition: none; } .dp:active { transform: none; } }
+
+/* Study timer: one timer for the whole tracker, pick the subject it counts towards */
+.timer { padding: 16px 20px; display: grid; gap: 12px; }
+.tm-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.tm-clock { font: 600 clamp(1.9rem, 6vw, 2.4rem)/1 var(--mono); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; min-width: 5.2ch; }
+.timer[data-state="idle"] .tm-clock { color: var(--muted); }
+.timer[data-state="paused"] .tm-clock { color: var(--muted); }
+.tm-live { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+.tm-live i { width: 8px; height: 8px; border-radius: 50%; background: #34D399; box-shadow: 0 0 8px rgb(52 211 153 / .7); }
+.timer[data-state="paused"] .tm-live i { background: #FBBF24; box-shadow: none; }
+.tm-pick { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--muted); }
+.tm-pick select { padding: 8px 10px; border-radius: 9px; background: var(--well); border: 1px solid transparent; box-shadow: var(--recess); color: var(--fg); max-width: 15em; min-height: 42px; }
+.tm-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.tm-mode { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tm-mode select { padding: 6px 8px; border-radius: 9px; background: var(--well); border: 1px solid transparent; box-shadow: var(--recess); color: var(--fg); min-height: 40px; }
+.tm-sum { font-size: 13px; color: var(--muted); }
+.tm-sum b { font: 600 13px var(--mono); color: var(--fg); }
+details.tm-log { border-top: 1px solid var(--rule); margin: 0 -20px -16px; }
+details.tm-log > summary { cursor: pointer; padding: 12px 20px; font-weight: 600; font-size: 14px; }
+.tm-log ul { list-style: none; margin: 0; padding: 0; max-height: 320px; overflow: auto; }
+.tm-log li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 9px 20px; border-top: 1px solid var(--rule); font-size: 13.5px; }
+.tm-log li .w { color: var(--muted); font-size: 12.5px; }
+.tm-log li .du { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+.tm-log li button { border: 0; background: transparent; color: var(--muted); cursor: pointer; border-radius: 8px; width: 36px; height: 36px; display: grid; place-items: center; }
+.tm-log li button:hover { color: var(--danger); background: rgb(255 255 255 / .05); }
+.tm-log li button svg { width: 12px; height: 12px; }
+.tm-log .none { padding: 4px 20px 16px; color: var(--muted); font-size: 13.5px; margin: 0; }
+.tm-log .more { padding: 10px 20px 14px; }
+.card .cstudy { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.card .cstudy b { font: 600 12px var(--mono); color: var(--fg); }
+@media (max-width: 560px) {
+  .timer { padding: 14px 16px; }
+  details.tm-log { margin: 0 -16px -14px; }
+  .tm-btns { margin-left: 0; width: 100%; }
+  .tm-btns .btn { flex: 1 1 0; justify-content: center; }
+  .tm-pick { width: 100%; } .tm-pick select { flex: 1; max-width: none; }
+  .tm-log li, details.tm-log > summary, .tm-log .none, .tm-log .more { padding-inline: 16px; }
+}
 </style>
 </head>
 <body>
@@ -651,8 +711,11 @@ body[data-mode="syl"] footer.notes p:not(.syl-only), body:not([data-mode="syl"])
       </div>
     </div>
     <div class="stats" id="stats"></div>
-    <div class="seg mode-seg" id="mode-seg" role="group" aria-label="What to track" data-on="papers"><span class="thumb" aria-hidden="true"></span><button type="button" data-mode="papers" aria-pressed="true">Past papers</button><button type="button" data-mode="syl" aria-pressed="false">Syllabus</button></div>
+    <div class="seg mode-seg" id="mode-seg" role="group" aria-label="Tabs" data-on="papers"><span class="thumb" aria-hidden="true"></span><button type="button" data-mode="papers" aria-pressed="true">Past papers</button><button type="button" data-mode="syl" aria-pressed="false">Traffic lights</button><button type="button" data-mode="timer" aria-pressed="false" id="tab-timer"><span class="lbl">Study timer</span><span class="tab-run" id="tab-run" hidden><i aria-hidden="true"></i><span id="tab-run-t"></span></span></button></div>
   </header>
+
+  <section class="timer panel" id="timer" aria-label="Study timer" data-state="idle"></section>
+  <section class="lights-panel panel" id="lights" aria-labelledby="lt-t"></section>
 
   <section class="group">
     <div class="subj-head"><p class="meta-label" id="subj-label">Subjects</p><div class="rag-sum" id="rag-sum" role="status" aria-label="Confidence traffic lights"></div></div>
@@ -810,6 +873,7 @@ function toast(msg, undo) {
 /* ---------- render ---------- */
 function renderStats() {
   if (ui.mode === "syl") return renderSylStats();
+  if (ui.mode === "timer") return renderTimerStats();
   let done = 0, wk = 0; const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
   for (const id in state.done) { done++; if (state.done[id] >= weekAgo) wk++; }
   document.getElementById("stats").replaceChildren(
@@ -841,35 +905,42 @@ function setRag(id, c) {
   persist(); refresh();
   toast(short(SUB[id].name) + ": " + (c ? RAG_NAME[c] + ", " + RAG_MEAN[c].toLowerCase() : "light cleared"), () => setRag(id, was));
 }
-const cycleRag = id => { const c = ragOf(id); setRag(id, c === null ? "r" : c === "r" ? "a" : c === "a" ? "g" : null); };
-const ragLights = (c, sug) => el("span", { class: "lights", "aria-hidden": "true" }, RAG.map(k => el("i", { class: "l-" + k + (c === k ? " on" : "") + (!c && sug === k ? " sug" : "") })));
-function renderRagSum() {
+// Traffic lights tab: one row per subject with its red / amber / green, above the syllabus dot points
+function renderLights() {
+  const box = document.getElementById("lights"); if (!box || ui.mode !== "syl") return;
   const ids = subjects(), n = { r: 0, a: 0, g: 0 }; let none = 0;
   ids.forEach(id => { const c = ragOf(id); if (c) n[c]++; else none++; });
-  const box = document.getElementById("rag-sum");
-  if (none === ids.length) { box.replaceChildren(el("span", {}, "Tap the lights on a subject to rate how confident you feel")); return; }
-  box.replaceChildren(...RAG.map(k => el("span", { class: "rsum rs-" + k }, el("i", { "aria-hidden": "true" }), el("b", {}, String(n[k])), " " + RAG_NAME[k].toLowerCase())),
-    none ? el("span", { class: "rsum" }, el("b", {}, String(none)), " not set") : "");
+  const sum = el("div", { class: "rag-sum", role: "status" }, none === ids.length ? el("span", {}, "Pick a light for each subject")
+    : [...RAG.map(k => el("span", { class: "rsum rs-" + k }, el("i", { "aria-hidden": "true" }), el("b", {}, String(n[k])), " " + RAG_NAME[k].toLowerCase())),
+       none ? el("span", { class: "rsum" }, el("b", {}, String(none)), " not set") : ""]);
+  box.replaceChildren(el("div", { class: "lt-head" }, el("h2", { id: "lt-t" }, "How confident do you feel?"), sum),
+    ...ids.map(id => {
+      const rc = ragOf(id), rs = rc ? null : suggestRag(id), lid = "lt-" + id;
+      return el("div", { class: "lt-row" },
+        el("span", { class: "nm", id: lid }, short(SUB[id].name)),
+        el("div", { class: "ragseg", role: "group", "aria-labelledby": lid }, RAG.map(k => el("button", { type: "button", class: "rs-" + k, "aria-pressed": String(rc === k),
+          title: RAG_NAME[k] + (rc === k ? ". Tap again to clear." : ""), onclick: () => setRag(id, rc === k ? null : k) }, el("i", { "aria-hidden": "true" }), RAG_MEAN[k]))),
+        el("span", { class: "conf-hint" }, rc ? "Your " + RAG_NAME[rc].toLowerCase() + " light. Tap it again to clear." : rs ? "Suggested " + RAG_NAME[rs.c].toLowerCase() + ": " + rs.why + "." : "Your call. It isn't worked out for you."));
+    }));
 }
 
 function renderCards() {
   if (ui.mode === "syl") return renderSylCards();
+  if (ui.mode === "timer") return renderTimerCards();
+  document.getElementById("subj-label").textContent = "Subjects";
   const ids = subjects();
   const cards = ids.map(id => {
     const s = SUB[id], x = tally(id, "all"); const pct = x.curTotal ? Math.round(100 * x.curDone / x.curTotal) : 0;
-    const c = ragOf(id), sg = c ? null : suggestRag(id);
-    const says = c ? RAG_NAME[c] + ", " + RAG_MEAN[c].toLowerCase() : "not set" + (sg ? ", suggested " + RAG_NAME[sg.c].toLowerCase() + " (" + sg.why + ")" : "");
     return el("div", { class: "cwrap" }, el("button", { class: "card", type: "button", "aria-current": String(id === ui.active), onclick: () => openSubject(id) },
       el("span", { class: "cname" }, short(s.name)),
       el("span", { class: "line" }, el("span", { class: "pct" }, pct + "%"),
         el("span", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + pct + "%" })),
         el("span", { class: "frac" }, x.curDone + " / " + x.curTotal)),
-      el("span", { class: "cnum" }, el("span", {}, x.allDone + " done in total"), x.avg != null ? el("span", {}, "avg " + x.avg) : null)),
-      el("button", { class: "rag", type: "button", title: "Confidence: " + says + ". Tap to change.", "aria-label": "How confident you feel in " + s.name + ": " + says + ". Tap to change.", onclick: () => cycleRag(id) }, ragLights(c, sg && sg.c)));
+      el("span", { class: "cnum" }, el("span", {}, x.allDone + " done in total"), x.avg != null ? el("span", {}, "avg " + x.avg) : null)));
   });
   cards.push(el("button", { class: "card add", type: "button", onclick: openPicker }, "+ Add or remove subjects"));
   document.getElementById("cards").replaceChildren(...cards);
-  renderRagSum();
+  document.getElementById("rag-sum").replaceChildren();
 }
 
 function chip(p, fromY) {
@@ -922,6 +993,7 @@ function schoolRows(list, fromY, mixed) {
 
 function renderView() {
   if (ui.mode === "syl") return renderSylView();
+  if (ui.mode === "timer") { document.getElementById("view").replaceChildren(); return; }
   const box = document.getElementById("view");
   const id = ui.active; const s = SUB[id];
   if (!s) { box.replaceChildren(); return; }
@@ -977,20 +1049,12 @@ function renderView() {
   (s.y11p || []).forEach((pth, i) => links.push(el("a", { href: "https://thsconline.github.io/s/" + encodeURI(pth), target: "_blank", rel: "noopener" }, i ? "THSC Year 11 tasks" : "THSC Year 11 exams")));
   if (s.nesa) links.push(el("a", { href: NESA + s.nesa, target: "_blank", rel: "noopener" }, "NESA HSC papers"));
 
-  const rc = ragOf(id), rs = rc ? null : suggestRag(id);
-  const conf = el("div", { class: "conf" },
-    el("span", { class: "conf-l", id: "conf-l" }, "How confident do you feel?"),
-    el("div", { class: "ragseg", role: "group", "aria-labelledby": "conf-l" }, RAG.map(k => el("button", { type: "button", class: "rs-" + k, "aria-pressed": String(rc === k),
-      title: RAG_NAME[k] + (rc === k ? ". Tap again to clear." : ""), onclick: () => setRag(id, rc === k ? null : k) }, el("i", { "aria-hidden": "true" }), RAG_MEAN[k]))),
-    el("span", { class: "conf-hint" }, rc ? "Your " + RAG_NAME[rc].toLowerCase() + " light. Tap it again to clear." : rs ? "Suggested " + RAG_NAME[rs.c].toLowerCase() + ": " + rs.why + "." : "Your call. It isn't worked out for you."));
-
   const main = el("section", { class: "panel", "aria-labelledby": "v-t" },
     el("div", { class: "vhead" },
       el("div", { class: "vtitle" }, el("h2", { id: "v-t" }, s.name),
         el("span", { class: "sub" }, x.curDone + " of " + x.curTotal + " " + typeLabel + " from " + fromY + " \u00b7 " + pct + "%")),
       el("div", { class: "meter", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(x.curTotal), "aria-valuenow": String(x.curDone), "aria-label": s.name + " progress" }, el("span", { style: "width:" + pct + "%" })),
-      el("div", { class: "links" }, links),
-      conf),
+      el("div", { class: "links" }, links)),
     el("div", { class: "toolbar" },
     el("div", { class: "types", role: "group", "aria-label": "Paper type" }, typeBtns),
     el("div", { class: "controls" },
@@ -1062,13 +1126,13 @@ function refreshChips() {
 
 function refresh() {
   const y = window.scrollY; const logScroll = document.querySelector(".log ul")?.scrollTop;
-  renderStats(); renderCards(); renderView();
+  renderStats(); renderCards(); renderView(); renderTimer(); renderLights();
   window.scrollTo(0, y); const l = document.querySelector(".log ul"); if (l && logScroll) l.scrollTop = logScroll;
 }
 
 async function openSubject(id) {
   ui.active = id; ui.query = ""; save("hsc-tab2", id);
-  try { if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id); } catch (e) {}
+  if (ui.mode === "papers") try { if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id); } catch (e) {}
   renderCards(); renderView();
   await ensure(id); if (ui.active === id) { renderCards(); renderView(); }
 }
@@ -1104,7 +1168,7 @@ document.getElementById("pk-form").addEventListener("submit", async e => {
   const order = GROUPS.flatMap(g => g[1]);
   state.subjects = ids.sort((a, b) => order.indexOf(a) - order.indexOf(b)); persist();
   if (!ids.includes(ui.active)) ui.active = ids[0];
-  await Promise.all(ids.map(ensure)); refresh(); openSubject(ui.active);
+  await Promise.all(ids.map(ensure)); refresh(); if (ui.mode === "papers") openSubject(ui.active);
 });
 
 /* ---------- syllabus ----------
@@ -1173,6 +1237,7 @@ function renderSylStats() {
 }
 
 function renderSylCards() {
+  document.getElementById("subj-label").textContent = "Syllabus dot points";
   const all = { done: 0, a: 0, r: 0, total: 0 };
   for (const id of sylSubjects()) { const t = sylTally(id); for (const k in all) all[k] += t[k]; }
   const unset = all.total - all.done - all.a - all.r;
@@ -1332,33 +1397,252 @@ function openSylPicker() {
   const dlg = document.getElementById("picker"); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
 }
 
-async function setMode(m) {
+function showTab(m) {
   ui.mode = m; save("hsc-mode", m);
   document.getElementById("mode-seg").dataset.on = m;
   document.querySelectorAll("#mode-seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
   document.body.dataset.mode = m;
+}
+async function setMode(m) {
+  showTab(m);
   if (m === "syl") {
     await ensureSylIndex();
     if (!sylSubjects().includes(ui.sylActive)) ui.sylActive = sylSubjects()[0];
     if (ui.sylActive) openSyl(ui.sylActive); else refresh();
-  } else { openSubject(ui.active); refresh(); }
+    renderLights();
+    // Suggested lights need each subject's paper list
+    await Promise.all(subjects().map(ensure)); renderLights();
+  } else if (m === "timer") {
+    try { if (location.hash !== "#timer") history.replaceState(null, "", "#timer"); } catch (e) {}
+    await ensureSylIndex(); refresh();
+  } else { openSubject(ui.active); refresh(); await Promise.all(subjects().map(ensure)); refresh(); }
+  tickTimer();
 }
+
+/* ---------- study timer ----------
+   One timer for the whole tracker. The student picks which subject the time counts towards, and can change it while it runs.
+   Saved as start times rather than a ticking count, so it keeps going across refreshes, closed tabs and other devices.
+   state.study = { log: {id: {s: subject, a: start (unix seconds), d: seconds studied}}, del: {id: 1} (deleted sessions, so a sync can't bring them back),
+                   run: null | {id, s, a: first start (unix s), at: running since (ms) or 0 when paused, acc: seconds before that, goal: countdown seconds or 0},
+                   rt: when run last changed (ms) } */
+const MIN_LOG = 60, LOG_SHOW = 30;
+const GOALS = [15, 20, 25, 30, 45, 50, 60, 90, 120];
+function cleanStudy(x) {
+  x = x && typeof x === "object" ? x : {};
+  const log = {}, del = {};
+  for (const [k, v] of Object.entries(x.log || {})) if (v && typeof v.s === "string" && +v.a > 0 && +v.d > 0) log[k] = { s: v.s, a: Math.round(+v.a), d: Math.round(+v.d) };
+  for (const k in x.del || {}) { del[k] = 1; delete log[k]; }
+  const r = x.run;
+  const run = r && typeof r.id === "string" && typeof r.s === "string" && !log[r.id] && !del[r.id]
+    ? { id: r.id, s: r.s, a: Math.round(+r.a) || Math.round(Date.now() / 1000), at: +r.at || 0, acc: Math.max(0, +r.acc || 0), goal: Math.max(0, +r.goal || 0) } : null;
+  return { log, del, run, rt: +x.rt || 0 };
+}
+// Sessions from both sides are kept (minus deleted ones); the running timer comes from whichever side touched it last.
+function mergeStudy(a, b) {
+  a = cleanStudy(a); b = cleanStudy(b);
+  const m = cleanStudy({ log: Object.assign({}, b.log, a.log), del: Object.assign({}, a.del, b.del), run: (a.rt >= b.rt ? a : b).run, rt: Math.max(a.rt, b.rt) });
+  return m;
+}
+state.study = cleanStudy(state.study);
+const nowS = () => Math.round(Date.now() / 1000);
+const runSecs = r => r ? r.acc + (r.at ? Math.max(0, (Date.now() - r.at) / 1000) : 0) : 0;
+// Countdown sessions stop at their goal, even if the page was closed when it ran out
+const runShown = r => r && r.goal ? Math.min(runSecs(r), r.goal) : runSecs(r);
+const subjName = id => SUB[id] ? short(SUB[id].name) : (SYLSUB()[id] ? short(SYLSUB()[id].name) : id);
+function clock(sec) {
+  sec = Math.max(0, Math.floor(sec)); const h = Math.floor(sec / 3600), m = Math.floor(sec / 60) % 60, s = sec % 60;
+  return (h ? h + ":" + String(m).padStart(2, "0") : String(m).padStart(2, "0")) + ":" + String(s).padStart(2, "0");
+}
+function dur(sec) {
+  const m = Math.round(sec / 60); if (m < 1) return sec > 0 ? "<1m" : "0m";
+  return m < 60 ? m + "m" : Math.floor(m / 60) + "h" + (m % 60 ? " " + String(m % 60).padStart(2, "0") + "m" : "");
+}
+// The school week: from Monday 12am, local time
+function weekStart() { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.getTime() / 1000; }
+function studyTotals() {
+  const t = {}, wk = weekStart(); let week = 0, all = 0;
+  const add = (s, a, d) => { const x = t[s] || (t[s] = { all: 0, week: 0 }); x.all += d; all += d; if (a >= wk) { x.week += d; week += d; } };
+  for (const v of Object.values(state.study.log)) add(v.s, v.a, v.d);
+  return { by: t, week, all };
+}
+function timerSubjects() {
+  const ids = subjects().slice();
+  for (const id of (SYLIX ? sylSubjects() : [])) if (!ids.includes(id)) ids.push(id);
+  const r = state.study.run; if (r && !ids.includes(r.s)) ids.push(r.s);
+  return ids;
+}
+function pickedSubject() {
+  const ids = timerSubjects(), r = state.study.run;
+  if (r) return r.s;
+  if (ids.includes(ui.tmSub)) return ui.tmSub;
+  const last = load("hsc-timer-sub", null), cur = ui.mode === "syl" ? ui.sylActive : ui.active;
+  return ids.includes(last) ? last : ids.includes(cur) ? cur : ids[0];
+}
+function setRun(r) { state.study = Object.assign({}, state.study, { run: r, rt: Date.now() }); }
+function startTimer() {
+  const s = pickedSubject(); if (!s || state.study.run) return;
+  const goal = ui.tmMode === "cd" ? ui.tmGoal * 60 : 0;
+  setRun({ id: s + "-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), s, a: nowS(), at: Date.now(), acc: 0, goal });
+  persist(); renderTimer(); unlockSound();
+}
+function pauseTimer() { const r = state.study.run; if (!r || !r.at) return; setRun(Object.assign({}, r, { at: 0, acc: runSecs(r) })); persist(); renderTimer(); }
+function resumeTimer() { const r = state.study.run; if (!r || r.at) return; setRun(Object.assign({}, r, { at: Date.now() })); persist(); renderTimer(); unlockSound(); }
+function stopTimer(why) {
+  const r = state.study.run; if (!r) return;
+  const d = Math.round(runShown(r));
+  const log = Object.assign({}, state.study.log);
+  if (d >= MIN_LOG) log[r.id] = { s: r.s, a: r.a, d };
+  state.study = Object.assign({}, state.study, { log, run: null, rt: Date.now() });
+  persist(); refresh();
+  if (d < MIN_LOG) toast("Under a minute, so it wasn't logged");
+  else if (why === "done") toast(subjName(r.s) + ": " + dur(d) + " countdown finished and logged");
+  else toast("Logged " + dur(d) + " of " + subjName(r.s), () => { if (state.study.run) return; const l = Object.assign({}, state.study.log); delete l[r.id]; state.study = Object.assign({}, state.study, { log: l, run: Object.assign({}, r, { at: 0, acc: d }), rt: Date.now() }); persist(); refresh(); });
+}
+function setTimerSubject(id) {
+  ui.tmSub = id; save("hsc-timer-sub", id);
+  const r = state.study.run;
+  if (r && r.s !== id) {
+    // Time so far stays with the old subject; the timer carries on for the new one
+    const d = Math.round(runShown(r));
+    if (d >= MIN_LOG) {
+      state.study = Object.assign({}, state.study, { log: Object.assign({}, state.study.log, { [r.id]: { s: r.s, a: r.a, d } }) });
+      setRun({ id: id + "-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), s: id, a: nowS(), at: r.at ? Date.now() : 0, acc: 0, goal: r.goal ? Math.max(1, r.goal - d) : 0 });
+      toast("Logged " + dur(d) + " of " + subjName(r.s) + ". Now timing " + subjName(id));
+    } else setRun(Object.assign({}, r, { s: id }));
+    persist(); refresh(); return;
+  }
+  renderTimer();
+}
+function deleteSession(id) {
+  const was = state.study.log[id]; if (!was) return;
+  const log = Object.assign({}, state.study.log); delete log[id];
+  state.study = Object.assign({}, state.study, { log, del: Object.assign({}, state.study.del, { [id]: 1 }) });
+  persist(); refresh();
+  toast("Deleted " + dur(was.d) + " of " + subjName(was.s), () => {
+    const del = Object.assign({}, state.study.del); delete del[id];
+    state.study = Object.assign({}, state.study, { log: Object.assign({}, state.study.log, { [id]: was }), del }); persist(); refresh();
+  });
+}
+// A short chime when a countdown ends. Browsers only allow sound after a tap, so the Start button wakes the audio up.
+let actx = null;
+function unlockSound() { try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); } catch (e) {} }
+function chime() {
+  try { navigator.vibrate && navigator.vibrate([180, 90, 180]); } catch (e) {}
+  if (!actx) return;
+  try { [0, .22, .44].forEach((t, i) => { const o = actx.createOscillator(), g = actx.createGain(); o.frequency.value = [880, 988, 1175][i];
+    g.gain.setValueAtTime(.0001, actx.currentTime + t); g.gain.exponentialRampToValueAtTime(.18, actx.currentTime + t + .02); g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + t + .5);
+    o.connect(g).connect(actx.destination); o.start(actx.currentTime + t); o.stop(actx.currentTime + t + .55); }); } catch (e) {}
+}
+const BASE_TITLE = document.title;
+function tickTimer() {
+  const r = state.study.run;
+  if (r && r.goal && runSecs(r) >= r.goal) { const live = r.at && runSecs(r) < r.goal + 5; stopTimer("done"); if (live) chime(); return; }
+  const c = document.getElementById("tm-clock");
+  const shown = r ? (r.goal ? Math.ceil(r.goal - runShown(r)) : runSecs(r)) : (ui.tmMode === "cd" ? ui.tmGoal * 60 : 0);
+  if (c) c.textContent = clock(shown);
+  // Small running clock on the Study timer tab, so it shows from the other tabs too
+  const tab = document.getElementById("tab-timer"), pill = document.getElementById("tab-run");
+  if (tab && pill) {
+    const on = !!r && ui.mode !== "timer";
+    pill.hidden = !on; tab.classList.toggle("running", on); pill.classList.toggle("paused", !!r && !r.at);
+    if (on) document.getElementById("tab-run-t").textContent = clock(shown);
+    tab.setAttribute("aria-label", "Study timer" + (r ? (r.at ? ", running: " : ", paused: ") + subjName(r.s) + " " + clock(shown) : ""));
+  }
+  // Keep the minutes on the subject cards moving while the timer tab is open
+  if (r && r.at && ui.mode === "timer") { const mn = Math.floor(runShown(r) / 60); if (mn !== ui.tmLastMin) { ui.tmLastMin = mn; renderCards(); renderTimerStats(); } }
+  document.title = r && r.at ? clock(shown) + " · " + subjName(r.s) : BASE_TITLE;
+}
+const XICON = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>';
+function renderTimer() {
+  const box = document.getElementById("timer"); if (!box) return;
+  const r = state.study.run, ids = timerSubjects(), cur = pickedSubject();
+  box.dataset.state = r ? (r.at ? "running" : "paused") : "idle";
+  const sel = el("select", { id: "tm-sub", "aria-label": "Subject you're studying", onchange: e => setTimerSubject(e.target.value) },
+    ids.length ? ids.map(id => el("option", { value: id, selected: id === cur }, subjName(id))) : el("option", { value: "" }, "Choose subjects first"));
+  const btns = !r ? [el("button", { class: "btn primary", type: "button", id: "tm-start", disabled: !cur, onclick: startTimer }, ui.tmMode === "cd" ? "Start " + ui.tmGoal + " min" : "Start")]
+    : [r.at ? el("button", { class: "btn", type: "button", id: "tm-pause", onclick: pauseTimer }, "Pause") : el("button", { class: "btn primary", type: "button", id: "tm-resume", onclick: resumeTimer }, "Resume"),
+       el("button", { class: "btn", type: "button", id: "tm-stop", onclick: () => stopTimer() }, "Stop and log")];
+  const modeRow = r ? el("span", { class: "tm-live" }, el("i", { "aria-hidden": "true" }), (r.at ? "Studying " : "Paused · ") + subjName(r.s) + (r.goal ? " · " + Math.round(r.goal / 60) + " min countdown" : "") + " · switch subject anytime, time so far stays logged")
+    : el("div", { class: "tm-mode", role: "group", "aria-label": "Timer type" },
+        [["sw", "Stopwatch"], ["cd", "Countdown"]].map(([k, t]) => el("button", { class: "type", type: "button", "aria-pressed": String(ui.tmMode === k), onclick: () => { ui.tmMode = k; save("hsc-timer-mode", k); renderTimer(); } }, t)),
+        ui.tmMode === "cd" ? el("select", { id: "tm-goal", "aria-label": "Countdown length", onchange: e => { ui.tmGoal = +e.target.value; save("hsc-timer-goal", ui.tmGoal); renderTimer(); } },
+          GOALS.map(m => el("option", { value: m, selected: m === ui.tmGoal }, m + " min"))) : null);
+  const sessions = Object.entries(state.study.log).sort((a, b) => b[1].a - a[1].a);
+  const shown = ui.tmAll ? sessions : sessions.slice(0, LOG_SHOW);
+  const when = a => new Date(a * 1000).toLocaleString("en-AU", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+  const logBox = el("details", { class: "tm-log", open: ui.tmLogOpen !== false, ontoggle: e => { ui.tmLogOpen = e.target.open; } },
+    el("summary", {}, "Study sessions" + (sessions.length ? " (" + sessions.length + ")" : "")),
+    sessions.length ? el("ul", {}, shown.map(([k, v]) => el("li", {},
+      el("span", {}, subjName(v.s), " ", el("span", { class: "w" }, when(v.a))),
+      el("span", { class: "du" }, dur(v.d)),
+      el("button", { type: "button", title: "Delete this session", "aria-label": "Delete " + dur(v.d) + " of " + subjName(v.s) + " from " + when(v.a), html: XICON, onclick: () => deleteSession(k) }))))
+      : el("p", { class: "none" }, r ? "Nothing logged yet. This session is added when you stop it." : "No sessions yet. Pick a subject and press Start. Sessions under a minute aren't logged."),
+    sessions.length > LOG_SHOW ? el("div", { class: "more" }, el("button", { class: "btn ghost", type: "button", onclick: () => { ui.tmAll = !ui.tmAll; renderTimer(); } }, ui.tmAll ? "Show fewer" : "Show all " + sessions.length)) : null);
+  box.replaceChildren(
+    el("div", { class: "tm-row" },
+      el("span", { class: "tm-clock", id: "tm-clock", role: "timer", "aria-live": "off" }, "00:00"),
+      el("label", { class: "tm-pick", for: "tm-sub" }, "Studying", sel),
+      el("div", { class: "tm-btns" }, btns)),
+    el("div", { class: "tm-row" }, modeRow),
+    logBox);
+  tickTimer();
+}
+function renderTimerStats() {
+  const t = studyTotals(), r = state.study.run, live = r ? runShown(r) : 0, n = Object.keys(state.study.log).length;
+  document.getElementById("stats").replaceChildren(
+    el("span", {}, el("b", {}, dur(t.week + live)), " studied this week"),
+    el("span", {}, el("b", {}, dur(t.all + live)), " in total"),
+    el("span", {}, el("b", {}, String(n)), n === 1 ? " session" : " sessions"),
+    ...(syncMsg ? [el("span", {}, syncMsg)] : []));
+}
+// Study timer tab: a card per subject with time this week and in total. Tapping one picks it for the timer.
+function renderTimerCards() {
+  document.getElementById("subj-label").textContent = "Time per subject";
+  const t = studyTotals().by, r = state.study.run, cur = pickedSubject(), ids = timerSubjects();
+  const week = ids.map(id => (t[id] ? t[id].week : 0) + (r && r.s === id ? runShown(r) : 0)), top = Math.max(1, ...week);
+  const cards = ids.map((id, i) => {
+    const x = t[id] || { all: 0, week: 0 }, live = r && r.s === id ? runShown(r) : 0;
+    const n = Object.values(state.study.log).filter(v => v.s === id).length;
+    return el("button", { class: "card tcard", type: "button", "aria-current": String(id === cur), title: r ? "Switch the timer to " + subjName(id) : "Time " + subjName(id),
+      onclick: () => setTimerSubject(id) },
+      el("span", { class: "cname" }, subjName(id)),
+      el("span", { class: "line" }, el("span", { class: "pct" }, dur(week[i])),
+        el("span", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + Math.round(100 * week[i] / top) + "%" })),
+        el("span", { class: "frac" }, "this week")),
+      el("span", { class: "cnum" }, el("span", {}, dur(x.all + live) + " in total"), el("span", {}, live && r.at ? "timing now" : n + (n === 1 ? " session" : " sessions"))));
+  });
+  cards.push(el("button", { class: "card add", type: "button", onclick: openPicker }, "+ Add or remove subjects"));
+  document.getElementById("cards").replaceChildren(...cards);
+  document.getElementById("rag-sum").replaceChildren(el("span", {}, r ? "Tap a subject to switch the timer to it" : "Tap a subject to pick it for the timer"));
+}
+ui.tmMode = load("hsc-timer-mode", "sw") === "cd" ? "cd" : "sw";
+ui.tmGoal = GOALS.includes(load("hsc-timer-goal", 25)) ? load("hsc-timer-goal", 25) : 25;
+setInterval(tickTimer, 1000);
+// Another tab on this device started or stopped the timer
+window.addEventListener("storage", e => { if (e.key === "hsc-log" && e.newValue) try { const o = JSON.parse(e.newValue); if (o && o.study) { state.study = mergeStudy(state.study, o.study); renderTimer(); renderCards(); } } catch (x) {} });
 
 /* ---------- start ---------- */
 window.addEventListener("hashchange", async () => {
   const h = location.hash.slice(1);
-  if (h === "syllabus" || h.startsWith("syl-")) { const sid = h.startsWith("syl-") ? h.slice(4) : ""; if (ui.mode !== "syl") { if (sid) ui.sylActive = sid; await setMode("syl"); } else if (sid && sid !== ui.sylActive && sylSubjects().includes(sid)) openSyl(sid); return; }
-  if (SUB[h] && ui.mode === "syl") { ui.active = h; await setMode("papers"); return; }
+  if (h === "timer") { if (ui.mode !== "timer") await setMode("timer"); return; }
+  if (h === "papers") { if (ui.mode !== "papers") await setMode("papers"); return; }
+  if (h === "syllabus" || h === "lights" || h.startsWith("syl-")) { const sid = h.startsWith("syl-") ? h.slice(4) : ""; if (ui.mode !== "syl") { if (sid) ui.sylActive = sid; await setMode("syl"); } else if (sid && sid !== ui.sylActive && sylSubjects().includes(sid)) openSyl(sid); return; }
+  if (SUB[h] && ui.mode !== "papers") { ui.active = h; await setMode("papers"); return; }
   if (SUB[h] && h !== ui.active && subjects().includes(h)) openSubject(h);
 });
 document.querySelectorAll("#mode-seg button").forEach(b => b.addEventListener("click", () => { if (ui.mode !== b.dataset.mode) setMode(b.dataset.mode); }));
 async function boot() {
+  renderTimer();
   { const h = location.hash.slice(1); if (SUB[h] && subjects().includes(h)) ui.active = h; }
   applyPalette(); ui.type = load("hsc-type", "all"); ui.group = load("hsc-group", "school"); ui.all = load("hsc-all", true);
   if (!subjects().includes(ui.active)) ui.active = subjects()[0];
-  { const h = location.hash.slice(1); if (h === "syllabus" || h.startsWith("syl-")) { ui.mode = "syl"; if (h.startsWith("syl-")) ui.sylActive = h.slice(4); } else if (!SUB[h]) ui.mode = load("hsc-mode", "papers") === "syl" ? "syl" : "papers"; }
+  { const h = location.hash.slice(1);
+    if (h === "syllabus" || h === "lights" || h.startsWith("syl-")) { ui.mode = "syl"; if (h.startsWith("syl-")) ui.sylActive = h.slice(4); }
+    else if (h === "timer" || h === "papers") ui.mode = h;
+    else if (!SUB[h]) { const m = load("hsc-mode", "papers"); ui.mode = ["syl", "timer"].includes(m) ? m : "papers"; } }
   ui.sylUpTo = load("hsc-syl-upto", "all"); if (ui.sylUpTo !== "all" && termRank(ui.sylUpTo) < 0) ui.sylUpTo = "all";
-  if (ui.mode === "syl") { await setMode("syl"); return; }
+  if (ui.mode !== "papers") { await setMode(ui.mode); return; }
+  showTab("papers");
   renderStats(); renderCards(); renderView();
   await Promise.all(subjects().map(ensure));
   refresh();
@@ -1384,9 +1668,9 @@ function cleanState(d) {
   d = d || {};
   return { done: Object.assign({}, d.done), marks: Object.assign({}, d.marks), custom: Array.isArray(d.custom) ? d.custom.slice() : [],
     subjects: Array.isArray(d.subjects) ? d.subjects.slice() : null, from: Object.assign({}, d.from), rag: Object.assign({}, d.rag),
-    syl: Object.fromEntries(Object.entries(d.syl || {}).filter(([, v]) => v === 1 || ["r", "a", "g"].includes(v)).map(([k, v]) => [k, v === 1 ? "g" : v])), sylTerm: Object.assign({}, d.sylTerm), sylSubs: Array.isArray(d.sylSubs) ? d.sylSubs.slice() : null };
+    syl: Object.fromEntries(Object.entries(d.syl || {}).filter(([, v]) => v === 1 || ["r", "a", "g"].includes(v)).map(([k, v]) => [k, v === 1 ? "g" : v])), sylTerm: Object.assign({}, d.sylTerm), sylSubs: Array.isArray(d.sylSubs) ? d.sylSubs.slice() : null, study: cleanStudy(d.study) };
 }
-const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length || Object.keys(s.syl).length || Object.keys(s.sylTerm).length || (s.sylSubs && s.sylSubs.length);
+const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length || Object.keys(s.syl).length || Object.keys(s.sylTerm).length || (s.sylSubs && s.sylSubs.length) || Object.keys(s.study.log).length || s.study.run;
 
 // Guest ticks join the account without losing anything on either side. Where both have a value,
 // the account keeps its own (marks, start years); a paper ticked in both keeps the earlier date.
@@ -1402,6 +1686,7 @@ function mergeStates(acc, loc) {
   for (const id in loc.syl) if (!(id in m.syl)) m.syl[id] = loc.syl[id];
   for (const id in loc.sylTerm) if (!(id in m.sylTerm)) m.sylTerm[id] = loc.sylTerm[id];
   if (loc.sylSubs) m.sylSubs = m.sylSubs ? m.sylSubs.concat(loc.sylSubs.filter(id => !m.sylSubs.includes(id))) : loc.sylSubs.slice();
+  m.study = mergeStudy(m.study, loc.study);
   return m;
 }
 
@@ -1414,6 +1699,15 @@ async function useAccount(user) {
   sbUser = user;
   const uid = user.id;
   docRef = { set: async s => {
+    // Study sessions can be logged on two devices at once, so fold in the account's copy before overwriting it
+    const got = await sb.from("progress").select("state").eq("user_id", uid).maybeSingle();
+    if (got.error) throw got.error;
+    if (got.data && got.data.state && got.data.state.study) {
+      const before = JSON.stringify(state.study);
+      s.study = mergeStudy(s.study, got.data.state.study);
+      state.study = mergeStudy(state.study, got.data.state.study);
+      if (JSON.stringify(state.study) !== before) { save("hsc-log", state); renderTimer(); renderCards(); }
+    }
     const { error } = await sb.from("progress").upsert({ user_id: uid, state: s, updated_at: new Date().toISOString() });
     if (error) throw error;
     // Only clear the flag if nothing changed while this upload was in flight
@@ -1445,6 +1739,19 @@ async function useAccount(user) {
   renderAcct(); refresh();
   if (document.getElementById("auth").open && authMode === "account") authView("account");
 }
+
+// Coming back to the tab: pick up sessions or a timer started on another device
+async function pullStudy() {
+  if (!docRef || !sb || !sbUser || saving) return;
+  try {
+    const { data, error } = await sb.from("progress").select("state").eq("user_id", sbUser.id).maybeSingle();
+    if (error || !data || !data.state || !docRef) return;
+    const remote = cleanStudy(data.state.study), merged = mergeStudy(state.study, remote);
+    if (JSON.stringify(merged) !== JSON.stringify(cleanStudy(state.study))) { state.study = merged; save("hsc-log", state); refresh(); }
+    if (JSON.stringify(merged) !== JSON.stringify(remote)) persist();
+  } catch (e) {}
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { tickTimer(); pullStudy(); } });
 
 function leaveAccount() {
   clearTimeout(saveTimer);
