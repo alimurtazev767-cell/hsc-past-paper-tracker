@@ -570,7 +570,7 @@ footer.notes { color: var(--muted); }
   .rag { top: 4px; right: 2px; }
 }
 @media (prefers-reduced-motion: reduce) { .lights, .lights i, .ragseg button { transition: none; } .rag:active .lights, .ragseg button:active { transform: none; } }
-/* ---- syllabus: Year 12 dot points the student marks as learnt ---- */
+/* ---- syllabus: Year 12 dot points, each with the student's own red / amber / green light ---- */
 .mode-seg { margin-top: 22px; justify-self: start; min-width: min(320px, 100%); }
 .mode-seg[data-on="syl"] .thumb { transform: translateX(100%); }
 .mode-seg button { padding: 8px 18px; }
@@ -602,9 +602,21 @@ body[data-mode="syl"] footer.notes p:not(.syl-only), body:not([data-mode="syl"])
 .dp-sub { display: grid; gap: 3px; margin-top: 6px; font-size: 13.5px; color: var(--muted); }
 .dp-sub > span { display: block; padding-left: 14px; position: relative; }
 .dp-sub > span::before { content: "\2013"; position: absolute; left: 0; }
-.dp[aria-pressed="true"] { background: rgb(245 245 247 / .1); border-color: rgb(245 245 247 / .22); box-shadow: none; color: #FFFFFF; }
-.dp[aria-pressed="true"] .dp-ck { background: #F5F5F7; color: #000000; box-shadow: none; }
-.dp[aria-pressed="true"] .dp-sub { color: #C7C7CC; }
+/* a dot point's own traffic light: red (needs work), amber (getting there), green (confident) */
+.dp[data-rag] { box-shadow: none; color: #FFFFFF; }
+.dp[data-rag] .dp-sub { color: #C7C7CC; }
+.dp[data-rag="r"] { background: rgb(255 69 58 / .1); border-color: rgb(255 69 58 / .35); }
+.dp[data-rag="a"] { background: rgb(255 159 10 / .1); border-color: rgb(255 159 10 / .35); }
+.dp[data-rag="g"] { background: rgb(48 209 88 / .1); border-color: rgb(48 209 88 / .35); }
+.dp[data-rag="r"] .dp-ck { background: var(--tl-r); box-shadow: 0 0 8px rgb(255 69 58 / .6); }
+.dp[data-rag="a"] .dp-ck { background: var(--tl-a); box-shadow: 0 0 8px rgb(255 159 10 / .55); }
+.dp[data-rag="g"] .dp-ck { background: var(--tl-g); box-shadow: 0 0 8px rgb(48 209 88 / .55); color: #000000; }
+.dp-tag { display: block; margin-top: 4px; font-size: 12px; font-weight: 600; letter-spacing: .01em; }
+.dp[data-rag="r"] .dp-tag { color: #FF8A82; } .dp[data-rag="a"] .dp-tag { color: #FFC266; } .dp[data-rag="g"] .dp-tag { color: #6EE38D; }
+.meter.stack { display: flex; }
+.meter.stack > span { border-radius: 0; flex: none; }
+.meter.stack > .s-g { background: var(--tl-g); } .meter.stack > .s-a { background: var(--tl-a); } .meter.stack > .s-r { background: var(--tl-r); }
+.mrag { display: inline-flex; flex-wrap: wrap; gap: 2px 10px; font-size: 12px; color: var(--muted); }
 .dp mark { background: rgb(255 214 10 / .3); color: inherit; border-radius: 3px; }
 .untag { padding: 0 22px 18px; display: grid; gap: 6px; }
 .urow { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--rule); font-size: 14px; }
@@ -1097,7 +1109,7 @@ document.getElementById("pk-form").addEventListener("submit", async e => {
 
 /* ---------- syllabus ----------
    Year 12 (HSC course) content for the syllabus each subject uses for the 2027 HSC, copied from NESA (see data/syllabus/index.json).
-   The student tags each module with the term they learnt it and taps dot points to mark them learnt.
+   The student tags each module with the term they learnt it and taps dot points to give each a red, amber or green light.
    Saved in state.syl (learnt dot points), state.sylTerm (module -> term) and state.sylSubs (chosen subjects), so it syncs like the ticks. */
 const SYL_GROUPS = [
   ["Mathematics", ["std", "adv", "ext1", "ext2"]],
@@ -1132,35 +1144,48 @@ async function ensureSyl(id) {
 }
 // A module with no dot points (shouldn't happen) still counts as one thing to tick.
 const unitsOf = m => { const d = m.groups.flatMap(g => g.dots); return d.length ? d : [{ id: m.id, t: m.name }]; };
-const learnt = id => !!(state.syl && state.syl[id]);
+// Each dot point gets the student's own traffic light, like the subjects. Saved in state.syl as "r", "a" or "g";
+// older saves stored 1 for "learnt", which reads as green.
+const dotRag = id => { const v = state.syl && state.syl[id]; return v === 1 || v === "g" ? "g" : v === "r" || v === "a" ? v : null; };
+const learnt = id => dotRag(id) === "g";
 const termOf = mid => (state.sylTerm || {})[mid] || "";
 // Shown when the filter is "up to Term X": modules tagged that term or earlier
 const inFilter = mid => ui.sylUpTo === "all" || (termOf(mid) && termRank(termOf(mid)) <= termRank(ui.sylUpTo));
 function sylTally(id) {
   const ix = SYLSUB()[id]; if (!ix) return { done: 0, total: 0 };
-  let done = 0; for (const k in state.syl) if (k.startsWith(id + "-")) done++;
-  return { done: Math.min(done, ix.n), total: ix.n };
+  const n = { r: 0, a: 0, g: 0 }; for (const k in state.syl) if (k.startsWith(id + "-")) { const c = dotRag(k); if (c) n[c]++; }
+  return { done: Math.min(n.g, ix.n), a: n.a, r: n.r, total: ix.n };
 }
-function modTally(m) { const u = unitsOf(m); return { done: u.filter(x => learnt(x.id)).length, total: u.length }; }
+function modTally(m) { const u = unitsOf(m), c = u.map(x => dotRag(x.id)); return { done: c.filter(x => x === "g").length, a: c.filter(x => x === "a").length, r: c.filter(x => x === "r").length, total: u.length }; }
+// Progress bar split into green, amber and red
+const ragMeter = (t, label) => el("div", { class: "meter stack", role: "img", "aria-label": label + ": " + t.done + " green, " + t.a + " amber, " + t.r + " red of " + t.total },
+  ["g", "a", "r"].map(k => { const v = k === "g" ? t.done : t[k]; return v ? el("span", { class: "s-" + k, style: "width:" + (100 * v / (t.total || 1)) + "%" }) : null; }));
+const ragCounts = t => el("span", { class: "mrag" }, ["g", "a", "r"].map(k => el("span", { class: "rsum rs-" + k }, el("i", { "aria-hidden": "true" }), String(k === "g" ? t.done : t[k]) + " " + RAG_NAME[k].toLowerCase())));
 const pctOf = (a, b) => b ? Math.round(100 * a / b) : 0;
 
 function renderSylStats() {
   let done = 0, total = 0;
   for (const id of sylSubjects()) { const t = sylTally(id); done += t.done; total += t.total; }
   document.getElementById("stats").replaceChildren(
-    el("span", {}, el("b", {}, String(done)), " of ", el("b", {}, String(total)), " dot points learnt"),
+    el("span", {}, el("b", {}, String(done)), " of ", el("b", {}, String(total)), " dot points green"),
     el("span", {}, el("b", {}, pctOf(done, total) + "%"), " overall"),
     ...(syncMsg ? [el("span", {}, syncMsg)] : []));
 }
 
 function renderSylCards() {
-  document.getElementById("rag-sum").replaceChildren();
+  const all = { done: 0, a: 0, r: 0, total: 0 };
+  for (const id of sylSubjects()) { const t = sylTally(id); for (const k in all) all[k] += t[k]; }
+  const unset = all.total - all.done - all.a - all.r;
+  document.getElementById("rag-sum").replaceChildren(...(all.done + all.a + all.r === 0
+    ? [el("span", {}, "Tap a dot point to give it a red, amber or green light")]
+    : RAG.map(k => el("span", { class: "rsum rs-" + k }, el("i", { "aria-hidden": "true" }), el("b", {}, String(k === "g" ? all.done : all[k])), " " + RAG_NAME[k].toLowerCase()))
+        .concat(unset ? [el("span", { class: "rsum" }, el("b", {}, String(unset)), " not set")] : [])));
   const cards = sylSubjects().map(id => {
     const s = SYLSUB()[id], x = sylTally(id), pct = pctOf(x.done, x.total);
     return el("div", { class: "cwrap" }, el("button", { class: "card", type: "button", "aria-current": String(id === ui.sylActive), onclick: () => openSyl(id) },
       el("span", { class: "cname" }, short(s.name)),
       el("span", { class: "line" }, el("span", { class: "pct" }, pct + "%"),
-        el("span", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + pct + "%" })),
+        ragMeter(x, short(s.name)),
         el("span", { class: "frac" }, x.done + " / " + x.total)),
       el("span", { class: "cnum" }, el("span", {}, s.modules.length + (s.modules.length === 1 ? " module" : " modules")), el("span", {}, "dot points"))));
   });
@@ -1169,17 +1194,18 @@ function renderSylCards() {
 }
 
 function setSylTerm(mid, t) { if (!state.sylTerm) state.sylTerm = {}; if (t) state.sylTerm[mid] = t; else delete state.sylTerm[mid]; persist(); refresh(); }
-function toggleDot(d) {
+// Tap cycles a dot point: not set > red > amber > green > not set
+function cycleDot(d) {
   if (!state.syl) state.syl = {};
-  const was = learnt(d.id);
-  if (was) delete state.syl[d.id]; else state.syl[d.id] = 1;
+  const c = dotRag(d.id), next = c === null ? "r" : c === "r" ? "a" : c === "a" ? "g" : null;
+  if (next) state.syl[d.id] = next; else delete state.syl[d.id];
   persist(); refresh();
 }
 function setModule(m, on) {
-  const before = unitsOf(m).filter(u => learnt(u.id)).map(u => u.id);
-  for (const u of unitsOf(m)) { if (on) state.syl[u.id] = 1; else delete state.syl[u.id]; }
+  const before = unitsOf(m).filter(u => dotRag(u.id)).map(u => [u.id, state.syl[u.id]]);
+  for (const u of unitsOf(m)) { if (on) state.syl[u.id] = "g"; else delete state.syl[u.id]; }
   persist(); refresh();
-  toast((on ? "Marked all of " : "Cleared ") + m.name, () => { for (const u of unitsOf(m)) delete state.syl[u.id]; before.forEach(i => state.syl[i] = 1); persist(); refresh(); });
+  toast((on ? "Made all of " + m.name + " green" : "Cleared " + m.name), () => { for (const u of unitsOf(m)) delete state.syl[u.id]; before.forEach(([i, v]) => state.syl[i] = v); persist(); refresh(); });
 }
 
 function termSelect(m) {
@@ -1190,11 +1216,12 @@ function termSelect(m) {
 }
 
 function dotButton(d, q) {
-  const on = learnt(d.id);
-  return el("button", { class: "dp", type: "button", "aria-pressed": String(on), "data-id": d.id, onclick: () => toggleDot(d) },
+  const c = dotRag(d.id), next = c === null ? "red" : c === "r" ? "amber" : c === "a" ? "green" : "not set";
+  return el("button", { class: "dp", type: "button", "data-rag": c || null, "data-id": d.id, title: "Tap to make it " + next, onclick: () => cycleDot(d) },
     el("span", { class: "dp-ck", "aria-hidden": "true", html: CHECK }),
     // d.m (and d.subm for sub-points) is the same text with its maths as MathML; d.t and d.sub are the plain-text forms used for search
     el("span", { class: "dp-t" }, d.m ? el("span", { html: d.m }) : mark(d.t, q),
+      c ? el("span", { class: "dp-tag" }, RAG_NAME[c] + " · " + RAG_MEAN[c]) : el("span", { class: "sr" }, "Not set"),
       (d.sub || []).length ? el("span", { class: "dp-sub" }, d.sub.map((s, i) => d.subm && d.subm[i] ? el("span", { html: d.subm[i] }) : el("span", {}, mark(s, q)))) : null));
 }
 // Highlight the search words inside a dot point
@@ -1214,11 +1241,11 @@ function moduleBlock(m, q) {
   return el("section", { class: "mod", id: "m-" + m.id, "aria-labelledby": "mh-" + m.id },
     el("div", { class: "mhead" },
       el("div", { class: "mtitle" }, el("h3", { id: "mh-" + m.id }, m.name),
-        el("span", { class: "mcount" }, t.done + " / " + t.total + " · " + pct + "%")),
-      el("div", { class: "meter", role: "progressbar", "aria-label": m.name + " progress", "aria-valuemin": "0", "aria-valuemax": String(t.total), "aria-valuenow": String(t.done) }, el("span", { style: "width:" + pct + "%" })),
+        el("span", { class: "mcount" }, t.done + " / " + t.total + " green · " + pct + "%")),
+      ragMeter(t, m.name), ragCounts(t),
       el("div", { class: "mctl" }, termSelect(m),
-        el("button", { class: "linkbtn", type: "button", onclick: () => setModule(m, t.done < t.total) }, t.done < t.total ? "Mark all learnt" : "Clear module"))),
-    solo ? el("div", { class: "dps" }, dotButton({ id: m.id, t: "I've learnt this module" })) :
+        el("button", { class: "linkbtn", type: "button", onclick: () => setModule(m, t.done < t.total) }, t.done < t.total ? "Make all green" : "Clear module"))),
+    solo ? el("div", { class: "dps" }, dotButton({ id: m.id, t: "This module" })) :
     groups.map(g => el("div", { class: "grp" }, g.h ? el("p", { class: "gh" }, g.h) : null, el("div", { class: "dps" }, g.dots.map(d => dotButton(d, q))))));
 }
 
@@ -1242,12 +1269,12 @@ function renderSylView() {
   const body = [];
   if (ui.sylUpTo !== "all") {
     body.push(el("p", { class: "section-note syl-note" }, shown.length
-      ? "Showing the modules you tagged " + TERM_NAME[ui.sylUpTo] + " or earlier. You've learnt " + cov[0] + " of their " + cov[1] + " dot points (" + pctOf(cov[0], cov[1]) + "%)."
+      ? "Showing the modules you tagged " + TERM_NAME[ui.sylUpTo] + " or earlier. " + cov[0] + " of their " + cov[1] + " dot points are green (" + pctOf(cov[0], cov[1]) + "%)."
       : "No modules are tagged " + TERM_NAME[ui.sylUpTo] + " or earlier yet. Pick the term you learnt each module below."));
   }
   const blocks = shown.map(m => moduleBlock(m, q)).filter(Boolean);
   body.push(...blocks);
-  if (!blocks.length && (q || ui.sylHide) && shown.length) body.push(el("p", { class: "empty", style: "padding-top:16px" }, q ? "No dot points match “" + ui.sylQuery.trim() + "”." : "You've learnt every dot point here."));
+  if (!blocks.length && (q || ui.sylHide) && shown.length) body.push(el("p", { class: "empty", style: "padding-top:16px" }, q ? "No dot points match “" + ui.sylQuery.trim() + "”." : "Every dot point here is green."));
   if (ui.sylUpTo !== "all" && untagged.length) {
     body.push(el("div", { class: "section-label" }, el("span", {}, "Not tagged with a term yet"), el("span", {}, String(untagged.length))),
       el("div", { class: "untag" }, untagged.map(m => el("div", { class: "urow" }, el("span", {}, m.name), termSelect(m)))));
@@ -1255,16 +1282,16 @@ function renderSylView() {
 
   const main = el("section", { class: "panel", "aria-labelledby": "v-t" },
     el("div", { class: "vhead" },
-      el("div", { class: "vtitle" }, el("h2", { id: "v-t" }, ix.name), el("span", { class: "sub" }, x.done + " of " + x.total + " dot points learnt · " + pct + "%")),
-      el("div", { class: "meter", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(x.total), "aria-valuenow": String(x.done), "aria-label": ix.name + " syllabus progress" }, el("span", { style: "width:" + pct + "%" })),
+      el("div", { class: "vtitle" }, el("h2", { id: "v-t" }, ix.name), el("span", { class: "sub" }, x.done + " of " + x.total + " dot points green · " + pct + "%")),
+      ragMeter(x, ix.name + " syllabus"), ragCounts(x),
       el("div", { class: "links" }, el("a", { href: d.url, target: "_blank", rel: "noopener" }, d.title + " on NESA"))),
     el("div", { class: "toolbar" },
       el("div", { class: "types", role: "group", "aria-label": "Show content learnt up to" }, pills),
       el("div", { class: "controls" },
         el("input", { type: "search", id: "sq", placeholder: "Search dot points", "aria-label": "Search dot points", value: ui.sylQuery || "",
           oninput: e => { ui.sylQuery = e.target.value; renderSylView(); const n = document.getElementById("sq"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }),
-        el("label", { for: "syl-hide" }, el("input", { type: "checkbox", id: "syl-hide", checked: !!ui.sylHide, onchange: e => { ui.sylHide = e.target.checked; renderSylView(); } }), "Hide learnt"))),
-    el("div", { class: "legend" }, el("span", {}, "Tap a dot point to mark it learnt. Tag each module with the term you learnt it, then pick a term above to see everything up to then.")),
+        el("label", { for: "syl-hide" }, el("input", { type: "checkbox", id: "syl-hide", checked: !!ui.sylHide, onchange: e => { ui.sylHide = e.target.checked; renderSylView(); } }), "Hide green"))),
+    el("div", { class: "legend" }, el("span", {}, "Tap a dot point to set its light: red for needs work, amber for getting there, green for confident. Tap again to move it on. Tag each module with the term you learnt it, then pick a term above to see everything up to then.")),
     body);
   box.replaceChildren(el("div", { class: "view" }, main, sylSide(d)));
 }
@@ -1276,7 +1303,7 @@ function sylSide(d) {
     el("ul", {}, d.modules.map(m => { const t = modTally(m), p = pctOf(t.done, t.total);
       return el("li", {}, el("button", { type: "button", class: "mjump", onclick: () => { if (!inFilter(m.id)) { ui.sylUpTo = "all"; save("hsc-syl-upto", "all"); renderSylView(); } document.getElementById("m-" + m.id)?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); } },
         el("span", { class: "n" }, m.name),
-        el("span", { class: "mm" }, el("span", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + p + "%" })), el("span", { class: "d" }, p + "%")),
+        el("span", { class: "mm" }, ragMeter(t, m.name), el("span", { class: "d" }, p + "%")),
         el("span", { class: "d" }, (termOf(m.id) ? TERM_NAME[termOf(m.id)] : "No term set") + " · " + t.done + " / " + t.total)));
     })),
     el("p", { class: "hint syl-src" }, "From the " + d.title + ", checked " + d.checked + ". © NSW Education Standards Authority."));
@@ -1285,8 +1312,8 @@ function sylSide(d) {
 async function openSyl(id) {
   ui.sylActive = id; ui.sylQuery = ""; save("hsc-syl-tab", id);
   try { if (location.hash.slice(1) !== "syl-" + id) history.replaceState(null, "", "#syl-" + id); } catch (e) {}
-  renderSylCards(); renderSylView();
-  await ensureSyl(id); if (ui.sylActive === id && ui.mode === "syl") { renderSylCards(); renderSylView(); }
+  renderStats(); renderSylCards(); renderSylView();
+  await ensureSyl(id); if (ui.sylActive === id && ui.mode === "syl") { renderStats(); renderSylCards(); renderSylView(); }
 }
 
 function openSylPicker() {
@@ -1357,7 +1384,7 @@ function cleanState(d) {
   d = d || {};
   return { done: Object.assign({}, d.done), marks: Object.assign({}, d.marks), custom: Array.isArray(d.custom) ? d.custom.slice() : [],
     subjects: Array.isArray(d.subjects) ? d.subjects.slice() : null, from: Object.assign({}, d.from), rag: Object.assign({}, d.rag),
-    syl: Object.assign({}, d.syl), sylTerm: Object.assign({}, d.sylTerm), sylSubs: Array.isArray(d.sylSubs) ? d.sylSubs.slice() : null };
+    syl: Object.fromEntries(Object.entries(d.syl || {}).filter(([, v]) => v === 1 || ["r", "a", "g"].includes(v)).map(([k, v]) => [k, v === 1 ? "g" : v])), sylTerm: Object.assign({}, d.sylTerm), sylSubs: Array.isArray(d.sylSubs) ? d.sylSubs.slice() : null };
 }
 const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length || Object.keys(s.syl).length || Object.keys(s.sylTerm).length || (s.sylSubs && s.sylSubs.length);
 
@@ -1372,7 +1399,7 @@ function mergeStates(acc, loc) {
   if (loc.subjects) m.subjects = m.subjects ? m.subjects.concat(loc.subjects.filter(id => !m.subjects.includes(id))) : loc.subjects.slice();
   for (const id in loc.from) if (!(id in m.from)) m.from[id] = loc.from[id];
   for (const id in loc.rag) if (!(id in m.rag)) m.rag[id] = loc.rag[id];
-  for (const id in loc.syl) m.syl[id] = 1;
+  for (const id in loc.syl) if (!(id in m.syl)) m.syl[id] = loc.syl[id];
   for (const id in loc.sylTerm) if (!(id in m.sylTerm)) m.sylTerm[id] = loc.sylTerm[id];
   if (loc.sylSubs) m.sylSubs = m.sylSubs ? m.sylSubs.concat(loc.sylSubs.filter(id => !m.sylSubs.includes(id))) : loc.sylSubs.slice();
   return m;
