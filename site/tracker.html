@@ -595,7 +595,9 @@ body[data-mode="syl"] footer.notes p:not(.syl-only), body:not([data-mode="syl"])
 .dp-ck { width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px #48484A; color: transparent; transition: background-color .2s ease, box-shadow .2s ease, color .2s ease; }
 .dp-ck svg { width: 12px; height: 12px; }
 .dp-t { min-width: 0; overflow-wrap: anywhere; text-wrap: pretty; }
-.dp-t math { font-size: 1.08em; }
+/* STIX Two Math (SIL OFL, vendor/stix-two-math-LICENSE.txt) so formulas draw the same on every device; the browser only downloads it when a formula is on screen */
+@font-face { font-family: "STIX Two Math"; src: url("vendor/stix-two-math.woff2") format("woff2"); font-display: swap; }
+.dp-t math { font-size: 1.08em; math-style: normal; font-family: "STIX Two Math", math; }
 .dp-t:has(math) { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
 .dp-sub { display: grid; gap: 3px; margin-top: 6px; font-size: 13.5px; color: var(--muted); }
 .dp-sub > span { display: block; padding-left: 14px; position: relative; }
@@ -1191,9 +1193,9 @@ function dotButton(d, q) {
   const on = learnt(d.id);
   return el("button", { class: "dp", type: "button", "aria-pressed": String(on), "data-id": d.id, onclick: () => toggleDot(d) },
     el("span", { class: "dp-ck", "aria-hidden": "true", html: CHECK }),
-    // d.m is the same dot point with its maths as MathML, built from NESA's syllabus document; d.t is its plain-text form used for search
+    // d.m (and d.subm for sub-points) is the same text with its maths as MathML; d.t and d.sub are the plain-text forms used for search
     el("span", { class: "dp-t" }, d.m ? el("span", { html: d.m }) : mark(d.t, q),
-      (d.sub || []).length ? el("span", { class: "dp-sub" }, d.sub.map(s => el("span", {}, mark(s, q)))) : null));
+      (d.sub || []).length ? el("span", { class: "dp-sub" }, d.sub.map((s, i) => d.subm && d.subm[i] ? el("span", { html: d.subm[i] }) : el("span", {}, mark(s, q)))) : null));
 }
 // Highlight the search words inside a dot point
 function mark(text, q) {
