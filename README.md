@@ -91,3 +91,4 @@ With Node 20 or newer: copy `.env.example` to `.env.local`, fill in the two valu
 - The database rules were run in a local PostgreSQL 16 with a stand-in for Supabase's `auth.uid()`: a person could read and update only their own row, could not write someone else's, signed-out access was refused, and oversized data was rejected. This is a stand-in, not a real Supabase project.
 - The page was run in Chromium against a fake Supabase server using the real Supabase library: guest ticks survive a reload, a wrong password shows "Invalid login credentials", signing in uploads guest ticks, new ticks sync, a second device pulls them, a reload keeps you signed in, and signing out clears the browser. There's no sideways scrolling at phone width. It has not yet been tried against a real Supabase project or on Vercel.
 # hsc-past-paper-tracker
+# hsc-past-paper-tracker
