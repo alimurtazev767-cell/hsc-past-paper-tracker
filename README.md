@@ -4,11 +4,32 @@ The tracker as a normal website: a static page hosted on **Vercel**, with **Supa
 
 Without Supabase set up, the site still works: ticks are saved in each visitor's browser only.
 
+## Fastest path: put it online now, add logins later
+
+Deploy it with no Supabase first. Everything works, and ticks are saved in each visitor's own browser.
+
+**Option A, GitHub (same as a typical Vercel site):**
+1. On GitHub, create a new repository and upload everything in this folder (unzip `hsc-past-paper-log-website.zip` first, then drag the files in).
+2. On vercel.com, choose **Add New > Project**, then **Import** that repository.
+3. Leave **Framework Preset** as **Other** and don't change the build settings. `vercel.json` already sets **Build Command** `node build.mjs` and **Output Directory** `dist`. Skip the environment variables for now.
+4. Choose **Deploy**. You get a `https://<name>.vercel.app` link. Every later push to GitHub redeploys it.
+
+**Option B, Vercel CLI (no GitHub):** in a terminal inside this folder, with Node installed:
+```
+npx vercel          # log in, answer the prompts with the defaults; gives a preview link
+npx vercel --prod   # puts it on your main .vercel.app address
+```
+
+**Option C, no build at all:** the `site/` folder is a complete static site on its own (open `site/index.html`). Deploy just that folder, for example by running `npx vercel --prod` inside `site/`, and set Framework Preset to **Other** with no build command. This way can't turn on logins later without switching to A or B.
+
+**Adding logins later:** follow steps 2 to 5 below. Then add `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in Vercel under **Settings > Environment Variables** and redeploy. A Sign in button appears once those are set.
+
 ## What's in this folder
 
 | Path | What it is |
 | --- | --- |
 | `site/index.html` | The tracker page, with a Sign in button added |
+| `site/config.js` | Empty placeholder (logins off). The build replaces it with your Supabase settings |
 | `site/data/*.json` | Paper lists for the 33 subjects (copied unchanged from the Artifact) |
 | `site/vendor/supabase.js` | Supabase's browser library, v2.117.2 (MIT licence), served from your own site |
 | `build.mjs` | Copies `site/` to `dist/` and writes `dist/config.js` from your environment variables |
@@ -90,5 +111,3 @@ With Node 20 or newer: copy `.env.example` to `.env.local`, fill in the two valu
 
 - The database rules were run in a local PostgreSQL 16 with a stand-in for Supabase's `auth.uid()`: a person could read and update only their own row, could not write someone else's, signed-out access was refused, and oversized data was rejected. This is a stand-in, not a real Supabase project.
 - The page was run in Chromium against a fake Supabase server using the real Supabase library: guest ticks survive a reload, a wrong password shows "Invalid login credentials", signing in uploads guest ticks, new ticks sync, a second device pulls them, a reload keeps you signed in, and signing out clears the browser. There's no sideways scrolling at phone width. It has not yet been tried against a real Supabase project or on Vercel.
-# hsc-past-paper-tracker
-# hsc-past-paper-tracker
