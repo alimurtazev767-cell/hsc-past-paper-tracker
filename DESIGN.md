@@ -13,14 +13,14 @@ colors:
   rule-strong: "#BCC5D3"
   band-muted: "#B9C4D8"
   selection-tint: "#CFE3F5"
-  line-orange: "#F6891F"
-  line-blue: "#0079AD"
-  line-green: "#00824A"
-  line-magenta: "#B8217F"
-  line-deep-blue: "#00509A"
-  line-teal: "#13777C"
-  line-purple: "#6E4FA0"
-  line-yellow: "#E3B505"
+  line-orange: "#E07010"
+  line-blue: "#0070B0"
+  line-green: "#157F35"
+  line-magenta: "#C0267F"
+  line-deep-blue: "#1450A0"
+  line-brown: "#8E4B2A"
+  line-purple: "#6A3FB0"
+  line-yellow: "#B88C00"
   signal-red: "#D92D20"
   signal-amber: "#B86E00"
   signal-green: "#12A150"
@@ -261,7 +261,7 @@ A cool, low-chroma signage palette with navy ink, carrying eight saturated line 
 
 ### Secondary: the line set
 Eight line colours, assigned in order to the student's chosen subjects (wrapping after eight) and set as `--line` / `--on` on each subject's wrapper:
-- **Line Orange** (line-orange) with navy text, **Line Blue** (line-blue), **Line Green** (line-green), **Line Magenta** (line-magenta), **Line Deep Blue** (line-deep-blue), **Line Teal** (line-teal), **Line Purple** (line-purple), each with white text, and **Line Yellow** (line-yellow) with navy text. Line Blue is the default `--line` when no subject is in scope.
+- **Line Orange** (line-orange) with navy text, **Line Blue** (line-blue), **Line Green** (line-green), **Line Magenta** (line-magenta), **Line Deep Blue** (line-deep-blue), **Line Brown** (line-brown), **Line Purple** (line-purple), each with white text, and **Line Gold** (line-yellow) with navy text. The order was checked with a colour-blind-safety validator; keep it. Line Blue is the default `--line` when no subject is in scope.
 
 ### Tertiary: the signal set
 - **Signal Red / Amber / Green** (signal-red, signal-amber, signal-green): confidence dots and summary, the dot-point lamps, and the stacked syllabus meter. Amber is set dark enough to read as a ring on white.

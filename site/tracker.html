@@ -107,7 +107,7 @@ h1 { font: 800 clamp(1.5rem, 3vw, 2rem)/1.1 var(--sans); letter-spacing: -0.02em
 .card .cnum b { color: var(--ink); }
 .card .line .meter { flex: 1; background: linear-gradient(color-mix(in srgb, var(--line) 40%, transparent), color-mix(in srgb, var(--line) 40%, transparent)) center / 100% 2px no-repeat; }
 .card .frac { font-size: 12.5px; color: var(--ink-3); }
-.card .cnum { display: flex; justify-content: space-between; gap: 6px; min-height: 1.4em; font-size: 12.5px; color: var(--ink-3); }
+.card .cnum { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 8px; min-height: 1.4em; font-size: 12.5px; color: var(--ink-3); }
 
 /* Meter as a line under construction: thin planned track, solid built line in the subject's colour */
 .meter { height: 8px; border-radius: 999px; background: linear-gradient(var(--rule-2), var(--rule-2)) center / 100% 2px no-repeat; overflow: hidden; }
@@ -142,7 +142,10 @@ h2 { font: 800 1.6rem/1.15 var(--sans); letter-spacing: -0.02em; margin: 0; text
 .sp-fields { align-items: end; }
 .sp-help { margin: -4px 0 0; font-size: 13.5px; color: var(--ink-2); }
 .sp-saved { margin: -4px 0 0; font-size: 13px; font-weight: 700; color: #146A38; }
-.sp-mine { display: grid; justify-content: stretch; }
+.sp-row.sp-mine { display: grid; grid-template-columns: minmax(0, 1fr); justify-content: stretch; justify-items: start; }
+.sp-row.sp-mine .chips { width: 100%; }
+.sp-mine-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+.sp-mine-head .hint { font-size: 13.5px; color: var(--ink-2); }
 .sp-fields label:not(.sp-done) { display: grid; gap: 4px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
 .sp-fields input { min-height: 36px; padding: 6px 10px; border: 1px solid var(--rule-2); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 14px; }
 .sp-fields input[type=text] { width: 9em; }
@@ -338,11 +341,6 @@ footer.notes details p { margin: 8px 0 0; }
 .day ul li > .n::before { background: var(--line); }
 .day-stops li { display: flex !important; align-items: center; gap: 10px; }
 .day-stops .lb { width: 26px; height: 26px; font-size: 11px; }
-.addtime { padding: 14px 20px 18px; border-top: 1px solid var(--rule); display: grid; gap: 8px; }
-.addtime .hint { padding: 0 !important; margin: 0; }
-.addtime-row { display: grid; grid-template-columns: minmax(0, 1fr) 5.5em auto; gap: 8px; }
-.addtime select, .addtime input { min-height: 38px; padding: 6px 8px; border: 1px solid var(--rule-2); border-radius: 8px; background: var(--panel); color: var(--ink); min-width: 0; }
-.addtime input[aria-invalid="true"] { border-color: var(--danger); }
 @media (max-width: 860px) { .clock-wrap { grid-template-columns: minmax(0, 1fr); } .clock-ctl { justify-items: stretch; } }
 @media (max-width: 560px) {
   .cal { padding: 16px; }
@@ -351,6 +349,63 @@ footer.notes details p { margin: 8px 0 0; }
   .cal-min { display: none; }
   .tseg { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ---- tasks and weekly study ---- */
+.side { display: grid; gap: 16px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; }
+.side .log { position: static; }
+.tasks-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 20px 20px 10px; }
+.tasks-head .meta-label { margin: 0; padding: 0 !important; }
+.tk-all { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink-2); cursor: pointer; }
+.task-add { display: grid; gap: 8px; padding: 0 20px 14px; }
+.task-add input { min-height: 38px; padding: 6px 10px; border: 1px solid var(--rule-2); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 14.5px; min-width: 0; }
+.task-add input[aria-invalid="true"] { border-color: var(--danger); }
+.task-add-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.task-list { list-style: none; margin: 0; padding: 0; max-height: 40vh; overflow: auto; }
+.task { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px 20px; border-top: 1px solid var(--rule); }
+.task input { margin-top: 3px; }
+.tk-t { display: grid; gap: 2px; font-size: 14.5px; font-weight: 600; cursor: pointer; overflow-wrap: anywhere; }
+.tk-t > span.tk-meta::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--line); margin-right: 6px; vertical-align: 0; }
+.tk-meta { font-size: 13px; font-weight: 400; color: var(--ink-3); }
+.task.late .tk-meta { color: var(--danger); font-weight: 600; }
+.task.is-done .tk-t { color: var(--ink-3); text-decoration: line-through; }
+.task-done { border-top: 1px solid var(--rule); }
+.task-done > summary { cursor: pointer; padding: 12px 20px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.tasks .none { padding: 6px 20px 20px; text-align: left; }
+.cal-task { max-width: 100%; font-size: 11.5px; font-weight: 600; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--ink); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.day-tasks { border-top: 0 !important; }
+.weekly { padding: 18px 24px 20px; border-top: 1px solid var(--rule); display: grid; gap: 12px; }
+.wk-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; }
+.wk-head h3 { margin: 0; font: 800 1.2rem/1.2 var(--sans); }
+.wk-goal { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.wk-goal input { width: 4.5em; min-height: 34px; padding: 4px 8px; border: 1px solid var(--rule-2); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 14px; }
+.wk-goal span { font-weight: 500; }
+.wk-now { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 14.5px; color: var(--ink-2); }
+.wk-now b { font-size: 22px; font-weight: 800; color: var(--ink); }
+.wk-meter { flex: 1 1 160px; max-width: 320px; height: 8px; border-radius: 999px; background: var(--well); border: 1px solid var(--rule); overflow: hidden; }
+.wk-meter > span { display: block; height: 100%; background: var(--ink); border-radius: inherit; }
+.wk-left { font-weight: 600; color: var(--ink); }
+.wk-chart { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; height: 190px; margin-top: 4px; }
+.wk-axis { display: flex; flex-direction: column; justify-content: space-between; padding-bottom: 22px; font-size: 12px; color: var(--ink-3); text-align: right; }
+.wk-axis span { transform: translateY(-50%); } .wk-axis span:last-child { transform: translateY(50%); }
+.wk-plot { position: relative; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 10px; padding-bottom: 22px; background: linear-gradient(var(--rule), var(--rule)) 0 0 / 100% 1px no-repeat, linear-gradient(var(--rule), var(--rule)) 0 calc(50% - 11px) / 100% 1px no-repeat, linear-gradient(var(--rule-2), var(--rule-2)) 0 calc(100% - 22px) / 100% 1px no-repeat; }
+.wk-col { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; border-radius: 6px; outline-offset: 2px; cursor: default; }
+.wk-col:hover .wk-bar, .wk-col:focus-visible .wk-bar { filter: brightness(1.08); }
+.wk-bar { display: flex; flex-direction: column-reverse; gap: 2px; width: min(36px, 70%); min-height: 0; }
+.wk-bar i { display: block; background: var(--line); min-height: 2px; }
+.wk-bar i:last-child { border-radius: 4px 4px 0 0; }
+.wk-x { position: absolute; bottom: -22px; font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+.wk-col.now .wk-x { color: var(--ink); font-weight: 700; }
+.wk-goalline { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--ink-2); pointer-events: none; }
+.wk-goalline span { position: absolute; right: 0; top: 2px; font-size: 12px; font-weight: 700; color: var(--ink-2); background: var(--panel); padding: 0 4px; }
+.wk-tip { position: absolute; top: -6px; width: 220px; padding: 8px 10px; border-radius: 8px; background: var(--ink); color: #FFFFFF; font-size: 13px; line-height: 1.4; pointer-events: none; z-index: 2; }
+.wk-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13.5px; color: var(--ink-2); }
+.wk-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.wk-legend i { width: 10px; height: 10px; border-radius: 3px; background: var(--line); }
+.wk-table > summary { cursor: pointer; font-size: 13.5px; color: var(--ink-2); width: fit-content; }
+.wk-table table { margin-top: 8px; border-collapse: collapse; font-size: 13.5px; }
+.wk-table th, .wk-table td { padding: 4px 12px 4px 0; text-align: left; border-bottom: 1px solid var(--rule); }
+@media (max-width: 860px) { .side { position: static; } }
+@media (max-width: 560px) { .weekly { padding: 16px; } .wk-plot { gap: 4px; } .wk-x { font-size: 10.5px; } .wk-col:not(.now):nth-child(odd) .wk-x { visibility: hidden; } }
 
 /* ---- accounts ---- */
 #auth { width: min(420px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; overscroll-behavior: contain; }
@@ -463,9 +518,9 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
 .dl i { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 2px currentColor; background: transparent; transition: background-color .15s ease, transform .1s ease-out; }
 .dl:hover i { transform: scale(1.25); }
 .dl-r { color: var(--tl-r); } .dl-a { color: var(--tl-a); } .dl-g { color: var(--tl-g); }
-.dl[aria-pressed="true"] i { background: currentColor; }
+.dl[aria-checked="true"] i { background: currentColor; }
 .dl:hover i { background: color-mix(in srgb, currentColor 35%, transparent); }
-.dl[aria-pressed="true"]:hover i { background: currentColor; }
+.dl[aria-checked="true"]:hover i { background: currentColor; }
 .dl[aria-pressed="true"]:hover i { transform: none; }
 .band .dl:focus-visible, .dl:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .firstrun { margin: 18px 24px 4px; padding: 16px 18px; border-radius: 10px; background: var(--well); border: 1px solid var(--rule); display: grid; gap: 10px; }
@@ -521,7 +576,7 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
   .firstrun { margin-inline: 16px; }
   .dp { grid-template-columns: minmax(0, 1fr); }
   .dp-lamps { justify-self: start; }
-  .seg.mode-seg button { flex: 1; }
+  .seg.mode-seg button { flex: 1; padding: 10px 8px 11px; font-size: 13.5px; white-space: nowrap; }
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .card { padding: 12px; }
   .chead { padding-right: 0; flex-direction: column; align-items: flex-start; gap: 8px; }
@@ -623,7 +678,7 @@ const DEFAULT_SUBJECTS = ["ext1", "ext2", "chem", "phys"];
 const SUB = Object.fromEntries(INDEX.map(s => [s.id, s]));
 const short = n => n.replace("Mathematics", "Maths").replace("Earth and Environmental Science", "Earth & Env Science");
 
-let state = { done: {}, marks: {}, custom: [], subjects: null, from: {}, rag: {}, syl: {}, sylTerm: {}, sylSubs: null, route: {}, school: "", study: [] };
+let state = { done: {}, marks: {}, custom: [], subjects: null, from: {}, rag: {}, syl: {}, sylTerm: {}, sylSubs: null, route: {}, school: "", study: [], tasks: [], weekGoal: 0 };
 let ui = { active: null, query: "", all: false, solOnly: false, type: "all", group: "school", mode: "papers", sylActive: null, sylUpTo: "all", sylQuery: "", sylHide: false, pickerFor: "papers" };
 const TYPES = ["hsc", "trial", "hy", "at1", "at2", "at3", "at4", "comp", "added"];
 const TYPE_NAME = { all: "All", hsc: "HSC", trial: "Trials", hy: "Half yearly", at1: "AT1", at2: "AT2", at3: "AT3", at4: "AT4", y11: "Year 11", y11hy: "Year 11 half yearly", y11pt1: "Year 11 task 1", y11pt2: "Year 11 task 2", y11pt3: "Year 11 task 3", comp: "Competitions", added: "Added by you" };
@@ -640,7 +695,8 @@ const CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke
 let docRef = null, syncMsg = "Saved on this device";
 const DATA = {};
 // Each chosen subject rides its own line colour, in the order the student picked them. on = text colour on that line.
-const LINES = [["#F6891F", "#0B1F45"], ["#0079AD", "#FFFFFF"], ["#00824A", "#FFFFFF"], ["#B8217F", "#FFFFFF"], ["#00509A", "#FFFFFF"], ["#13777C", "#FFFFFF"], ["#6E4FA0", "#FFFFFF"], ["#E3B505", "#0B1F45"]];
+// Validated as a chart palette in this order (CVD separation, lightness band, chroma, 3:1 on white); on = badge text colour
+const LINES = [["#E07010", "#0B1F45"], ["#0070B0", "#FFFFFF"], ["#C0267F", "#FFFFFF"], ["#157F35", "#FFFFFF"], ["#6A3FB0", "#FFFFFF"], ["#B88C00", "#0B1F45"], ["#1450A0", "#FFFFFF"], ["#8E4B2A", "#FFFFFF"]];
 const CODE = { ext1: "X1", ext2: "X2", adv: "MA", std: "MS", engadv: "EA", engstd: "ES", engx1: "E1", bio: "BI", chem: "CH", phys: "PH", ees: "EE", invsci: "IS", agri: "AG", anc: "AH", mod: "MH", histx: "HX", bus: "BS", eco: "EC", legal: "LS", eng: "EN", ipt: "IT", sdd: "SE", pdhpe: "PD", sac: "SC", sor1: "R1", sor2: "R2", va: "VA", jpc: "JC", jpx: "JX", jpb: "JB", latc: "LC", latx: "LX", comp: "MC", hms: "HM" };
 const lineStyle = (id, list) => { const l = LINES[Math.max(0, list.indexOf(id)) % LINES.length]; return "--line:" + l[0] + ";--on:" + l[1]; };
 const badge = (id, name, big) => el("span", { class: "lb" + (big ? " big" : ""), "aria-hidden": "true" }, CODE[id] || name.replace(/[^A-Z]/g, "").slice(0, 2) || name.slice(0, 2).toUpperCase());
@@ -650,6 +706,7 @@ function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch 
 state = Object.assign(state, load("hsc-log", {}));
 ui.active = load("hsc-tab2", null); ui.sylActive = load("hsc-syl-tab", null);
 if (!Array.isArray(state.study)) state.study = [];
+if (!Array.isArray(state.tasks)) state.tasks = [];
 if (!state.syl || typeof state.syl !== "object") state.syl = {}; if (!state.sylTerm || typeof state.sylTerm !== "object") state.sylTerm = {};
 const subjects = () => (state.subjects && state.subjects.length ? state.subjects : DEFAULT_SUBJECTS).filter(id => SUB[id]);
 const fromYear = id => state.from[id] || SUB[id].from;
@@ -729,7 +786,7 @@ function announce(msg) { const l = document.getElementById("live"); if (l) { l.t
 function toast(msg, undo) {
   announce(msg + (undo ? ". Undo with Control Z." : ""));
   document.querySelector(".toast")?.remove(); clearTimeout(toastTimer);
-  const doUndo = () => { lastUndo = null; t.remove(); undo(); };
+  const doUndo = () => { lastUndo = null; t.remove(); undo(); announce("Undone"); };
   const t = el("div", { class: "toast" }, msg,
     undo ? el("button", { type: "button", onclick: doUndo }, "Undo") : null,
     undo ? el("kbd", { "aria-hidden": "true" }, /Mac|iP/.test(navigator.platform) ? "\u2318Z" : "Ctrl+Z") : null);
@@ -833,7 +890,7 @@ function toggle(p) {
   const was = state.done[p.id];
   if (was) delete state.done[p.id]; else state.done[p.id] = today();
   persist(); refresh();
-  toast((was ? "Unticked " : "Ticked ") + p.name, () => { if (was) state.done[p.id] = was; else delete state.done[p.id]; persist(); refresh();
+  toast((was ? "Unticked " : "Ticked ") + p.name + (p.kind === "trial" && !/trial/i.test(p.name) ? " Trial" : ""), () => { if (was) state.done[p.id] = was; else delete state.done[p.id]; persist(); refresh();
     document.querySelector('#view .chip[data-id="' + CSS.escape(p.id) + '"]')?.focus({ preventScroll: true }); });
 }
 
@@ -850,11 +907,12 @@ function yearRows(list, fromY, labelFor) {
 }
 
 // One select pins the student's own school to the top of every subject's school list
-function schoolPick(list) {
+function schoolPick(list, where) {
+  const sid = "my-school" + (where ? "-" + where : "");
   const names = [...new Set(list.map(pp => pp.school).filter(Boolean))].sort((a, b) => a.localeCompare(b));
   if (state.school && !names.includes(state.school)) names.unshift(state.school);
-  return el("div", { class: "pick-school" }, el("label", { for: "my-school" }, "Your school"),
-    el("select", { id: "my-school", onchange: e => { state.school = e.target.value; persist(); setTimeout(refresh, 0); announce(state.school ? state.school + " pinned to the top" : "School cleared"); } },
+  return el("div", { class: "pick-school" }, el("label", { for: sid }, "Your school"),
+    el("select", { id: sid, onchange: e => { state.school = e.target.value; persist(); setTimeout(refresh, 0); announce(state.school ? state.school + " pinned to the top" : "School cleared"); } },
       el("option", { value: "" }, "Not set"), names.map(n => el("option", { value: n, selected: n === state.school }, n))),
     el("span", { class: "sr" }, "Your school moves to the top of the list in every subject."));
 }
@@ -932,19 +990,25 @@ function routeOf(id) {
       el("button", { type: "button", class: "stn" + (st.done ? " done" : "") + (st === next ? " next" : "") + (i < ni ? " past" : ""), "data-key": "stn-" + st.k,
         "aria-current": st === sel ? "true" : null, "aria-controls": "stop-panel",
         "aria-label": st.name + ", " + stopWhen(st) + (st.done ? ", sat" + (st.mark ? ", mark " + st.mark : "") : st === next ? ", next stop" : ""),
-        onclick: () => { ui.stopSel[id] = st.k; renderView(); } },
+        onclick: () => { ui.stopSel[id] = st.k; ui.stopOpen = Object.assign({}, ui.stopOpen, { [id]: true }); renderView(); } },
         el("span", { class: "pin", "aria-hidden": "true", html: st.done ? CHECK : "" }),
         el("span", { class: "yl", "aria-hidden": "true" }, st.name),
         el("span", { class: "yw", "aria-hidden": "true" }, stopWhen(st))))),
-    stopPanel(id, sel, sel === next));
+    ui.mode === "syl" && !(ui.stopOpen || {})[id] ? el("button", { type: "button", class: "linkbtn", "data-key": "stop-open", "aria-controls": "stop-panel", "aria-expanded": "false", onclick: () => { ui.stopOpen = Object.assign({}, ui.stopOpen, { [id]: true }); renderView(); } }, "Show " + sel.name + " details") : stopPanel(id, sel, sel === next));
 }
 function stopPanel(id, st, isNext) {
   const pr = practiceOf(id, st.k), mods = modulesFor(id, st);
   const inSyl = ui.mode === "syl", hasSyl = (SYLIX || []).some(x => x.id === id);
   const fid = "st-" + st.k;
   setTimeout(() => { if (ui.stopSaved === id + st.k) ui.stopSaved = null; }, 0);
-  const minePapers = state.school && papersOf(id) ? allOf(id).filter(pp => pp.kind === st.k && pp.school === state.school) : [];
-  const mine = minePapers.length ? el("div", { class: "sp-row sp-mine" }, el("span", {}, el("b", {}, state.school), "'s past " + PRACTICE_NAME[st.k]), el("div", { class: "chips" }, minePapers.sort((a, b) => b.year - a.year).map(pp => chip(Object.assign({}, pp, { chip: pp.year ? String(pp.year) : pp.chip }), fromYear(id))))) : null;
+  const fy = fromYear(id), minePapers = state.school && papersOf(id) ? allOf(id).filter(pp => pp.kind === st.k && pp.school === state.school).sort((a, b) => b.year - a.year) : [];
+  const recent = minePapers.filter(pp => pp.year >= fy), shown = ui.mineAll ? minePapers : recent.slice(0, 8), more = (ui.mineAll ? 0 : minePapers.length - shown.length);
+  const pick = papersOf(id) && !SUB[id].comp ? schoolPick(allOf(id).filter(pp => pp.school), "stop") : null;
+  const mine = !state.school ? (pick ? el("div", { class: "sp-row sp-mine" }, el("div", { class: "sp-mine-head" }, pick, el("span", { class: "hint" }, "Pick it to see its past " + PRACTICE_NAME[st.k] + " here."))) : null) : minePapers.length || pick ? el("div", { class: "sp-row sp-mine" }, el("div", { class: "sp-mine-head" }, pick,
+    minePapers.length ? el("span", { class: "hint" }, "Past " + PRACTICE_NAME[st.k] + (ui.mineAll ? "" : " from " + fy)) : null,
+    more > 0 ? el("button", { type: "button", class: "linkbtn", "data-key": "mine-all", onclick: () => { ui.mineAll = true; renderView(); } }, "Show all " + minePapers.length) : null),
+    !minePapers.length ? null : shown.length ? el("div", { class: "chips" }, shown.map(pp => chip(Object.assign({}, pp, { chip: pp.year ? String(pp.year) : pp.chip }), fy))) : el("span", { class: "hint" }, "None since " + fy + "."),
+    minePapers.length ? null : el("span", { class: "hint" }, state.school + " has no " + PRACTICE_NAME[st.k] + " listed.")) : null;
   const practice = pr ? el("div", { class: "sp-row" },
       el("span", {}, el("b", {}, pr.done + " of " + pr.total), " " + PRACTICE_NAME[st.k] + " done as practice"),
       pr.total ? el("button", { type: "button", class: "btn", "data-key": "go-" + st.k, onclick: () => showPractice(id, st.k) }, "Show " + PRACTICE_NAME[st.k]) : null)
@@ -968,7 +1032,7 @@ function stopPanel(id, st, isNext) {
       el("label", { for: fid + "-date" }, "Date", el("input", { type: "date", id: fid + "-date", value: st.date || "", onchange: e => setStop(id, st.k, { date: e.target.value }) })),
       el("label", { for: fid + "-mark" }, "Your mark", el("input", { type: "text", id: fid + "-mark", inputmode: "decimal", maxlength: "12", placeholder: "e.g. 42/50", value: st.mark || "", onchange: e => setStop(id, st.k, { mark: e.target.value.trim() }) })),
         el("label", { class: "sp-done", for: fid + "-done" }, el("input", { type: "checkbox", id: fid + "-done", checked: !!st.done, onchange: e => setStop(id, st.k, { done: e.target.checked }) }), "I've sat this"))),
-    st.done ? null : st.date && daysTo(st.date) < 0 ? el("p", { class: "sp-help" }, "This date has passed. ", el("button", { type: "button", class: "linkbtn", "data-key": "sat-" + st.k, onclick: () => setStop(id, st.k, { done: true }) }, "Mark " + st.name + " as sat"))
+    st.done ? null : st.mark ? el("p", { class: "sp-help" }, "You've added a mark. ", el("button", { type: "button", class: "linkbtn", "data-key": "sat2-" + st.k, onclick: () => setStop(id, st.k, { done: true }) }, "Mark " + st.name + " as sat")) : st.date && daysTo(st.date) < 0 ? el("p", { class: "sp-help" }, "This date has passed. ", el("button", { type: "button", class: "linkbtn", "data-key": "sat-" + st.k, onclick: () => setStop(id, st.k, { done: true }) }, "Mark " + st.name + " as sat"))
       : st.date ? null : el("p", { class: "sp-help" }, "Add the date from your school's assessment calendar when you get it."),
     ui.stopSaved === id + st.k ? el("p", { class: "sp-saved", role: "status" }, "Saved") : null,
     mine, practice, modLine);
@@ -992,13 +1056,14 @@ function drawView() {
   if (!s) { box.replaceChildren(); return; }
   const p = papersOf(id);
   if (!p) { box.replaceChildren(el("div", { class: "panel" }, el("p", { class: "empty", style: "padding-top:18px" }, "Loading " + s.name + "\u2026"))); return; }
+  if (ui.type === "next") { const n = nextStop(id); ui.type = n && allOf(id).some(pp => pp.kind === n.k) ? n.k : "all"; }
   const fromY = fromYear(id), x = tally(id), pct = x.curTotal ? Math.round(100 * x.curDone / x.curTotal) : 0;
   const q = ui.query.trim().toLowerCase();
   const keep = pp => (ui.all || pp.year >= fromY || pp.custom) && (!q || pp.name.toLowerCase().includes(q)) && (!ui.solOnly || pp.sol || pp.custom || pp.kind === "hsc");
   const all = allOf(id);
   const counts = {}; for (const t of TYPES) counts[t] = all.filter(pp => pp.kind === t && (ui.all || pp.year >= fromY || pp.custom) && (!q || pp.name.toLowerCase().includes(q))).length;
   if (ui.type !== "all" && !all.some(pp => pp.kind === ui.type)) ui.type = "all";
-  const older = listed(id).filter(pp => pp.year < fromY && inType(pp, ui.type)).length;
+  const older = listed(id).filter(pp => pp.year < fromY && inType(pp, ui.type) && (!q || pp.name.toLowerCase().includes(q))).length;
   const typeLabel = ui.type === "all" ? "papers" : TYPE_NAME[ui.type] + (ui.type === "hsc" ? " papers" : "");
 
   const fromSel = el("select", { id: "from-year", "aria-label": "Count progress from year", onchange: e => { state.from[id] = +e.target.value; persist(); refresh(); } },
@@ -1062,7 +1127,7 @@ function drawView() {
       el("div", { class: "seg", id: "seg", role: "group", "aria-label": "Group papers", "data-on": ui.shownGroup || ui.group },
         el("span", { class: "thumb", "aria-hidden": "true" }),
         [["school", "By school"], ["year", "By year"]].map(([k, t]) => el("button", { type: "button", "data-key": "group-" + k, "aria-pressed": String(ui.group === k), onclick: () => { ui.group = k; save("hsc-group", k); renderView(); } }, t))),
-      el("input", { type: "search", id: "q", placeholder: "Search schools or papers  ( / )", "aria-label": "Search papers", value: ui.query,
+      el("input", { type: "search", id: "q", placeholder: "Search papers ( / )", "aria-label": "Search papers", value: ui.query,
         oninput: e => { ui.query = e.target.value; renderView(); const n = document.getElementById("q"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }),
       el("label", { for: "from-year" }, "From", fromSel),
       older ? el("label", { for: "all-yrs" }, el("input", { type: "checkbox", id: "all-yrs", checked: ui.all, onchange: e => { ui.all = e.target.checked; save("hsc-all", ui.all); renderView(); } }), "Older papers (" + older + ")") : null,
@@ -1255,9 +1320,8 @@ function setSylTerm(mid, t) { if (!state.sylTerm) state.sylTerm = {}; if (t) sta
 function lampKeys(e, d) {
   const i = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key]; if (!i) return;
   e.preventDefault();
-  const cur = RAG.indexOf(dotRag(d.id)), k = RAG[((cur < 0 ? (i > 0 ? -1 : 0) : cur) + i + 3) % 3];
-  setDot(d, k, true);
-  requestAnimationFrame(() => document.querySelector('[data-key="dl-' + k + "-" + CSS.escape(d.id) + '"]')?.focus());
+  const btns = [...e.currentTarget.querySelectorAll(".dl")], at = btns.indexOf(document.activeElement), nx = btns[((at < 0 ? 0 : at) + i + 3) % 3];
+  btns.forEach(b => b.tabIndex = b === nx ? 0 : -1); nx.focus();
 }
 function setDot(d, c, keep) {
   if (!state.syl) state.syl = {};
@@ -1289,7 +1353,7 @@ function dotButton(d, q) {
       c ? el("span", { class: "dp-tag" }, RAG_NAME[c] + ": " + RAG_MEAN[c].toLowerCase()) : null,
       (d.sub || []).length ? el("span", { class: "dp-sub" }, d.sub.map((s, i) => d.subm && d.subm[i] ? el("span", { html: d.subm[i] }) : el("span", {}, mark(s, q)))) : null),
     el("span", { class: "dp-lamps", role: "radiogroup", "aria-label": "Your light for: " + d.t, onkeydown: e => lampKeys(e, d) }, RAG.map((k, i) =>
-      el("button", { type: "button", role: "radio", class: "dl dl-" + k, "data-key": "dl-" + k + "-" + d.id, "aria-checked": String(c === k), "aria-pressed": String(c === k), tabindex: (c ? c === k : i === 0) ? "0" : "-1", title: RAG_NAME[k] + ": " + RAG_MEAN[k] + (c === k ? ". Choose again to clear." : ""), onclick: () => setDot(d, k) },
+      el("button", { type: "button", role: "radio", class: "dl dl-" + k, "data-key": "dl-" + k + "-" + d.id, "aria-checked": String(c === k), tabindex: (c ? c === k : i === 0) ? "0" : "-1", title: RAG_NAME[k] + ": " + RAG_MEAN[k] + (c === k ? ". Choose again to clear." : ""), onclick: () => setDot(d, k) },
         el("i", { "aria-hidden": "true" }), el("span", { class: "sr" }, RAG_NAME[k] + ", " + RAG_MEAN[k])))));
 }
 // Highlight the search words inside a dot point
@@ -1511,12 +1575,13 @@ function calendarOf() {
   for (let d = 1; d <= days; d++) {
     const key = y + "-" + String(mo).padStart(2, "0") + "-" + String(d).padStart(2, "0"), ses = studyOf(x => x.d === key), tot = minsOf(ses);
     const per = {}; ses.forEach(x => per[x.s] = (per[x.s] || 0) + x.m);
-    const stops = stopsOn[key] || [];
+    const stops = stopsOn[key] || [], due = (state.tasks || []).filter(x => x.due === key && !x.done);
     cells.push(el("button", { type: "button", class: "cal-day" + (key === td ? " today" : "") + (tot ? " has" : ""), "data-key": "day-" + key, "aria-pressed": String(key === ui.calDay),
-      "aria-label": new Date(key + "T00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" }) + (tot ? ", " + fmtMins(tot) + " studied" : "") + stops.map(x => ", " + nameOf(x.id) + " " + x.st.name).join(""),
+      "aria-label": new Date(key + "T00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" }) + (tot ? ", " + fmtMins(tot) + " studied" : "") + stops.map(x => ", " + nameOf(x.id) + " " + x.st.name).join("") + (due.length ? ", " + due.length + (due.length === 1 ? " task due" : " tasks due") : ""),
       onclick: () => { ui.calDay = key; renderView(); } },
       el("span", { class: "cal-n" }, String(d)),
       stops.map(x => el("span", { class: "cal-stop", style: lineStyle(x.id, ids) }, (CODE[x.id] || "") + " " + x.st.name)),
+      due.length ? el("span", { class: "cal-task" }, due.length === 1 ? due[0].t : due.length + " tasks due") : null,
       tot ? el("span", { class: "cal-min" }, fmtMins(tot)) : null,
       tot ? el("span", { class: "cal-bars", "aria-hidden": "true" }, Object.entries(per).map(([s, m]) => el("i", { style: lineStyle(s, ids) + ";flex:" + m }))) : null));
   }
@@ -1537,23 +1602,15 @@ function calendarOf() {
 function dayPanel() {
   const key = ui.calDay, ids = timerSubjects(), ses = studyOf(x => x.d === key);
   const stops = []; for (const id of new Set(ids.concat(Object.keys(state.route || {})))) for (const st of stopsOf(id)) if (st.date === key) stops.push({ id, st });
-  const subjSel = el("select", { id: "add-s", "aria-label": "Subject" }, ids.map(id => el("option", { value: id, selected: id === ui.timerSubj }, nameOf(id))));
-  const minIn = el("input", { id: "add-m", type: "number", min: "1", max: "600", step: "5", placeholder: "min", "aria-label": "Minutes" });
   return el("aside", { class: "panel log day", id: "log", tabindex: "-1", "aria-label": "Selected day" },
     el("h3", { class: "meta-label" }, new Date(key + "T00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" })),
+    (dueOn => dueOn.length ? el("ul", { class: "day-tasks" }, dueOn.map(x => el("li", { style: lineStyle(x.s, ids) }, el("span", { class: "n" }, x.t), el("span", { class: "d" }, nameOf(x.s) + (x.done ? " \u00b7 done" : " \u00b7 due"))))) : null)((state.tasks || []).filter(x => x.due === key)),
     stops.length ? el("ul", { class: "day-stops" }, stops.map(x => el("li", { style: lineStyle(x.id, ids) }, badge(x.id, nameOf(x.id)), el("span", {}, el("b", {}, nameOf(x.id) + " " + x.st.name), x.st.done ? " · sat" + (x.st.mark ? ", mark " + x.st.mark : "") : "")))) : null,
     ses.length ? el("ul", {}, ses.map(x => el("li", { style: lineStyle(x.s, ids) },
       el("span", { class: "n" }, nameOf(x.s) + " · " + fmtMins(x.m)),
       el("button", { type: "button", class: "linkbtn", "data-key": "rm-" + x.id, "aria-label": "Remove " + fmtMins(x.m) + " of " + nameOf(x.s), onclick: () => removeSession(x) }, "Remove"),
       x.n ? el("span", { class: "d" }, x.n) : null)))
-      : el("p", { class: "none" }, key > today() ? "Nothing planned here yet." : "No study logged this day."),
-    key <= today() ? el("form", { class: "addtime", onsubmit: e => {
-      e.preventDefault(); const m = Math.round(+minIn.value);
-      if (!(m >= 1 && m <= 600)) { minIn.focus(); minIn.setAttribute("aria-invalid", "true"); toast("Enter minutes between 1 and 600"); return; }
-      const ses = { id: Date.now().toString(36), s: subjSel.value, d: key, m }; state.study = (state.study || []).concat(ses); persist(); refresh();
-      toast("Added " + fmtMins(m) + " of " + nameOf(ses.s), () => { state.study = state.study.filter(y => y.id !== ses.id); persist(); refresh(); });
-    } }, el("p", { class: "hint" }, "Studied without the timer? Add it here."),
-      el("div", { class: "addtime-row" }, subjSel, minIn, el("button", { class: "btn", type: "submit" }, "Add"))) : null);
+      : el("p", { class: "none" }, key > today() ? (stops.length ? "No study logged yet." : "Nothing planned here yet.") : "No study logged this day."));
 }
 
 function drawTimerView() {
@@ -1574,7 +1631,7 @@ function drawTimerView() {
         el("span", { class: "sub" }, fmtMins(todayM) + " today · " + fmtMins(weekM) + " this week")),
       el("div", { class: "clock-wrap" },
         el("div", { class: "clock-face" },
-          el("span", { id: "clock", class: "clock", role: "timer", "aria-label": (timer.target ? "Time left" : "Time studied") }, clockText()),
+          el("span", { id: "clock", class: "clock", role: "timer" }, clockText()),
           el("span", { class: "clock-sub" }, active ? (running ? (timer.target ? "left in your " + timer.target + " min block" : "studied so far") : "paused") : (timer.target ? timer.target + " min focus block" : "counts up until you finish")),
           timer.target ? el("span", { class: "clock-bar", "aria-hidden": "true" }, el("span", { style: "width:" + Math.min(100, 100 * elapsed() / (timer.target * 60000)) + "%" })) : null),
         el("div", { class: "clock-ctl" },
@@ -1587,13 +1644,100 @@ function drawTimerView() {
             active ? el("button", { type: "button", class: "btn big", "data-key": "t-finish", onclick: () => finishTimer(false) }, "Finish and log") : null,
             active ? el("button", { type: "button", class: "linkbtn", "data-key": "t-discard", onclick: discardTimer }, "Discard") : null),
           el("p", { class: "hint" }, "Space starts or pauses. The timer keeps going if you close the tab.")))),
+    weekSection(ids),
     calendarOf());
-  box.replaceChildren(el("div", { class: "view", style: lineStyle(id, ids) }, main, dayPanel()));
+  box.replaceChildren(el("div", { class: "view", style: lineStyle(id, ids) }, main, el("div", { class: "side" }, tasksPanel(id, ids), dayPanel())));
 }
 document.addEventListener("keydown", e => {
   if (ui.mode !== "timer" || e.code !== "Space" || e.repeat || (e.target instanceof Element && e.target.closest("input, select, textarea, button, a, dialog, summary"))) return;
   e.preventDefault(); timer.at ? pauseTimer() : startTimer();
 });
+
+/* ---------- tasks and weekly study ----------
+   A task is { id, s: subject, t: text, due?: "YYYY-MM-DD", done?: "YYYY-MM-DD" } in state.tasks.
+   The weekly goal (minutes) is state.weekGoal. Both save and sync with everything else. */
+const addDays = (k, n) => { const d = new Date(k + "T00:00"); d.setDate(d.getDate() + n); return dayKey(d); };
+function setTask(x, patch) { state.tasks = state.tasks.map(y => y.id === x.id ? Object.assign({}, y, patch) : y).map(y => { for (const f in y) if (y[f] == null || y[f] === "") delete y[f]; return y; }); persist(); setTimeout(refresh, 0); }
+function toggleTask(x) {
+  const was = x.done; setTask(x, { done: was ? null : today() });
+  toast((was ? "Not done: " : "Done: ") + x.t, () => setTask(x, { done: was || null }));
+}
+function removeTask(x) {
+  state.tasks = state.tasks.filter(y => y.id !== x.id); persist(); refresh();
+  toast("Deleted task: " + x.t, () => { state.tasks = state.tasks.concat(x); persist(); refresh(); });
+}
+const dueText = d => { const n = daysTo(d); return n < 0 ? (n === -1 ? "overdue by 1 day" : "overdue by " + -n + " days") : n === 0 ? "due today" : n === 1 ? "due tomorrow" : "due " + fmtLong(d) + " · in " + n + " days"; };
+function tasksPanel(id, ids) {
+  const all = state.tasks || [], mine = all.filter(x => ui.taskAll || x.s === id);
+  const open = mine.filter(x => !x.done).sort((a, b) => (a.due || "9999").localeCompare(b.due || "9999") || a.id.localeCompare(b.id));
+  const done = mine.filter(x => x.done).sort((a, b) => b.done.localeCompare(a.done));
+  const txt = el("input", { id: "task-t", type: "text", maxlength: "120", placeholder: "e.g. Finish AT1 practice paper", "aria-label": "New task for " + nameOf(id) });
+  const due = el("input", { id: "task-d", type: "date", "aria-label": "Due date (optional)" });
+  const row = x => el("li", { class: "task" + (x.done ? " is-done" : "") + (!x.done && x.due && daysTo(x.due) < 0 ? " late" : ""), style: lineStyle(x.s, ids) },
+    el("input", { type: "checkbox", id: "tk-" + x.id, checked: !!x.done, onchange: () => toggleTask(x) }),
+    el("label", { for: "tk-" + x.id, class: "tk-t" }, x.t, el("span", { class: "tk-meta" }, (ui.taskAll ? nameOf(x.s) + (x.due || x.done ? " · " : "") : "") + (x.done ? "done " + fmtLong(x.done) : x.due ? dueText(x.due) : ""))),
+    el("button", { type: "button", class: "linkbtn tk-x", "data-key": "tkx-" + x.id, "aria-label": "Delete task: " + x.t, onclick: () => removeTask(x) }, "Delete"));
+  return el("section", { class: "panel tasks", "aria-labelledby": "tasks-t" },
+    el("div", { class: "tasks-head" }, el("h3", { class: "meta-label", id: "tasks-t" }, "Tasks"),
+      el("label", { class: "tk-all", for: "tk-all" }, el("input", { type: "checkbox", id: "tk-all", checked: !!ui.taskAll, onchange: e => { ui.taskAll = e.target.checked; renderView(); } }), "All subjects")),
+    el("form", { class: "task-add", onsubmit: e => {
+      e.preventDefault(); const t = txt.value.trim();
+      if (!t) { txt.focus(); txt.setAttribute("aria-invalid", "true"); announce("Type a task first"); return; }
+      const x = { id: Date.now().toString(36), s: id, t }; if (due.value) x.due = due.value;
+      state.tasks = (state.tasks || []).concat(x); persist(); refresh();
+      requestAnimationFrame(() => document.getElementById("task-t")?.focus());
+      toast("Added task for " + nameOf(id), () => { state.tasks = state.tasks.filter(y => y.id !== x.id); persist(); refresh(); });
+    } }, txt, el("div", { class: "task-add-row" }, due, el("button", { class: "btn", type: "submit" }, "Add task"))),
+    open.length ? el("ul", { class: "task-list" }, open.map(row)) : el("p", { class: "none" }, done.length ? "Everything here is done." : "No tasks yet. Add what you need to get through, with a due date if it has one."),
+    done.length ? el("details", { class: "task-done" }, el("summary", {}, "Done (" + done.length + ")"), el("ul", { class: "task-list" }, done.map(row))) : null);
+}
+
+function weekSection(ids) {
+  const ws0 = weekStart(), weeks = [];
+  for (let i = 7; i >= 0; i--) {
+    const a = addDays(ws0, -7 * i), b = addDays(a, 7), ses = studyOf(x => x.d >= a && x.d < b), per = {};
+    ses.forEach(x => per[x.s] = (per[x.s] || 0) + x.m);
+    weeks.push({ a, per, tot: minsOf(ses), now: i === 0 });
+  }
+  const goal = state.weekGoal || 0, cur = weeks[weeks.length - 1].tot;
+  const top = Math.max(goal, ...weeks.map(w => w.tot), 60);
+  const nice = Math.ceil(top / 60 / (top > 600 ? 5 : top > 240 ? 2 : 1)) * (top > 600 ? 5 : top > 240 ? 2 : 1) * 60;
+  const subs = ids.filter(id => weeks.some(w => w.per[id])).concat(Object.keys(weeks.reduce((o, w) => Object.assign(o, w.per), {})).filter(id => !ids.includes(id)));
+  const label = w => (w.now ? "This week" : "Week of " + fmtLong(w.a)) + ": " + (w.tot ? fmtMins(w.tot) + " (" + subs.filter(s => w.per[s]).map(s => nameOf(s) + " " + fmtMins(w.per[s])).join(", ") + ")" : "no study logged");
+  const goalIn = el("input", { id: "goal-h", type: "number", min: "0", max: "80", step: "0.5", value: goal ? String(goal / 60) : "", placeholder: "0", "aria-describedby": "goal-h-u",
+    onchange: e => { const h = Math.max(0, Math.min(80, +e.target.value || 0)); state.weekGoal = Math.round(h * 60); persist(); setTimeout(refresh, 0); announce(h ? "Weekly goal " + fmtMins(state.weekGoal) : "Weekly goal cleared"); } });
+  return el("section", { class: "weekly", "aria-labelledby": "wk-t" },
+    el("div", { class: "wk-head" },
+      el("h3", { id: "wk-t" }, "Study time per week"),
+      el("label", { class: "wk-goal", for: "goal-h" }, "Weekly goal", goalIn, el("span", { id: "goal-h-u" }, "hours"))),
+    el("div", { class: "wk-now" },
+      el("b", {}, fmtMins(cur)), goal ? " of " + fmtMins(goal) + " this week" : " this week",
+      goal ? el("span", { class: "wk-meter", role: "progressbar", "aria-label": "This week against your goal", "aria-valuemin": "0", "aria-valuemax": String(goal), "aria-valuenow": String(Math.min(cur, goal)) }, el("span", { style: "width:" + Math.min(100, 100 * cur / goal) + "%" })) : null,
+      goal ? el("span", { class: "wk-left" }, cur >= goal ? "Goal reached" : fmtMins(goal - cur) + " to go") : null),
+    el("div", { class: "wk-chart", role: "group", "aria-label": "Study time for the last 8 weeks" },
+      el("div", { class: "wk-axis", "aria-hidden": "true" }, el("span", {}, fmtMins(nice)), el("span", {}, fmtMins(nice / 2)), el("span", {}, "0")),
+      el("div", { class: "wk-plot" },
+        goal ? el("span", { class: "wk-goalline", style: "bottom:calc(22px + (100% - 22px) * " + (goal / nice) + ")", "aria-hidden": "true" }, el("span", {}, "Goal")) : null,
+        weeks.map(w => el("div", { class: "wk-col" + (w.now ? " now" : ""), tabindex: "0", "data-key": "wk-" + w.a, "aria-label": label(w), "data-tip": label(w) },
+          el("span", { class: "wk-bar", style: "height:" + (100 * w.tot / nice) + "%" }, subs.filter(s => w.per[s]).map(s => el("i", { style: lineStyle(s, ids) + ";flex:" + w.per[s] }))),
+          el("span", { class: "wk-x", "aria-hidden": "true" }, w.now ? "This week" : fmtLong(w.a)))),
+        el("div", { class: "wk-tip", id: "wk-tip", hidden: true }))),
+    subs.length ? el("div", { class: "wk-legend" }, subs.map(s => el("span", { style: lineStyle(s, ids) }, el("i", { "aria-hidden": "true" }), nameOf(s)))) : null,
+    el("details", { class: "wk-table" }, el("summary", {}, "Show as a table"),
+      el("table", {}, el("thead", {}, el("tr", {}, el("th", { scope: "col" }, "Week"), subs.map(s => el("th", { scope: "col" }, nameOf(s))), el("th", { scope: "col" }, "Total"))),
+        el("tbody", {}, weeks.map(w => el("tr", {}, el("th", { scope: "row" }, w.now ? "This week" : fmtLong(w.a)), subs.map(s => el("td", {}, w.per[s] ? fmtMins(w.per[s]) : "")), el("td", {}, fmtMins(w.tot))))))));
+}
+// Hover and focus show a week's breakdown above its bar
+document.addEventListener("pointerover", e => wkTip(e.target)); document.addEventListener("focusin", e => wkTip(e.target));
+document.addEventListener("pointerout", e => { if (e.target instanceof Element && e.target.closest(".wk-col")) wkTip(null); });
+function wkTip(t) {
+  const tip = document.getElementById("wk-tip"); if (!tip) return;
+  const col = t instanceof Element ? t.closest(".wk-col") : null;
+  if (!col) { tip.hidden = true; return; }
+  tip.textContent = col.dataset.tip; tip.hidden = false;
+  const plot = col.parentElement.getBoundingClientRect(), c = col.getBoundingClientRect();
+  tip.style.left = Math.min(Math.max(0, c.left - plot.left + c.width / 2 - 110), plot.width - 220) + "px";
+}
 
 /* ---------- start ---------- */
 window.addEventListener("hashchange", async () => {
@@ -1606,7 +1750,7 @@ window.addEventListener("hashchange", async () => {
 document.querySelectorAll("#mode-seg button").forEach(b => b.addEventListener("click", () => { if (ui.mode !== b.dataset.mode) setMode(b.dataset.mode); }));
 async function boot() {
   { const h = location.hash.slice(1); if (SUB[h] && subjects().includes(h)) ui.active = h; }
-  ui.type = load("hsc-type", "all"); ui.group = load("hsc-group", "school"); ui.all = load("hsc-all", false);
+  ui.type = load("hsc-type", null) || "next"; ui.group = load("hsc-group", "school"); ui.all = load("hsc-all", false);
   if (!subjects().includes(ui.active)) ui.active = subjects()[0];
   { const h = location.hash.slice(1); if (h === "syllabus" || h.startsWith("syl-")) { ui.mode = "syl"; if (h.startsWith("syl-")) ui.sylActive = h.slice(4); } else if (h === "timer") ui.mode = "timer"; else if (!SUB[h]) { const m = load("hsc-mode", "papers"); ui.mode = m === "syl" || m === "timer" ? m : "papers"; } }
   ui.timerSubj = load("hsc-timer-subj", null); runTick();
@@ -1639,9 +1783,10 @@ function cleanState(d) {
     subjects: Array.isArray(d.subjects) ? d.subjects.slice() : null, from: Object.assign({}, d.from), rag: Object.assign({}, d.rag),
     syl: Object.fromEntries(Object.entries(d.syl || {}).filter(([, v]) => v === 1 || ["r", "a", "g"].includes(v)).map(([k, v]) => [k, v === 1 ? "g" : v])), sylTerm: Object.assign({}, d.sylTerm), sylSubs: Array.isArray(d.sylSubs) ? d.sylSubs.slice() : null,
     route: JSON.parse(JSON.stringify(d.route && typeof d.route === "object" ? d.route : {})), school: typeof d.school === "string" ? d.school : "",
-    study: Array.isArray(d.study) ? d.study.filter(x => x && x.id && x.s && /^\d{4}-\d\d-\d\d$/.test(x.d) && x.m > 0).map(x => Object.assign({}, x)) : [] };
+    study: Array.isArray(d.study) ? d.study.filter(x => x && x.id && x.s && /^\d{4}-\d\d-\d\d$/.test(x.d) && x.m > 0).map(x => Object.assign({}, x)) : [],
+    tasks: Array.isArray(d.tasks) ? d.tasks.filter(x => x && x.id && x.s && x.t).map(x => Object.assign({}, x)) : [], weekGoal: +d.weekGoal > 0 ? +d.weekGoal : 0 };
 }
-const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length || Object.keys(s.syl).length || Object.keys(s.sylTerm).length || (s.sylSubs && s.sylSubs.length) || Object.keys(s.route).length || !!s.school || s.study.length;
+const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length || Object.keys(s.syl).length || Object.keys(s.sylTerm).length || (s.sylSubs && s.sylSubs.length) || Object.keys(s.route).length || !!s.school || s.study.length || s.tasks.length || !!s.weekGoal;
 
 // Guest ticks join the account without losing anything on either side. Where both have a value,
 // the account keeps its own (marks, start years); a paper ticked in both keeps the earlier date.
@@ -1659,6 +1804,8 @@ function mergeStates(acc, loc) {
   for (const id in loc.route) m.route[id] = Object.assign({}, loc.route[id], m.route[id]);
   if (!m.school && loc.school) m.school = loc.school;
   { const have = new Set(m.study.map(x => x.id)); for (const x of loc.study) if (!have.has(x.id)) m.study.push(x); }
+  { const have = new Set(m.tasks.map(x => x.id)); for (const x of loc.tasks) if (!have.has(x.id)) m.tasks.push(x); }
+  if (!m.weekGoal && loc.weekGoal) m.weekGoal = loc.weekGoal;
   if (loc.sylSubs) m.sylSubs = m.sylSubs ? m.sylSubs.concat(loc.sylSubs.filter(id => !m.sylSubs.includes(id))) : loc.sylSubs.slice();
   return m;
 }
