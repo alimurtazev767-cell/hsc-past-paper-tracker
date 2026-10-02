@@ -635,6 +635,46 @@ body[data-mode="syl"] footer.notes p:not(.syl-only), body:not([data-mode="syl"])
   .mode-seg { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) { .dp, .dp-ck { transition: none; } .dp:active { transform: none; } }
+
+/* Study timer: one timer for the whole tracker, pick the subject it counts towards */
+.timer { padding: 16px 20px; display: grid; gap: 12px; }
+.tm-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.tm-clock { font: 600 clamp(1.9rem, 6vw, 2.4rem)/1 var(--mono); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; min-width: 5.2ch; }
+.timer[data-state="idle"] .tm-clock { color: var(--muted); }
+.timer[data-state="paused"] .tm-clock { color: var(--muted); }
+.tm-live { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+.tm-live i { width: 8px; height: 8px; border-radius: 50%; background: #34D399; box-shadow: 0 0 8px rgb(52 211 153 / .7); }
+.timer[data-state="paused"] .tm-live i { background: #FBBF24; box-shadow: none; }
+.tm-pick { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--muted); }
+.tm-pick select { padding: 8px 10px; border-radius: 9px; background: var(--well); border: 1px solid transparent; box-shadow: var(--recess); color: var(--fg); max-width: 15em; min-height: 42px; }
+.tm-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.tm-mode { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tm-mode select { padding: 6px 8px; border-radius: 9px; background: var(--well); border: 1px solid transparent; box-shadow: var(--recess); color: var(--fg); min-height: 40px; }
+.tm-sum { font-size: 13px; color: var(--muted); }
+.tm-sum b { font: 600 13px var(--mono); color: var(--fg); }
+details.tm-log { border-top: 1px solid var(--rule); margin: 0 -20px -16px; }
+details.tm-log > summary { cursor: pointer; padding: 12px 20px; font-weight: 600; font-size: 14px; }
+.tm-tot { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 0 20px 10px; font-size: 13px; color: var(--muted); }
+.tm-tot b { font: 600 13px var(--mono); color: var(--fg); }
+.tm-log ul { list-style: none; margin: 0; padding: 0; max-height: 320px; overflow: auto; }
+.tm-log li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 9px 20px; border-top: 1px solid var(--rule); font-size: 13.5px; }
+.tm-log li .w { color: var(--muted); font-size: 12.5px; }
+.tm-log li .du { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+.tm-log li button { border: 0; background: transparent; color: var(--muted); cursor: pointer; border-radius: 8px; width: 36px; height: 36px; display: grid; place-items: center; }
+.tm-log li button:hover { color: var(--danger); background: rgb(255 255 255 / .05); }
+.tm-log li button svg { width: 12px; height: 12px; }
+.tm-log .none { padding: 4px 20px 16px; color: var(--muted); font-size: 13.5px; margin: 0; }
+.tm-log .more { padding: 10px 20px 14px; }
+.card .cstudy { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.card .cstudy b { font: 600 12px var(--mono); color: var(--fg); }
+@media (max-width: 560px) {
+  .timer { padding: 14px 16px; }
+  details.tm-log { margin: 0 -16px -14px; }
+  .tm-btns { margin-left: 0; width: 100%; }
+  .tm-btns .btn { flex: 1 1 0; justify-content: center; }
+  .tm-pick { width: 100%; } .tm-pick select { flex: 1; max-width: none; }
+  .tm-log li, details.tm-log > summary, .tm-tot, .tm-log .none, .tm-log .more { padding-inline: 16px; }
+}
 </style>
 </head>
 <body>
@@ -653,6 +693,8 @@ body[data-mode="syl"] footer.notes p:not(.syl-only), body:not([data-mode="syl"])
     <div class="stats" id="stats"></div>
     <div class="seg mode-seg" id="mode-seg" role="group" aria-label="What to track" data-on="papers"><span class="thumb" aria-hidden="true"></span><button type="button" data-mode="papers" aria-pressed="true">Past papers</button><button type="button" data-mode="syl" aria-pressed="false">Syllabus</button></div>
   </header>
+
+  <section class="timer panel" id="timer" aria-label="Study timer" data-state="idle"></section>
 
   <section class="group">
     <div class="subj-head"><p class="meta-label" id="subj-label">Subjects</p><div class="rag-sum" id="rag-sum" role="status" aria-label="Confidence traffic lights"></div></div>
@@ -864,7 +906,7 @@ function renderCards() {
       el("span", { class: "line" }, el("span", { class: "pct" }, pct + "%"),
         el("span", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + pct + "%" })),
         el("span", { class: "frac" }, x.curDone + " / " + x.curTotal)),
-      el("span", { class: "cnum" }, el("span", {}, x.allDone + " done in total"), x.avg != null ? el("span", {}, "avg " + x.avg) : null)),
+      el("span", { class: "cnum" }, el("span", {}, x.allDone + " done in total"), x.avg != null ? el("span", {}, "avg " + x.avg) : null), studyLine(id)),
       el("button", { class: "rag", type: "button", title: "Confidence: " + says + ". Tap to change.", "aria-label": "How confident you feel in " + s.name + ": " + says + ". Tap to change.", onclick: () => cycleRag(id) }, ragLights(c, sg && sg.c)));
   });
   cards.push(el("button", { class: "card add", type: "button", onclick: openPicker }, "+ Add or remove subjects"));
@@ -1062,7 +1104,7 @@ function refreshChips() {
 
 function refresh() {
   const y = window.scrollY; const logScroll = document.querySelector(".log ul")?.scrollTop;
-  renderStats(); renderCards(); renderView();
+  renderStats(); renderCards(); renderView(); renderTimer();
   window.scrollTo(0, y); const l = document.querySelector(".log ul"); if (l && logScroll) l.scrollTop = logScroll;
 }
 
@@ -1187,7 +1229,7 @@ function renderSylCards() {
       el("span", { class: "line" }, el("span", { class: "pct" }, pct + "%"),
         ragMeter(x, short(s.name)),
         el("span", { class: "frac" }, x.done + " / " + x.total)),
-      el("span", { class: "cnum" }, el("span", {}, s.modules.length + (s.modules.length === 1 ? " module" : " modules")), el("span", {}, "dot points"))));
+      el("span", { class: "cnum" }, el("span", {}, s.modules.length + (s.modules.length === 1 ? " module" : " modules")), el("span", {}, "dot points")), studyLine(id)));
   });
   cards.push(el("button", { class: "card add", type: "button", onclick: openSylPicker }, "+ Add or remove subjects"));
   document.getElementById("cards").replaceChildren(...cards);
@@ -1344,6 +1386,179 @@ async function setMode(m) {
   } else { openSubject(ui.active); refresh(); }
 }
 
+/* ---------- study timer ----------
+   One timer for the whole tracker. The student picks which subject the time counts towards, and can change it while it runs.
+   Saved as start times rather than a ticking count, so it keeps going across refreshes, closed tabs and other devices.
+   state.study = { log: {id: {s: subject, a: start (unix seconds), d: seconds studied}}, del: {id: 1} (deleted sessions, so a sync can't bring them back),
+                   run: null | {id, s, a: first start (unix s), at: running since (ms) or 0 when paused, acc: seconds before that, goal: countdown seconds or 0},
+                   rt: when run last changed (ms) } */
+const MIN_LOG = 60, LOG_SHOW = 30;
+const GOALS = [15, 20, 25, 30, 45, 50, 60, 90, 120];
+function cleanStudy(x) {
+  x = x && typeof x === "object" ? x : {};
+  const log = {}, del = {};
+  for (const [k, v] of Object.entries(x.log || {})) if (v && typeof v.s === "string" && +v.a > 0 && +v.d > 0) log[k] = { s: v.s, a: Math.round(+v.a), d: Math.round(+v.d) };
+  for (const k in x.del || {}) { del[k] = 1; delete log[k]; }
+  const r = x.run;
+  const run = r && typeof r.id === "string" && typeof r.s === "string" && !log[r.id] && !del[r.id]
+    ? { id: r.id, s: r.s, a: Math.round(+r.a) || Math.round(Date.now() / 1000), at: +r.at || 0, acc: Math.max(0, +r.acc || 0), goal: Math.max(0, +r.goal || 0) } : null;
+  return { log, del, run, rt: +x.rt || 0 };
+}
+// Sessions from both sides are kept (minus deleted ones); the running timer comes from whichever side touched it last.
+function mergeStudy(a, b) {
+  a = cleanStudy(a); b = cleanStudy(b);
+  const m = cleanStudy({ log: Object.assign({}, b.log, a.log), del: Object.assign({}, a.del, b.del), run: (a.rt >= b.rt ? a : b).run, rt: Math.max(a.rt, b.rt) });
+  return m;
+}
+state.study = cleanStudy(state.study);
+const nowS = () => Math.round(Date.now() / 1000);
+const runSecs = r => r ? r.acc + (r.at ? Math.max(0, (Date.now() - r.at) / 1000) : 0) : 0;
+// Countdown sessions stop at their goal, even if the page was closed when it ran out
+const runShown = r => r && r.goal ? Math.min(runSecs(r), r.goal) : runSecs(r);
+const subjName = id => SUB[id] ? short(SUB[id].name) : (SYLSUB()[id] ? short(SYLSUB()[id].name) : id);
+function clock(sec) {
+  sec = Math.max(0, Math.floor(sec)); const h = Math.floor(sec / 3600), m = Math.floor(sec / 60) % 60, s = sec % 60;
+  return (h ? h + ":" + String(m).padStart(2, "0") : String(m).padStart(2, "0")) + ":" + String(s).padStart(2, "0");
+}
+function dur(sec) {
+  const m = Math.round(sec / 60); if (m < 1) return sec > 0 ? "<1m" : "0m";
+  return m < 60 ? m + "m" : Math.floor(m / 60) + "h" + (m % 60 ? " " + String(m % 60).padStart(2, "0") + "m" : "");
+}
+// The school week: from Monday 12am, local time
+function weekStart() { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.getTime() / 1000; }
+function studyTotals() {
+  const t = {}, wk = weekStart(); let week = 0, all = 0;
+  const add = (s, a, d) => { const x = t[s] || (t[s] = { all: 0, week: 0 }); x.all += d; all += d; if (a >= wk) { x.week += d; week += d; } };
+  for (const v of Object.values(state.study.log)) add(v.s, v.a, v.d);
+  return { by: t, week, all };
+}
+function timerSubjects() {
+  const ids = subjects().slice();
+  for (const id of (SYLIX ? sylSubjects() : [])) if (!ids.includes(id)) ids.push(id);
+  const r = state.study.run; if (r && !ids.includes(r.s)) ids.push(r.s);
+  return ids;
+}
+function pickedSubject() {
+  const ids = timerSubjects(), r = state.study.run;
+  if (r) return r.s;
+  if (ids.includes(ui.tmSub)) return ui.tmSub;
+  const last = load("hsc-timer-sub", null), cur = ui.mode === "syl" ? ui.sylActive : ui.active;
+  return ids.includes(last) ? last : ids.includes(cur) ? cur : ids[0];
+}
+function setRun(r) { state.study = Object.assign({}, state.study, { run: r, rt: Date.now() }); }
+function startTimer() {
+  const s = pickedSubject(); if (!s || state.study.run) return;
+  const goal = ui.tmMode === "cd" ? ui.tmGoal * 60 : 0;
+  setRun({ id: s + "-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), s, a: nowS(), at: Date.now(), acc: 0, goal });
+  persist(); renderTimer(); unlockSound();
+}
+function pauseTimer() { const r = state.study.run; if (!r || !r.at) return; setRun(Object.assign({}, r, { at: 0, acc: runSecs(r) })); persist(); renderTimer(); }
+function resumeTimer() { const r = state.study.run; if (!r || r.at) return; setRun(Object.assign({}, r, { at: Date.now() })); persist(); renderTimer(); unlockSound(); }
+function stopTimer(why) {
+  const r = state.study.run; if (!r) return;
+  const d = Math.round(runShown(r));
+  const log = Object.assign({}, state.study.log);
+  if (d >= MIN_LOG) log[r.id] = { s: r.s, a: r.a, d };
+  state.study = Object.assign({}, state.study, { log, run: null, rt: Date.now() });
+  persist(); refresh();
+  if (d < MIN_LOG) toast("Under a minute, so it wasn't logged");
+  else if (why === "done") toast(subjName(r.s) + ": " + dur(d) + " countdown finished and logged");
+  else toast("Logged " + dur(d) + " of " + subjName(r.s), () => { if (state.study.run) return; const l = Object.assign({}, state.study.log); delete l[r.id]; state.study = Object.assign({}, state.study, { log: l, run: Object.assign({}, r, { at: 0, acc: d }), rt: Date.now() }); persist(); refresh(); });
+}
+function setTimerSubject(id) {
+  ui.tmSub = id; save("hsc-timer-sub", id);
+  const r = state.study.run;
+  if (r && r.s !== id) {
+    // Time so far stays with the old subject; the timer carries on for the new one
+    const d = Math.round(runShown(r));
+    if (d >= MIN_LOG) {
+      state.study = Object.assign({}, state.study, { log: Object.assign({}, state.study.log, { [r.id]: { s: r.s, a: r.a, d } }) });
+      setRun({ id: id + "-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), s: id, a: nowS(), at: r.at ? Date.now() : 0, acc: 0, goal: r.goal ? Math.max(1, r.goal - d) : 0 });
+      toast("Logged " + dur(d) + " of " + subjName(r.s) + ". Now timing " + subjName(id));
+    } else setRun(Object.assign({}, r, { s: id }));
+    persist(); refresh(); return;
+  }
+  renderTimer();
+}
+function deleteSession(id) {
+  const was = state.study.log[id]; if (!was) return;
+  const log = Object.assign({}, state.study.log); delete log[id];
+  state.study = Object.assign({}, state.study, { log, del: Object.assign({}, state.study.del, { [id]: 1 }) });
+  persist(); refresh();
+  toast("Deleted " + dur(was.d) + " of " + subjName(was.s), () => {
+    const del = Object.assign({}, state.study.del); delete del[id];
+    state.study = Object.assign({}, state.study, { log: Object.assign({}, state.study.log, { [id]: was }), del }); persist(); refresh();
+  });
+}
+// A short chime when a countdown ends. Browsers only allow sound after a tap, so the Start button wakes the audio up.
+let actx = null;
+function unlockSound() { try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); } catch (e) {} }
+function chime() {
+  try { navigator.vibrate && navigator.vibrate([180, 90, 180]); } catch (e) {}
+  if (!actx) return;
+  try { [0, .22, .44].forEach((t, i) => { const o = actx.createOscillator(), g = actx.createGain(); o.frequency.value = [880, 988, 1175][i];
+    g.gain.setValueAtTime(.0001, actx.currentTime + t); g.gain.exponentialRampToValueAtTime(.18, actx.currentTime + t + .02); g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + t + .5);
+    o.connect(g).connect(actx.destination); o.start(actx.currentTime + t); o.stop(actx.currentTime + t + .55); }); } catch (e) {}
+}
+const BASE_TITLE = document.title;
+function tickTimer() {
+  const r = state.study.run;
+  if (r && r.goal && runSecs(r) >= r.goal) { const live = r.at && runSecs(r) < r.goal + 5; stopTimer("done"); if (live) chime(); return; }
+  const c = document.getElementById("tm-clock");
+  const shown = r ? (r.goal ? Math.ceil(r.goal - runShown(r)) : runSecs(r)) : (ui.tmMode === "cd" ? ui.tmGoal * 60 : 0);
+  if (c) c.textContent = clock(shown);
+  document.title = r && r.at ? clock(shown) + " · " + subjName(r.s) : BASE_TITLE;
+}
+const XICON = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>';
+function renderTimer() {
+  const box = document.getElementById("timer"); if (!box) return;
+  const r = state.study.run, ids = timerSubjects(), cur = pickedSubject(), tot = studyTotals();
+  box.dataset.state = r ? (r.at ? "running" : "paused") : "idle";
+  const sel = el("select", { id: "tm-sub", "aria-label": "Subject you're studying", onchange: e => setTimerSubject(e.target.value) },
+    ids.length ? ids.map(id => el("option", { value: id, selected: id === cur }, subjName(id))) : el("option", { value: "" }, "Choose subjects first"));
+  const btns = !r ? [el("button", { class: "btn primary", type: "button", id: "tm-start", disabled: !cur, onclick: startTimer }, ui.tmMode === "cd" ? "Start " + ui.tmGoal + " min" : "Start")]
+    : [r.at ? el("button", { class: "btn", type: "button", id: "tm-pause", onclick: pauseTimer }, "Pause") : el("button", { class: "btn primary", type: "button", id: "tm-resume", onclick: resumeTimer }, "Resume"),
+       el("button", { class: "btn", type: "button", id: "tm-stop", onclick: () => stopTimer() }, "Stop and log")];
+  const modeRow = r ? el("span", { class: "tm-live" }, el("i", { "aria-hidden": "true" }), (r.at ? "Studying " : "Paused · ") + subjName(r.s) + (r.goal ? " · " + Math.round(r.goal / 60) + " min countdown" : "") + " · switch subject anytime, time so far stays logged")
+    : el("div", { class: "tm-mode", role: "group", "aria-label": "Timer type" },
+        [["sw", "Stopwatch"], ["cd", "Countdown"]].map(([k, t]) => el("button", { class: "type", type: "button", "aria-pressed": String(ui.tmMode === k), onclick: () => { ui.tmMode = k; save("hsc-timer-mode", k); renderTimer(); } }, t)),
+        ui.tmMode === "cd" ? el("select", { id: "tm-goal", "aria-label": "Countdown length", onchange: e => { ui.tmGoal = +e.target.value; save("hsc-timer-goal", ui.tmGoal); renderTimer(); } },
+          GOALS.map(m => el("option", { value: m, selected: m === ui.tmGoal }, m + " min"))) : null);
+  const sessions = Object.entries(state.study.log).sort((a, b) => b[1].a - a[1].a);
+  const shown = ui.tmAll ? sessions : sessions.slice(0, LOG_SHOW);
+  const when = a => new Date(a * 1000).toLocaleString("en-AU", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+  const totIds = Object.keys(tot.by).sort((a, b) => tot.by[b].week - tot.by[a].week || tot.by[b].all - tot.by[a].all);
+  const logBox = el("details", { class: "tm-log", open: !!ui.tmLogOpen, ontoggle: e => { ui.tmLogOpen = e.target.open; } },
+    el("summary", {}, "Study sessions" + (sessions.length ? " (" + sessions.length + ")" : "")),
+    totIds.length ? el("div", { class: "tm-tot" }, totIds.map(id => el("span", {}, subjName(id) + " ", el("b", {}, dur(tot.by[id].week)), " this week, ", el("b", {}, dur(tot.by[id].all)), " total"))) : null,
+    sessions.length ? el("ul", {}, shown.map(([k, v]) => el("li", {},
+      el("span", {}, subjName(v.s), " ", el("span", { class: "w" }, when(v.a))),
+      el("span", { class: "du" }, dur(v.d)),
+      el("button", { type: "button", title: "Delete this session", "aria-label": "Delete " + dur(v.d) + " of " + subjName(v.s) + " from " + when(v.a), html: XICON, onclick: () => deleteSession(k) }))))
+      : el("p", { class: "none" }, "No sessions yet. Pick a subject and press Start. Sessions under a minute aren't logged."),
+    sessions.length > LOG_SHOW ? el("div", { class: "more" }, el("button", { class: "btn ghost", type: "button", onclick: () => { ui.tmAll = !ui.tmAll; renderTimer(); } }, ui.tmAll ? "Show fewer" : "Show all " + sessions.length)) : null);
+  box.replaceChildren(
+    el("div", { class: "tm-row" },
+      el("span", { class: "tm-clock", id: "tm-clock", role: "timer", "aria-live": "off" }, "00:00"),
+      el("label", { class: "tm-pick", for: "tm-sub" }, "Studying", sel),
+      el("div", { class: "tm-btns" }, btns)),
+    el("div", { class: "tm-row" }, modeRow,
+      el("span", { class: "tm-sum", style: "margin-left:auto" }, el("b", {}, dur(tot.week + (r ? runShown(r) : 0))), " studied this week")),
+    logBox);
+  tickTimer();
+}
+// Shown on each subject card, counting the running session too
+function studyLine(id) {
+  const t = studyTotals().by[id] || { all: 0, week: 0 }, r = state.study.run, live = r && r.s === id ? runShown(r) : 0;
+  if (!t.all && !live) return null;
+  return el("span", { class: "cstudy" }, el("b", {}, dur(t.week + live)), " studied this week · ", el("b", {}, dur(t.all + live)), " total");
+}
+ui.tmMode = load("hsc-timer-mode", "sw") === "cd" ? "cd" : "sw";
+ui.tmGoal = GOALS.includes(load("hsc-timer-goal", 25)) ? load("hsc-timer-goal", 25) : 25;
+setInterval(tickTimer, 1000);
+// Another tab on this device started or stopped the timer
+window.addEventListener("storage", e => { if (e.key === "hsc-log" && e.newValue) try { const o = JSON.parse(e.newValue); if (o && o.study) { state.study = mergeStudy(state.study, o.study); renderTimer(); renderCards(); } } catch (x) {} });
+
 /* ---------- start ---------- */
 window.addEventListener("hashchange", async () => {
   const h = location.hash.slice(1);
@@ -1353,6 +1568,7 @@ window.addEventListener("hashchange", async () => {
 });
 document.querySelectorAll("#mode-seg button").forEach(b => b.addEventListener("click", () => { if (ui.mode !== b.dataset.mode) setMode(b.dataset.mode); }));
 async function boot() {
+  renderTimer();
   { const h = location.hash.slice(1); if (SUB[h] && subjects().includes(h)) ui.active = h; }
   applyPalette(); ui.type = load("hsc-type", "all"); ui.group = load("hsc-group", "school"); ui.all = load("hsc-all", true);
   if (!subjects().includes(ui.active)) ui.active = subjects()[0];
@@ -1384,9 +1600,9 @@ function cleanState(d) {
   d = d || {};
   return { done: Object.assign({}, d.done), marks: Object.assign({}, d.marks), custom: Array.isArray(d.custom) ? d.custom.slice() : [],
     subjects: Array.isArray(d.subjects) ? d.subjects.slice() : null, from: Object.assign({}, d.from), rag: Object.assign({}, d.rag),
-    syl: Object.fromEntries(Object.entries(d.syl || {}).filter(([, v]) => v === 1 || ["r", "a", "g"].includes(v)).map(([k, v]) => [k, v === 1 ? "g" : v])), sylTerm: Object.assign({}, d.sylTerm), sylSubs: Array.isArray(d.sylSubs) ? d.sylSubs.slice() : null };
+    syl: Object.fromEntries(Object.entries(d.syl || {}).filter(([, v]) => v === 1 || ["r", "a", "g"].includes(v)).map(([k, v]) => [k, v === 1 ? "g" : v])), sylTerm: Object.assign({}, d.sylTerm), sylSubs: Array.isArray(d.sylSubs) ? d.sylSubs.slice() : null, study: cleanStudy(d.study) };
 }
-const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length || Object.keys(s.syl).length || Object.keys(s.sylTerm).length || (s.sylSubs && s.sylSubs.length);
+const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length || Object.keys(s.syl).length || Object.keys(s.sylTerm).length || (s.sylSubs && s.sylSubs.length) || Object.keys(s.study.log).length || s.study.run;
 
 // Guest ticks join the account without losing anything on either side. Where both have a value,
 // the account keeps its own (marks, start years); a paper ticked in both keeps the earlier date.
@@ -1402,6 +1618,7 @@ function mergeStates(acc, loc) {
   for (const id in loc.syl) if (!(id in m.syl)) m.syl[id] = loc.syl[id];
   for (const id in loc.sylTerm) if (!(id in m.sylTerm)) m.sylTerm[id] = loc.sylTerm[id];
   if (loc.sylSubs) m.sylSubs = m.sylSubs ? m.sylSubs.concat(loc.sylSubs.filter(id => !m.sylSubs.includes(id))) : loc.sylSubs.slice();
+  m.study = mergeStudy(m.study, loc.study);
   return m;
 }
 
@@ -1414,6 +1631,15 @@ async function useAccount(user) {
   sbUser = user;
   const uid = user.id;
   docRef = { set: async s => {
+    // Study sessions can be logged on two devices at once, so fold in the account's copy before overwriting it
+    const got = await sb.from("progress").select("state").eq("user_id", uid).maybeSingle();
+    if (got.error) throw got.error;
+    if (got.data && got.data.state && got.data.state.study) {
+      const before = JSON.stringify(state.study);
+      s.study = mergeStudy(s.study, got.data.state.study);
+      state.study = mergeStudy(state.study, got.data.state.study);
+      if (JSON.stringify(state.study) !== before) { save("hsc-log", state); renderTimer(); renderCards(); }
+    }
     const { error } = await sb.from("progress").upsert({ user_id: uid, state: s, updated_at: new Date().toISOString() });
     if (error) throw error;
     // Only clear the flag if nothing changed while this upload was in flight
@@ -1445,6 +1671,19 @@ async function useAccount(user) {
   renderAcct(); refresh();
   if (document.getElementById("auth").open && authMode === "account") authView("account");
 }
+
+// Coming back to the tab: pick up sessions or a timer started on another device
+async function pullStudy() {
+  if (!docRef || !sb || !sbUser || saving) return;
+  try {
+    const { data, error } = await sb.from("progress").select("state").eq("user_id", sbUser.id).maybeSingle();
+    if (error || !data || !data.state || !docRef) return;
+    const remote = cleanStudy(data.state.study), merged = mergeStudy(state.study, remote);
+    if (JSON.stringify(merged) !== JSON.stringify(cleanStudy(state.study))) { state.study = merged; save("hsc-log", state); refresh(); }
+    if (JSON.stringify(merged) !== JSON.stringify(remote)) persist();
+  } catch (e) {}
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { tickTimer(); pullStudy(); } });
 
 function leaveAccount() {
   clearTimeout(saveTimer);
