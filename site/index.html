@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>HSC Past Paper Log</title>
 <meta name="description" content="Tick off the HSC past papers, trials and assessment tasks you've done, subject by subject, and see which subjects need work.">
-<meta name="theme-color" content="#070708">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23121214'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#0B1F45">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%230B1F45'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <script>
 // The tracker used to live at this address. Old bookmarks (/#chem) and sign-in email links still go to it, with everything after the address kept.
 (function () {
@@ -16,215 +16,232 @@
 })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap">
 <style>
-/* Same layered dark look as the tracker: canvas #070708, raised panels #121214, recessed wells #1A1A1E */
+/* Network Map, as in the tracker (DESIGN.md): enamel ground, navy signage band, one colour per subject line, line colour only for progress */
 :root {
-  --bg: #070708; --sheet: #121214; --well: #1A1A1E; --raise: #1C1C20; --slate: #2C2C31;
-  --fg: #FFFFFF; --text: #F5F5F7; --muted: #8E8E93; --dim: #636366;
-  --rule: rgb(255 255 255 / .06); --rule-2: rgb(255 255 255 / .10);
-  --tl-r: #FF453A; --tl-a: #FF9F0A; --tl-g: #30D158; --tl-off: #2C2C31;
-  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif;
-  --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
-  --lift: inset 0 1px 0 rgb(255 255 255 / .035), 0 1px 2px rgb(0 0 0 / .4), 0 12px 32px -12px rgb(0 0 0 / .6);
-  --recess: inset 0 1px 2px rgb(0 0 0 / .45), inset 0 0 0 1px rgb(255 255 255 / .04);
-  --sheen: linear-gradient(180deg, rgb(255 255 255 / .09), rgb(255 255 255 / 0) 55%);
-  color-scheme: dark;
+  --ground: #EEF1F5; --panel: #FFFFFF; --well: #F3F5F8;
+  --ink: #0B1F45; --ink-2: #4A5874; --ink-3: #66728A;
+  --rule: #D5DBE5; --rule-2: #BCC5D3;
+  --band: #0B1F45; --band-2: #B9C4D8;
+  --tl-r: #D92D20; --tl-a: #E08A00; --tl-g: #12A150; --tl-off: #33415C;
+  --line: #0079AD; --on: #FFFFFF;
+  --sans: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --lift: 0 1px 2px rgb(0 0 0 / .06), 0 6px 16px -12px rgb(0 0 0 / .2);
+  color-scheme: light;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 400 16px/1.5 var(--sans); font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
 [hidden] { display: none !important; }
 a { color: inherit; }
-a:focus-visible, button:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
-::selection { background: #FFFFFF; color: #000000; }
-.wrap { max-width: 1080px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left)); }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.band :focus-visible { outline-color: #FFFFFF; }
+::selection { background: #CFE3F5; color: var(--ink); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left)); }
 
-/* top bar: translucent material, content scrolls under it */
-.nav { position: sticky; top: 0; z-index: 5; background: rgb(7 7 8 / .72); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); border-bottom: 1px solid var(--rule); padding-top: env(safe-area-inset-top); }
-.nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; }
-.brand { display: inline-flex; align-items: center; gap: 10px; font: 600 15px var(--display); letter-spacing: -0.01em; text-decoration: none; min-width: 0; }
-.brand span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mark { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; flex: none; background: var(--sheen), var(--slate); box-shadow: inset 0 1px 0 rgb(255 255 255 / .1), 0 0 0 .5px rgb(255 255 255 / .12); }
-.mark svg { width: 16px; height: 16px; }
+/* Navy band: nav and hero, like the sign above the platform */
+.band { background: var(--band); color: #FFFFFF; padding-top: env(safe-area-inset-top); }
+.nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 68px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; text-decoration: none; min-width: 0; }
+.brand span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mark { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; flex: none; background: #FFFFFF; color: var(--band); }
+.mark svg { width: 15px; height: 15px; }
 .nav-actions { display: flex; gap: 8px; flex: none; }
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 9px 16px; border-radius: 11px; font: 500 14px var(--body); text-decoration: none; cursor: pointer; background: var(--sheet); color: var(--fg); border: 1px solid var(--rule-2); box-shadow: var(--lift); transition: background-color .2s ease, border-color .2s ease, transform .1s ease-out; white-space: nowrap; }
-.btn:hover { background: var(--raise); border-color: rgb(255 255 255 / .16); }
-.btn:active { transform: scale(.97); }
-.btn.primary { background: #F5F5F7; color: #000000; border-color: transparent; font-weight: 600; }
-.btn.primary:hover { background: #FFFFFF; }
-.btn.big { min-height: 50px; padding: 12px 22px; font-size: 15.5px; border-radius: 13px; }
-.btn svg { width: 16px; height: 16px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 9px 16px; border-radius: 8px; font: 600 14.5px var(--sans); text-decoration: none; cursor: pointer; background: var(--panel); color: var(--ink); border: 1px solid var(--rule-2); transition: background-color .15s ease, border-color .15s ease; white-space: nowrap; }
+.btn:hover { background: var(--well); border-color: var(--ink-3); }
+.btn.primary { background: var(--ink); color: #FFFFFF; border-color: var(--ink); }
+.btn.primary:hover { background: #1A3366; }
+.band .btn { background: transparent; color: #FFFFFF; border-color: rgb(255 255 255 / .3); }
+.band .btn:hover { background: rgb(255 255 255 / .1); border-color: rgb(255 255 255 / .55); }
+.band .btn.primary { background: #FFFFFF; color: var(--ink); border-color: #FFFFFF; }
+.band .btn.primary:hover { background: #E6ECF5; }
+.btn.big { min-height: 50px; padding: 12px 22px; font-size: 16px; border-radius: 10px; }
 @media (pointer: coarse) { .btn { min-height: 44px; } }
 
-/* hero */
-.hero { padding: 72px 0 40px; display: grid; gap: 22px; justify-items: start; }
-.badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; margin: 0; border: 1px solid var(--rule); border-radius: 999px; background: var(--sheet); box-shadow: var(--lift); font: 600 10px/1.4 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.badge i { width: 6px; height: 6px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 8px rgb(255 255 255 / .5); }
-h1 { margin: 0; font: 800 clamp(2.6rem, 7.5vw, 5rem)/.98 var(--display); letter-spacing: -0.035em; text-wrap: balance; max-width: 14ch; font-optical-sizing: auto; }
-.lede { margin: 0; max-width: 54ch; font-size: clamp(1.02rem, 2vw, 1.18rem); line-height: 1.5; color: var(--muted); text-wrap: pretty; }
-.lede b { color: var(--text); font-weight: 500; }
+.hero { padding: 48px 0 140px; display: grid; gap: 22px; justify-items: start; }
+h1 { margin: 0; font: 800 clamp(2.6rem, 6.4vw, 4.6rem)/1 var(--sans); letter-spacing: -0.03em; text-wrap: balance; max-width: 15ch; }
+.lede { margin: 0; max-width: 56ch; font-size: clamp(1.05rem, 2vw, 1.2rem); line-height: 1.55; color: var(--band-2); text-wrap: pretty; }
+.lede b { color: #FFFFFF; font-weight: 600; }
 .cta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.small { margin: 0; font-size: 13px; color: var(--muted); }
+.small { margin: 0; font-size: 14px; color: var(--band-2); }
 
-/* returning student */
-.back { width: 100%; max-width: 560px; display: grid; gap: 14px; padding: 18px 20px; border-radius: 16px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); }
+/* returning student, on the band */
+.back { width: 100%; max-width: 600px; display: grid; gap: 12px; padding: 18px 20px; border-radius: 12px; background: rgb(255 255 255 / .07); border: 1px solid rgb(255 255 255 / .16); }
 .back-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.back h2 { margin: 0; font: 600 1.05rem var(--display); letter-spacing: -0.015em; }
-.back .who { font-size: 12.5px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
-.back .who i { width: 7px; height: 7px; border-radius: 50%; background: var(--tl-g); }
-.nums { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13.5px; color: var(--muted); }
-.nums b { display: block; font: 700 1.5rem/1.1 var(--display); letter-spacing: -0.02em; color: var(--fg); font-variant-numeric: tabular-nums; }
-.tlsum { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--muted); }
+.back h2 { margin: 0; font: 700 1.1rem var(--sans); }
+.back .who { font-size: 13px; color: var(--band-2); display: inline-flex; align-items: center; gap: 6px; }
+.back .who i { width: 8px; height: 8px; border-radius: 50%; background: #34D27A; }
+.nums { display: flex; flex-wrap: wrap; gap: 6px 26px; font-size: 14px; color: var(--band-2); }
+.nums b { display: block; font: 800 1.6rem/1.1 var(--sans); letter-spacing: -0.02em; color: #FFFFFF; }
+.tlsum { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; color: var(--band-2); }
 .tlsum span { display: inline-flex; align-items: center; gap: 6px; }
-.tlsum b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
-.tlsum i { width: 8px; height: 8px; border-radius: 50%; }
+.tlsum b { color: #FFFFFF; font-weight: 700; }
+.tlsum i { width: 9px; height: 9px; border-radius: 50%; }
 
-/* example window */
-.shot { margin: 8px 0 0; border-radius: 20px; padding: 18px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift), 0 40px 100px -40px rgb(0 0 0 / .9); display: grid; gap: 16px; position: relative; overflow: hidden; }
-.shot::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 50% at 70% 0%, rgb(255 255 255 / .05), transparent 70%); pointer-events: none; }
-.shot-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.shot-bar .dots { display: flex; gap: 6px; }
-.shot-bar .dots i { width: 10px; height: 10px; border-radius: 50%; background: #2C2C31; }
-.shot-bar small { font: 600 10px/1.4 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
-.mcards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.mcard { position: relative; display: grid; gap: 14px; padding: 16px; border-radius: 14px; background: #161618; border: 1px solid var(--rule); box-shadow: var(--lift); min-width: 0; }
-.mcard.on { border-color: rgb(255 255 255 / .28); }
-.mcard b { font: 600 14.5px/1.3 var(--display); letter-spacing: -0.012em; padding-right: 52px; }
-.mline { display: flex; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; }
-.mline strong { font: 700 19px var(--display); letter-spacing: -0.025em; min-width: 3.2ch; }
-.meter { flex: 1; height: 4px; border-radius: 99px; background: var(--well); box-shadow: var(--recess); overflow: hidden; }
-.meter span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #D1D1D6, #FFFFFF); }
-.lights { position: absolute; top: 15px; right: 14px; display: inline-flex; gap: 4px; padding: 4px 6px; border-radius: 999px; background: var(--well); box-shadow: var(--recess); }
+/* The example: a small network map, one line per subject, overlapping the band */
+.map { margin: -104px 0 0; padding: 22px 24px 18px; border-radius: 14px; background: var(--panel); border: 1px solid var(--rule); display: grid; gap: 4px; }
+.map-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--rule); }
+.map-head b { font-size: 16px; }
+.map-head span { font-size: 13.5px; color: var(--ink-3); }
+.mline { display: grid; grid-template-columns: 30px 130px minmax(0, 1fr) auto 3.4em; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.mline:last-child { border-bottom: 0; }
+.lb { width: 30px; height: 30px; border-radius: 50%; background: var(--line); color: var(--on); display: grid; place-items: center; font: 800 12px/1 var(--sans); letter-spacing: .02em; }
+.mname { font-weight: 600; font-size: 15px; }
+.mpct { font-weight: 800; font-size: 18px; text-align: right; }
+.route { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.stn { position: relative; display: grid; grid-template-rows: 24px auto; justify-items: center; align-items: center; gap: 2px; }
+.stn::before { content: ""; position: absolute; top: 12px; left: 0; right: 0; height: 6px; transform: translateY(-50%); background: linear-gradient(var(--rule-2), var(--rule-2)) center / 100% 2px no-repeat; }
+.stn.past::before { background: var(--line); }
+.stn.next::before { background: linear-gradient(var(--line), var(--line)) left center / 50% 6px no-repeat, linear-gradient(var(--rule-2), var(--rule-2)) right center / 50% 2px no-repeat; }
+.stn:first-child::before { left: 50%; }
+.stn:last-child::before { right: 50%; }
+.pin { position: relative; width: 20px; height: 20px; border-radius: 50%; background: var(--panel); box-shadow: inset 0 0 0 4px var(--line); display: grid; place-items: center; color: var(--on); }
+.pin svg { width: 11px; height: 11px; }
+.stn.done .pin { background: var(--line); box-shadow: inset 0 0 0 2px var(--panel), 0 0 0 2px var(--line); }
+.stn.next .pin { width: 24px; height: 24px; box-shadow: inset 0 0 0 5px var(--line); }
+.yl { font-size: 12px; font-weight: 600; color: var(--ink-3); }
+.stn.done .yl, .stn.next .yl { color: var(--ink); }
+.lights { display: inline-flex; gap: 4px; padding: 4px 6px; border-radius: 999px; background: var(--band); }
 .lights i { width: 8px; height: 8px; border-radius: 50%; background: var(--tl-off); }
-.lights .r { background: var(--tl-r); box-shadow: 0 0 8px rgb(255 69 58 / .75); }
-.lights .a { background: var(--tl-a); box-shadow: 0 0 8px rgb(255 159 10 / .7); }
-.lights .g { background: var(--tl-g); box-shadow: 0 0 8px rgb(48 209 88 / .7); }
-.mchips { display: flex; flex-wrap: wrap; gap: 6px; }
-.mchip { position: relative; padding: 8px 12px; border-radius: 10px; font-size: 13.5px; background: var(--well); box-shadow: var(--recess); color: #D1D1D6; }
-.mchip.done { background: #F5F5F7; color: #000000; box-shadow: 0 1px 2px rgb(0 0 0 / .4); }
-.mchip.done::after { content: ""; position: absolute; top: -6px; right: -6px; width: 17px; height: 17px; border-radius: 50%; background: #070708 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.2 3.2L13 4.8' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 10px no-repeat; box-shadow: 0 0 0 1.5px #F5F5F7; }
-.mrow { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; align-items: start; padding-top: 14px; border-top: 1px solid var(--rule); }
-.mrow > span { padding-top: 7px; font-size: 14px; font-weight: 600; }
-.mrow > span small { display: block; font: 500 12px ui-monospace, "SF Mono", Menlo, monospace; color: var(--muted); }
+.lights .r { background: #FF5A4E; } .lights .a { background: #FFB020; } .lights .g { background: #34D27A; }
+.map figcaption { margin-top: 6px; font-size: 13px; color: var(--ink-3); }
 
 /* sections */
-section.block { padding: 72px 0 0; display: grid; gap: 22px; }
-.eyebrow { margin: 0; font: 600 10px/1.4 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-h2.title { margin: 0; font: 700 clamp(1.7rem, 4vw, 2.4rem)/1.08 var(--display); letter-spacing: -0.028em; text-wrap: balance; max-width: 22ch; }
-.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; counter-reset: s; }
-.steps li { padding: 22px 20px; border-radius: 16px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); display: grid; gap: 8px; align-content: start; }
-.steps .n { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 6px; font: 600 13px var(--display); background: var(--sheen), var(--slate); box-shadow: inset 0 1px 0 rgb(255 255 255 / .1), 0 0 0 .5px rgb(255 255 255 / .12); }
-.steps h3 { margin: 0; font: 600 1.05rem/1.3 var(--display); letter-spacing: -0.015em; }
-.steps p { margin: 0; font-size: 14.5px; color: var(--muted); line-height: 1.5; }
-.legend { display: grid; gap: 6px; margin-top: 4px; }
-.legend span { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: #D1D1D6; }
-.legend i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
-.facts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-radius: 16px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); overflow: hidden; }
-.facts li { padding: 18px 20px; display: grid; gap: 2px; border-top: 1px solid var(--rule); }
+section.block { padding: 80px 0 0; display: grid; gap: 26px; }
+h2.title { margin: 0; font: 800 clamp(1.8rem, 4vw, 2.6rem)/1.08 var(--sans); letter-spacing: -0.025em; text-wrap: balance; max-width: 24ch; }
+
+/* How it works: three stops on one line */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 28px; --line: var(--ink); }
+.steps li { position: relative; display: grid; gap: 8px; align-content: start; padding-top: 52px; }
+.steps li::before { content: ""; position: absolute; top: 15px; left: 0; right: -28px; height: 6px; background: var(--ink); }
+.steps li:last-child::before { display: none; }
+.steps .n { position: absolute; top: 0; left: 0; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font: 800 15px var(--sans); background: var(--panel); color: var(--ink); box-shadow: inset 0 0 0 5px var(--ink); }
+.steps h3 { margin: 0; font: 700 1.15rem/1.3 var(--sans); }
+.steps p { margin: 0; font-size: 15.5px; color: var(--ink-2); line-height: 1.55; max-width: 38ch; }
+.legend { display: grid; gap: 6px; margin-top: 6px; }
+.legend span { display: flex; align-items: center; gap: 8px; font-size: 14.5px; color: var(--ink); }
+.legend i { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+
+.facts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-radius: 14px; background: var(--panel); border: 1px solid var(--rule); overflow: hidden; }
+.facts li { padding: 20px 22px; display: grid; gap: 4px; border-top: 1px solid var(--rule); }
 .facts li:nth-child(-n+2) { border-top: 0; }
 .facts li:nth-child(2n) { border-left: 1px solid var(--rule); }
-.facts b { font: 600 15px var(--display); letter-spacing: -0.01em; }
-.facts span { font-size: 14px; color: var(--muted); }
-.end { padding: 80px 0 24px; display: grid; justify-items: center; text-align: center; gap: 16px; }
-.end h2 { margin: 0; font: 700 clamp(1.6rem, 4vw, 2.2rem)/1.1 var(--display); letter-spacing: -0.028em; }
-footer.notes { padding: 32px 0 calc(48px + env(safe-area-inset-bottom)); border-top: 1px solid var(--rule); margin-top: 48px; display: grid; gap: 8px; font-size: 12.5px; color: var(--muted); max-width: 75ch; }
+.facts b { font-weight: 700; font-size: 16px; }
+.facts span { font-size: 15px; color: var(--ink-2); }
+.end { margin-top: 88px; padding: 48px 28px; border-radius: 14px; background: var(--band); color: #FFFFFF; display: grid; justify-items: center; text-align: center; gap: 18px; }
+.end h2 { margin: 0; font: 800 clamp(1.7rem, 4vw, 2.4rem)/1.1 var(--sans); letter-spacing: -0.025em; }
+footer.notes { padding: 28px 0 calc(48px + env(safe-area-inset-bottom)); display: grid; gap: 8px; font-size: 13.5px; color: var(--ink-2); max-width: 75ch; }
 footer.notes p { margin: 0; }
+footer.notes a { color: var(--ink); text-underline-offset: 2px; }
 
 @media (max-width: 860px) {
-  .mcards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .mcards .mcard:nth-child(n+3) { display: none; }
-  .steps { grid-template-columns: minmax(0, 1fr); }
+  .mline { grid-template-columns: 30px minmax(0, 1fr) auto 3.4em; }
+  .mline .route { grid-column: 1 / -1; grid-row: 2; }
+  .steps { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .steps li { padding: 0 0 0 54px; }
+  .steps li::before { top: 18px; bottom: -28px; left: 15px; right: auto; width: 6px; height: auto; }
+  .steps li:last-child::before { display: none; }
+  .steps .n { top: 0; }
 }
 @media (max-width: 560px) {
-  .hero { padding: 44px 0 28px; gap: 18px; }
+  .hero { padding: 28px 0 120px; gap: 18px; }
   .cta { width: 100%; }
   .cta .btn { flex: 1 1 auto; }
   .nav .ghost-sm { display: none; }
-  .shot { padding: 14px; border-radius: 18px; }
-  .mcard { padding: 14px 12px; }
-  .mcard b { padding-right: 46px; font-size: 13.5px; }
-  .lights { right: 10px; top: 13px; }
-  .mrow { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-  .mrow > span { padding: 0; }
+  .map { padding: 16px 16px 12px; }
   .facts { grid-template-columns: minmax(0, 1fr); }
   .facts li:nth-child(2) { border-top: 1px solid var(--rule); }
   .facts li:nth-child(2n) { border-left: 0; }
-  section.block { padding-top: 56px; }
+  section.block { padding-top: 60px; }
 }
-@media (prefers-reduced-motion: reduce) { .btn { transition: none; } .btn:active { transform: none; } }
-@media (prefers-reduced-transparency: reduce) { .nav { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; } }
-@media (prefers-contrast: more) { :root { --rule: rgb(255 255 255 / .2); --rule-2: rgb(255 255 255 / .3); --muted: #AEAEB2; } }
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+@media (prefers-contrast: more) { :root { --rule: #9AA5B5; --rule-2: #6F7C93; --ink-2: #2E3B55; --ink-3: #46546E; } }
 </style>
 </head>
 <body>
 
-<header class="nav">
+<div class="band">
   <div class="wrap">
-    <a class="brand" href="./" aria-label="HSC Past Paper Log, home"><span class="mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-6.5"/></svg></span><span>HSC Past Paper Log</span></a>
-    <nav class="nav-actions" aria-label="Get going">
-      <a class="btn ghost-sm" href="tracker#signin" id="nav-signin" hidden>Sign in</a>
-      <a class="btn primary" href="tracker" id="nav-open">Open tracker</a>
-    </nav>
+    <header class="nav">
+      <a class="brand" href="./" aria-label="HSC Past Paper Log, home"><span class="mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span>HSC Past Paper Log</span></a>
+      <nav class="nav-actions" aria-label="Get going">
+        <a class="btn ghost-sm" href="tracker#signin" id="nav-signin" hidden>Sign in</a>
+        <a class="btn primary" href="tracker" id="nav-open">Open tracker</a>
+      </nav>
+    </header>
+
+    <section class="hero" aria-labelledby="h-t">
+      <h1 id="h-t">Every past paper, ticked off.</h1>
+      <p class="lede">Keep track of the <b>HSC papers, trials and assessment tasks</b> you've done in Year 12, subject by subject. Give each subject a <b>red, amber or green</b> light so you can see where to spend your study time.</p>
+
+      <div class="back" id="back" hidden>
+        <div class="back-top"><h2>Welcome back</h2><span class="who" id="back-who" hidden><i aria-hidden="true"></i>Signed in</span></div>
+        <div class="nums" id="back-nums"></div>
+        <div class="tlsum" id="back-tl"></div>
+      </div>
+
+      <div class="cta">
+        <a class="btn primary big" href="tracker" id="go">Get started</a>
+        <a class="btn big" href="tracker#signin" id="signin" hidden>Sign in</a>
+        <a class="btn big" href="#how" id="how-link">How it works</a>
+      </div>
+      <p class="small" id="cta-note">Free, with no account needed. Your ticks save in this browser.</p>
+    </section>
   </div>
-</header>
+</div>
 
 <main class="wrap">
-  <section class="hero" aria-labelledby="h-t">
-    <p class="badge"><i aria-hidden="true"></i>Year 12 &middot; HSC 2026</p>
-    <h1 id="h-t">Every past paper, ticked off.</h1>
-    <p class="lede">Keep track of the <b>HSC papers, trials and assessment tasks</b> you've done, subject by subject. Give each subject a <b>red, amber or green</b> light so you can see where to spend your study time.</p>
-
-    <div class="back" id="back" hidden>
-      <div class="back-top"><h2>Welcome back</h2><span class="who" id="back-who" hidden><i aria-hidden="true"></i>Signed in</span></div>
-      <div class="nums" id="back-nums"></div>
-      <div class="tlsum" id="back-tl"></div>
-    </div>
-
-    <div class="cta">
-      <a class="btn primary big" href="tracker" id="go">Get started</a>
-      <a class="btn big" href="tracker#signin" id="signin" hidden>Sign in</a>
-      <a class="btn big" href="#how" id="how-link">How it works</a>
-    </div>
-    <p class="small" id="cta-note">Free, with no account needed. Your ticks save in this browser.</p>
-  </section>
-
-  <figure class="shot" aria-label="Example of the tracker" style="margin-inline:0">
-    <div class="shot-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><small>Example</small></div>
-    <div class="mcards" aria-hidden="true">
-      <div class="mcard on"><b>Maths Ext 1</b><span class="lights"><i></i><i></i><i class="g"></i></span><span class="mline"><strong>67%</strong><span class="meter"><span style="width:67%"></span></span></span></div>
-      <div class="mcard"><b>Chemistry</b><span class="lights"><i></i><i class="a"></i><i></i></span><span class="mline"><strong>43%</strong><span class="meter"><span style="width:43%"></span></span></span></div>
-      <div class="mcard"><b>Physics</b><span class="lights"><i class="r"></i><i></i><i></i></span><span class="mline"><strong>14%</strong><span class="meter"><span style="width:14%"></span></span></span></div>
-      <div class="mcard"><b>Maths Ext 2</b><span class="lights"><i></i><i class="a"></i><i></i></span><span class="mline"><strong>33%</strong><span class="meter"><span style="width:33%"></span></span></span></div>
-    </div>
-    <div class="mrow" aria-hidden="true"><span>HSC papers<small>4/6</small></span><span class="mchips"><span class="mchip done">2025</span><span class="mchip done">2024</span><span class="mchip done">2023</span><span class="mchip">2022</span><span class="mchip done">2021</span><span class="mchip">2020</span></span></div>
-    <figcaption class="small">Made-up numbers, to show what it looks like.</figcaption>
+  <figure class="map" aria-label="Example of the tracker">
+    <div class="map-head" aria-hidden="true"><b>Your subjects as lines</b><span>Each station is a year's HSC paper</span></div>
+      <div class="mline" style="--line:#F6891F;--on:#0B1F45">
+        <span class="lb">X1</span><span class="mname">Maths Ext 1</span>
+        <span class="route"><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2020</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2021</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2022</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2023</span></span><span class="stn next"><span class="pin"></span><span class="yl">2024</span></span><span class="stn "><span class="pin"></span><span class="yl">2025</span></span></span>
+        <span class="lights"><i></i><i></i><i class="g"></i></span><b class="mpct">67%</b>
+      </div>
+      <div class="mline" style="--line:#00824A;--on:#FFFFFF">
+        <span class="lb">CH</span><span class="mname">Chemistry</span>
+        <span class="route"><span class="stn past"><span class="pin"></span><span class="yl">2020</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2021</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2022</span></span><span class="stn next"><span class="pin"></span><span class="yl">2023</span></span><span class="stn "><span class="pin"></span><span class="yl">2024</span></span><span class="stn "><span class="pin"></span><span class="yl">2025</span></span></span>
+        <span class="lights"><i></i><i class="a"></i><i></i></span><b class="mpct">43%</b>
+      </div>
+      <div class="mline" style="--line:#B8217F;--on:#FFFFFF">
+        <span class="lb">PH</span><span class="mname">Physics</span>
+        <span class="route"><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2020</span></span><span class="stn next"><span class="pin"></span><span class="yl">2021</span></span><span class="stn "><span class="pin"></span><span class="yl">2022</span></span><span class="stn "><span class="pin"></span><span class="yl">2023</span></span><span class="stn "><span class="pin"></span><span class="yl">2024</span></span><span class="stn "><span class="pin"></span><span class="yl">2025</span></span></span>
+        <span class="lights"><i class="r"></i><i></i><i></i></span><b class="mpct">14%</b>
+      </div>
+      <div class="mline" style="--line:#0079AD;--on:#FFFFFF">
+        <span class="lb">X2</span><span class="mname">Maths Ext 2</span>
+        <span class="route"><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2020</span></span><span class="stn done past"><span class="pin"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="yl">2021</span></span><span class="stn next"><span class="pin"></span><span class="yl">2022</span></span><span class="stn "><span class="pin"></span><span class="yl">2023</span></span><span class="stn "><span class="pin"></span><span class="yl">2024</span></span><span class="stn "><span class="pin"></span><span class="yl">2025</span></span></span>
+        <span class="lights"><i></i><i class="a"></i><i></i></span><b class="mpct">33%</b>
+      </div>
+    <figcaption>Made-up numbers, to show what it looks like.</figcaption>
   </figure>
 
   <section class="block" id="how" aria-labelledby="how-t">
-    <p class="eyebrow">How it works</p>
-    <h2 class="title" id="how-t">Three steps, then just keep ticking.</h2>
+    <h2 class="title" id="how-t">Three stops, then just keep ticking.</h2>
     <ol class="steps">
       <li><span class="n" aria-hidden="true">1</span><h3>Choose your subjects</h3><p>Pick from 32 Year 12 subjects, plus maths competitions. Each one lists the HSC papers and the trial papers and assessment tasks that THSC Online has, grouped by school or by year.</p></li>
-      <li><span class="n" aria-hidden="true">2</span><h3>Tick papers as you do them</h3><p>Tap a paper to mark it done. Add your mark if you like. Each subject shows how far through you are, and the Completed list keeps the dates.</p></li>
-      <li><span class="n" aria-hidden="true">3</span><h3>Set a traffic light</h3><p>Tap the lights on a subject to say how you feel about it. The colour is your call; the tracker only shows a faint hint from your progress.</p>
+      <li><span class="n" aria-hidden="true">2</span><h3>Tick papers as you do them</h3><p>Tap a paper to mark it done and add your mark if you like. Each subject's HSC papers sit on a line, so you can see your next stop, and the Completed list keeps the dates.</p></li>
+      <li><span class="n" aria-hidden="true">3</span><h3>Set a traffic light</h3><p>Tap the lights on a subject to say how you feel about it. The colour is your call; the tracker never picks it for you.</p>
         <span class="legend"><span><i style="background:var(--tl-r)"></i>Red: needs work</span><span><i style="background:var(--tl-a)"></i>Amber: getting there</span><span><i style="background:var(--tl-g)"></i>Green: confident</span></span></li>
     </ol>
   </section>
 
   <section class="block" aria-labelledby="inc-t">
-    <p class="eyebrow">What's in it</p>
     <h2 class="title" id="inc-t">Built for NSW Year 12.</h2>
     <ul class="facts">
       <li><b>HSC papers</b><span>From THSC Online up to 2018 and NESA after that.</span></li>
       <li><b>Trials and assessments</b><span>Trial papers, plus half yearlies and AT1 to AT4 where THSC has them.</span></li>
+      <li><b>Syllabus dot points</b><span>Give each Year 12 dot point its own light in Maths, English, Chemistry, Physics and HMS.</span></li>
       <li><b>Your own papers</b><span>Add a paper that isn't listed, like your school's own trial.</span></li>
       <li id="fact-sync"><b>Saved for you</b><span>Ticks save in this browser, so come back on the same device.</span></li>
+      <li><b>Free</b><span>No ads and nothing to pay. Made for students' private study.</span></li>
     </ul>
   </section>
 
-  <section class="end" aria-labelledby="end-t">
+  <section class="end band" aria-labelledby="end-t">
     <h2 id="end-t">Ready when you are.</h2>
     <a class="btn primary big" href="tracker" id="go-2">Get started</a>
   </section>
