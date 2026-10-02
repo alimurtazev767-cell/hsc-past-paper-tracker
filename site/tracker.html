@@ -572,7 +572,26 @@ footer.notes { color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { .lights, .lights i, .ragseg button { transition: none; } .rag:active .lights, .ragseg button:active { transform: none; } }
 /* ---- syllabus: Year 12 dot points, each with the student's own red / amber / green light ---- */
 .mode-seg { margin-top: 22px; justify-self: start; min-width: min(320px, 100%); }
+.mode-seg { grid-template-columns: repeat(3, minmax(0, 1fr)); min-width: min(480px, 100%); }
+.mode-seg .thumb { width: calc((100% - 6px) / 3); }
 .mode-seg[data-on="syl"] .thumb { transform: translateX(100%); }
+.mode-seg[data-on="timer"] .thumb { transform: translateX(200%); }
+.mode-seg button { white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.tab-run { display: inline-flex; align-items: center; gap: 5px; font: 600 12.5px var(--mono); color: #FFFFFF; font-variant-numeric: tabular-nums; }
+.tab-run[hidden] { display: none; }
+.tab-run i { width: 7px; height: 7px; border-radius: 50%; background: #34D399; box-shadow: 0 0 8px rgb(52 211 153 / .7); }
+.tab-run.paused i { background: #FBBF24; box-shadow: none; }
+#timer, #lights { display: none; }
+body[data-mode="timer"] #timer, body[data-mode="syl"] #lights { display: grid; }
+body[data-mode="timer"] #view:empty { display: none; }
+body[data-mode="timer"] footer.notes p { display: none; }
+.lights-panel { padding: 18px 20px 8px; gap: 4px; }
+.lights-panel h2 { font-size: 1.15rem; }
+.lt-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 14px; padding-bottom: 8px; }
+.lt-row { display: grid; grid-template-columns: minmax(8em, 1fr) auto; gap: 6px 14px; align-items: center; padding: 10px 0; border-top: 1px solid var(--rule); }
+.lt-row .nm { font-weight: 600; font-size: 14.5px; }
+.lt-row .conf-hint { grid-column: 1 / -1; }
+.tcard .pct { font-size: 20px; }
 .mode-seg button { padding: 8px 18px; }
 body[data-mode="syl"] footer.notes p:not(.syl-only), body:not([data-mode="syl"]) .syl-only { display: none; }
 .syl-note { margin: 18px 22px 0; }
@@ -633,6 +652,9 @@ body[data-mode="syl"] footer.notes p:not(.syl-only), body:not([data-mode="syl"])
   .untag { padding: 0 16px 16px; }
   .syl-note { margin: 16px 16px 0; }
   .mode-seg { width: 100%; }
+  .mode-seg button { padding: 8px 6px; font-size: 13px; }
+  #tab-timer.running .lbl { display: none; }
+  .lt-row { grid-template-columns: minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) { .dp, .dp-ck { transition: none; } .dp:active { transform: none; } }
 
@@ -654,8 +676,6 @@ body[data-mode="syl"] footer.notes p:not(.syl-only), body:not([data-mode="syl"])
 .tm-sum b { font: 600 13px var(--mono); color: var(--fg); }
 details.tm-log { border-top: 1px solid var(--rule); margin: 0 -20px -16px; }
 details.tm-log > summary { cursor: pointer; padding: 12px 20px; font-weight: 600; font-size: 14px; }
-.tm-tot { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 0 20px 10px; font-size: 13px; color: var(--muted); }
-.tm-tot b { font: 600 13px var(--mono); color: var(--fg); }
 .tm-log ul { list-style: none; margin: 0; padding: 0; max-height: 320px; overflow: auto; }
 .tm-log li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 9px 20px; border-top: 1px solid var(--rule); font-size: 13.5px; }
 .tm-log li .w { color: var(--muted); font-size: 12.5px; }
@@ -673,7 +693,7 @@ details.tm-log > summary { cursor: pointer; padding: 12px 20px; font-weight: 600
   .tm-btns { margin-left: 0; width: 100%; }
   .tm-btns .btn { flex: 1 1 0; justify-content: center; }
   .tm-pick { width: 100%; } .tm-pick select { flex: 1; max-width: none; }
-  .tm-log li, details.tm-log > summary, .tm-tot, .tm-log .none, .tm-log .more { padding-inline: 16px; }
+  .tm-log li, details.tm-log > summary, .tm-log .none, .tm-log .more { padding-inline: 16px; }
 }
 </style>
 </head>
@@ -691,10 +711,11 @@ details.tm-log > summary { cursor: pointer; padding: 12px 20px; font-weight: 600
       </div>
     </div>
     <div class="stats" id="stats"></div>
-    <div class="seg mode-seg" id="mode-seg" role="group" aria-label="What to track" data-on="papers"><span class="thumb" aria-hidden="true"></span><button type="button" data-mode="papers" aria-pressed="true">Past papers</button><button type="button" data-mode="syl" aria-pressed="false">Syllabus</button></div>
+    <div class="seg mode-seg" id="mode-seg" role="group" aria-label="Tabs" data-on="papers"><span class="thumb" aria-hidden="true"></span><button type="button" data-mode="papers" aria-pressed="true">Past papers</button><button type="button" data-mode="syl" aria-pressed="false">Traffic lights</button><button type="button" data-mode="timer" aria-pressed="false" id="tab-timer"><span class="lbl">Study timer</span><span class="tab-run" id="tab-run" hidden><i aria-hidden="true"></i><span id="tab-run-t"></span></span></button></div>
   </header>
 
   <section class="timer panel" id="timer" aria-label="Study timer" data-state="idle"></section>
+  <section class="lights-panel panel" id="lights" aria-labelledby="lt-t"></section>
 
   <section class="group">
     <div class="subj-head"><p class="meta-label" id="subj-label">Subjects</p><div class="rag-sum" id="rag-sum" role="status" aria-label="Confidence traffic lights"></div></div>
@@ -852,6 +873,7 @@ function toast(msg, undo) {
 /* ---------- render ---------- */
 function renderStats() {
   if (ui.mode === "syl") return renderSylStats();
+  if (ui.mode === "timer") return renderTimerStats();
   let done = 0, wk = 0; const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
   for (const id in state.done) { done++; if (state.done[id] >= weekAgo) wk++; }
   document.getElementById("stats").replaceChildren(
@@ -883,35 +905,42 @@ function setRag(id, c) {
   persist(); refresh();
   toast(short(SUB[id].name) + ": " + (c ? RAG_NAME[c] + ", " + RAG_MEAN[c].toLowerCase() : "light cleared"), () => setRag(id, was));
 }
-const cycleRag = id => { const c = ragOf(id); setRag(id, c === null ? "r" : c === "r" ? "a" : c === "a" ? "g" : null); };
-const ragLights = (c, sug) => el("span", { class: "lights", "aria-hidden": "true" }, RAG.map(k => el("i", { class: "l-" + k + (c === k ? " on" : "") + (!c && sug === k ? " sug" : "") })));
-function renderRagSum() {
+// Traffic lights tab: one row per subject with its red / amber / green, above the syllabus dot points
+function renderLights() {
+  const box = document.getElementById("lights"); if (!box || ui.mode !== "syl") return;
   const ids = subjects(), n = { r: 0, a: 0, g: 0 }; let none = 0;
   ids.forEach(id => { const c = ragOf(id); if (c) n[c]++; else none++; });
-  const box = document.getElementById("rag-sum");
-  if (none === ids.length) { box.replaceChildren(el("span", {}, "Tap the lights on a subject to rate how confident you feel")); return; }
-  box.replaceChildren(...RAG.map(k => el("span", { class: "rsum rs-" + k }, el("i", { "aria-hidden": "true" }), el("b", {}, String(n[k])), " " + RAG_NAME[k].toLowerCase())),
-    none ? el("span", { class: "rsum" }, el("b", {}, String(none)), " not set") : "");
+  const sum = el("div", { class: "rag-sum", role: "status" }, none === ids.length ? el("span", {}, "Pick a light for each subject")
+    : [...RAG.map(k => el("span", { class: "rsum rs-" + k }, el("i", { "aria-hidden": "true" }), el("b", {}, String(n[k])), " " + RAG_NAME[k].toLowerCase())),
+       none ? el("span", { class: "rsum" }, el("b", {}, String(none)), " not set") : ""]);
+  box.replaceChildren(el("div", { class: "lt-head" }, el("h2", { id: "lt-t" }, "How confident do you feel?"), sum),
+    ...ids.map(id => {
+      const rc = ragOf(id), rs = rc ? null : suggestRag(id), lid = "lt-" + id;
+      return el("div", { class: "lt-row" },
+        el("span", { class: "nm", id: lid }, short(SUB[id].name)),
+        el("div", { class: "ragseg", role: "group", "aria-labelledby": lid }, RAG.map(k => el("button", { type: "button", class: "rs-" + k, "aria-pressed": String(rc === k),
+          title: RAG_NAME[k] + (rc === k ? ". Tap again to clear." : ""), onclick: () => setRag(id, rc === k ? null : k) }, el("i", { "aria-hidden": "true" }), RAG_MEAN[k]))),
+        el("span", { class: "conf-hint" }, rc ? "Your " + RAG_NAME[rc].toLowerCase() + " light. Tap it again to clear." : rs ? "Suggested " + RAG_NAME[rs.c].toLowerCase() + ": " + rs.why + "." : "Your call. It isn't worked out for you."));
+    }));
 }
 
 function renderCards() {
   if (ui.mode === "syl") return renderSylCards();
+  if (ui.mode === "timer") return renderTimerCards();
+  document.getElementById("subj-label").textContent = "Subjects";
   const ids = subjects();
   const cards = ids.map(id => {
     const s = SUB[id], x = tally(id, "all"); const pct = x.curTotal ? Math.round(100 * x.curDone / x.curTotal) : 0;
-    const c = ragOf(id), sg = c ? null : suggestRag(id);
-    const says = c ? RAG_NAME[c] + ", " + RAG_MEAN[c].toLowerCase() : "not set" + (sg ? ", suggested " + RAG_NAME[sg.c].toLowerCase() + " (" + sg.why + ")" : "");
     return el("div", { class: "cwrap" }, el("button", { class: "card", type: "button", "aria-current": String(id === ui.active), onclick: () => openSubject(id) },
       el("span", { class: "cname" }, short(s.name)),
       el("span", { class: "line" }, el("span", { class: "pct" }, pct + "%"),
         el("span", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + pct + "%" })),
         el("span", { class: "frac" }, x.curDone + " / " + x.curTotal)),
-      el("span", { class: "cnum" }, el("span", {}, x.allDone + " done in total"), x.avg != null ? el("span", {}, "avg " + x.avg) : null), studyLine(id)),
-      el("button", { class: "rag", type: "button", title: "Confidence: " + says + ". Tap to change.", "aria-label": "How confident you feel in " + s.name + ": " + says + ". Tap to change.", onclick: () => cycleRag(id) }, ragLights(c, sg && sg.c)));
+      el("span", { class: "cnum" }, el("span", {}, x.allDone + " done in total"), x.avg != null ? el("span", {}, "avg " + x.avg) : null)));
   });
   cards.push(el("button", { class: "card add", type: "button", onclick: openPicker }, "+ Add or remove subjects"));
   document.getElementById("cards").replaceChildren(...cards);
-  renderRagSum();
+  document.getElementById("rag-sum").replaceChildren();
 }
 
 function chip(p, fromY) {
@@ -964,6 +993,7 @@ function schoolRows(list, fromY, mixed) {
 
 function renderView() {
   if (ui.mode === "syl") return renderSylView();
+  if (ui.mode === "timer") { document.getElementById("view").replaceChildren(); return; }
   const box = document.getElementById("view");
   const id = ui.active; const s = SUB[id];
   if (!s) { box.replaceChildren(); return; }
@@ -1019,20 +1049,12 @@ function renderView() {
   (s.y11p || []).forEach((pth, i) => links.push(el("a", { href: "https://thsconline.github.io/s/" + encodeURI(pth), target: "_blank", rel: "noopener" }, i ? "THSC Year 11 tasks" : "THSC Year 11 exams")));
   if (s.nesa) links.push(el("a", { href: NESA + s.nesa, target: "_blank", rel: "noopener" }, "NESA HSC papers"));
 
-  const rc = ragOf(id), rs = rc ? null : suggestRag(id);
-  const conf = el("div", { class: "conf" },
-    el("span", { class: "conf-l", id: "conf-l" }, "How confident do you feel?"),
-    el("div", { class: "ragseg", role: "group", "aria-labelledby": "conf-l" }, RAG.map(k => el("button", { type: "button", class: "rs-" + k, "aria-pressed": String(rc === k),
-      title: RAG_NAME[k] + (rc === k ? ". Tap again to clear." : ""), onclick: () => setRag(id, rc === k ? null : k) }, el("i", { "aria-hidden": "true" }), RAG_MEAN[k]))),
-    el("span", { class: "conf-hint" }, rc ? "Your " + RAG_NAME[rc].toLowerCase() + " light. Tap it again to clear." : rs ? "Suggested " + RAG_NAME[rs.c].toLowerCase() + ": " + rs.why + "." : "Your call. It isn't worked out for you."));
-
   const main = el("section", { class: "panel", "aria-labelledby": "v-t" },
     el("div", { class: "vhead" },
       el("div", { class: "vtitle" }, el("h2", { id: "v-t" }, s.name),
         el("span", { class: "sub" }, x.curDone + " of " + x.curTotal + " " + typeLabel + " from " + fromY + " \u00b7 " + pct + "%")),
       el("div", { class: "meter", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(x.curTotal), "aria-valuenow": String(x.curDone), "aria-label": s.name + " progress" }, el("span", { style: "width:" + pct + "%" })),
-      el("div", { class: "links" }, links),
-      conf),
+      el("div", { class: "links" }, links)),
     el("div", { class: "toolbar" },
     el("div", { class: "types", role: "group", "aria-label": "Paper type" }, typeBtns),
     el("div", { class: "controls" },
@@ -1104,13 +1126,13 @@ function refreshChips() {
 
 function refresh() {
   const y = window.scrollY; const logScroll = document.querySelector(".log ul")?.scrollTop;
-  renderStats(); renderCards(); renderView(); renderTimer();
+  renderStats(); renderCards(); renderView(); renderTimer(); renderLights();
   window.scrollTo(0, y); const l = document.querySelector(".log ul"); if (l && logScroll) l.scrollTop = logScroll;
 }
 
 async function openSubject(id) {
   ui.active = id; ui.query = ""; save("hsc-tab2", id);
-  try { if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id); } catch (e) {}
+  if (ui.mode === "papers") try { if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id); } catch (e) {}
   renderCards(); renderView();
   await ensure(id); if (ui.active === id) { renderCards(); renderView(); }
 }
@@ -1146,7 +1168,7 @@ document.getElementById("pk-form").addEventListener("submit", async e => {
   const order = GROUPS.flatMap(g => g[1]);
   state.subjects = ids.sort((a, b) => order.indexOf(a) - order.indexOf(b)); persist();
   if (!ids.includes(ui.active)) ui.active = ids[0];
-  await Promise.all(ids.map(ensure)); refresh(); openSubject(ui.active);
+  await Promise.all(ids.map(ensure)); refresh(); if (ui.mode === "papers") openSubject(ui.active);
 });
 
 /* ---------- syllabus ----------
@@ -1215,6 +1237,7 @@ function renderSylStats() {
 }
 
 function renderSylCards() {
+  document.getElementById("subj-label").textContent = "Syllabus dot points";
   const all = { done: 0, a: 0, r: 0, total: 0 };
   for (const id of sylSubjects()) { const t = sylTally(id); for (const k in all) all[k] += t[k]; }
   const unset = all.total - all.done - all.a - all.r;
@@ -1229,7 +1252,7 @@ function renderSylCards() {
       el("span", { class: "line" }, el("span", { class: "pct" }, pct + "%"),
         ragMeter(x, short(s.name)),
         el("span", { class: "frac" }, x.done + " / " + x.total)),
-      el("span", { class: "cnum" }, el("span", {}, s.modules.length + (s.modules.length === 1 ? " module" : " modules")), el("span", {}, "dot points")), studyLine(id)));
+      el("span", { class: "cnum" }, el("span", {}, s.modules.length + (s.modules.length === 1 ? " module" : " modules")), el("span", {}, "dot points"))));
   });
   cards.push(el("button", { class: "card add", type: "button", onclick: openSylPicker }, "+ Add or remove subjects"));
   document.getElementById("cards").replaceChildren(...cards);
@@ -1374,16 +1397,26 @@ function openSylPicker() {
   const dlg = document.getElementById("picker"); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
 }
 
-async function setMode(m) {
+function showTab(m) {
   ui.mode = m; save("hsc-mode", m);
   document.getElementById("mode-seg").dataset.on = m;
   document.querySelectorAll("#mode-seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
   document.body.dataset.mode = m;
+}
+async function setMode(m) {
+  showTab(m);
   if (m === "syl") {
     await ensureSylIndex();
     if (!sylSubjects().includes(ui.sylActive)) ui.sylActive = sylSubjects()[0];
     if (ui.sylActive) openSyl(ui.sylActive); else refresh();
-  } else { openSubject(ui.active); refresh(); }
+    renderLights();
+    // Suggested lights need each subject's paper list
+    await Promise.all(subjects().map(ensure)); renderLights();
+  } else if (m === "timer") {
+    try { if (location.hash !== "#timer") history.replaceState(null, "", "#timer"); } catch (e) {}
+    await ensureSylIndex(); refresh();
+  } else { openSubject(ui.active); refresh(); await Promise.all(subjects().map(ensure)); refresh(); }
+  tickTimer();
 }
 
 /* ---------- study timer ----------
@@ -1507,12 +1540,22 @@ function tickTimer() {
   const c = document.getElementById("tm-clock");
   const shown = r ? (r.goal ? Math.ceil(r.goal - runShown(r)) : runSecs(r)) : (ui.tmMode === "cd" ? ui.tmGoal * 60 : 0);
   if (c) c.textContent = clock(shown);
+  // Small running clock on the Study timer tab, so it shows from the other tabs too
+  const tab = document.getElementById("tab-timer"), pill = document.getElementById("tab-run");
+  if (tab && pill) {
+    const on = !!r && ui.mode !== "timer";
+    pill.hidden = !on; tab.classList.toggle("running", on); pill.classList.toggle("paused", !!r && !r.at);
+    if (on) document.getElementById("tab-run-t").textContent = clock(shown);
+    tab.setAttribute("aria-label", "Study timer" + (r ? (r.at ? ", running: " : ", paused: ") + subjName(r.s) + " " + clock(shown) : ""));
+  }
+  // Keep the minutes on the subject cards moving while the timer tab is open
+  if (r && r.at && ui.mode === "timer") { const mn = Math.floor(runShown(r) / 60); if (mn !== ui.tmLastMin) { ui.tmLastMin = mn; renderCards(); renderTimerStats(); } }
   document.title = r && r.at ? clock(shown) + " · " + subjName(r.s) : BASE_TITLE;
 }
 const XICON = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>';
 function renderTimer() {
   const box = document.getElementById("timer"); if (!box) return;
-  const r = state.study.run, ids = timerSubjects(), cur = pickedSubject(), tot = studyTotals();
+  const r = state.study.run, ids = timerSubjects(), cur = pickedSubject();
   box.dataset.state = r ? (r.at ? "running" : "paused") : "idle";
   const sel = el("select", { id: "tm-sub", "aria-label": "Subject you're studying", onchange: e => setTimerSubject(e.target.value) },
     ids.length ? ids.map(id => el("option", { value: id, selected: id === cur }, subjName(id))) : el("option", { value: "" }, "Choose subjects first"));
@@ -1527,31 +1570,50 @@ function renderTimer() {
   const sessions = Object.entries(state.study.log).sort((a, b) => b[1].a - a[1].a);
   const shown = ui.tmAll ? sessions : sessions.slice(0, LOG_SHOW);
   const when = a => new Date(a * 1000).toLocaleString("en-AU", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
-  const totIds = Object.keys(tot.by).sort((a, b) => tot.by[b].week - tot.by[a].week || tot.by[b].all - tot.by[a].all);
-  const logBox = el("details", { class: "tm-log", open: !!ui.tmLogOpen, ontoggle: e => { ui.tmLogOpen = e.target.open; } },
+  const logBox = el("details", { class: "tm-log", open: ui.tmLogOpen !== false, ontoggle: e => { ui.tmLogOpen = e.target.open; } },
     el("summary", {}, "Study sessions" + (sessions.length ? " (" + sessions.length + ")" : "")),
-    totIds.length ? el("div", { class: "tm-tot" }, totIds.map(id => el("span", {}, subjName(id) + " ", el("b", {}, dur(tot.by[id].week)), " this week, ", el("b", {}, dur(tot.by[id].all)), " total"))) : null,
     sessions.length ? el("ul", {}, shown.map(([k, v]) => el("li", {},
       el("span", {}, subjName(v.s), " ", el("span", { class: "w" }, when(v.a))),
       el("span", { class: "du" }, dur(v.d)),
       el("button", { type: "button", title: "Delete this session", "aria-label": "Delete " + dur(v.d) + " of " + subjName(v.s) + " from " + when(v.a), html: XICON, onclick: () => deleteSession(k) }))))
-      : el("p", { class: "none" }, "No sessions yet. Pick a subject and press Start. Sessions under a minute aren't logged."),
+      : el("p", { class: "none" }, r ? "Nothing logged yet. This session is added when you stop it." : "No sessions yet. Pick a subject and press Start. Sessions under a minute aren't logged."),
     sessions.length > LOG_SHOW ? el("div", { class: "more" }, el("button", { class: "btn ghost", type: "button", onclick: () => { ui.tmAll = !ui.tmAll; renderTimer(); } }, ui.tmAll ? "Show fewer" : "Show all " + sessions.length)) : null);
   box.replaceChildren(
     el("div", { class: "tm-row" },
       el("span", { class: "tm-clock", id: "tm-clock", role: "timer", "aria-live": "off" }, "00:00"),
       el("label", { class: "tm-pick", for: "tm-sub" }, "Studying", sel),
       el("div", { class: "tm-btns" }, btns)),
-    el("div", { class: "tm-row" }, modeRow,
-      el("span", { class: "tm-sum", style: "margin-left:auto" }, el("b", {}, dur(tot.week + (r ? runShown(r) : 0))), " studied this week")),
+    el("div", { class: "tm-row" }, modeRow),
     logBox);
   tickTimer();
 }
-// Shown on each subject card, counting the running session too
-function studyLine(id) {
-  const t = studyTotals().by[id] || { all: 0, week: 0 }, r = state.study.run, live = r && r.s === id ? runShown(r) : 0;
-  if (!t.all && !live) return null;
-  return el("span", { class: "cstudy" }, el("b", {}, dur(t.week + live)), " studied this week · ", el("b", {}, dur(t.all + live)), " total");
+function renderTimerStats() {
+  const t = studyTotals(), r = state.study.run, live = r ? runShown(r) : 0, n = Object.keys(state.study.log).length;
+  document.getElementById("stats").replaceChildren(
+    el("span", {}, el("b", {}, dur(t.week + live)), " studied this week"),
+    el("span", {}, el("b", {}, dur(t.all + live)), " in total"),
+    el("span", {}, el("b", {}, String(n)), n === 1 ? " session" : " sessions"),
+    ...(syncMsg ? [el("span", {}, syncMsg)] : []));
+}
+// Study timer tab: a card per subject with time this week and in total. Tapping one picks it for the timer.
+function renderTimerCards() {
+  document.getElementById("subj-label").textContent = "Time per subject";
+  const t = studyTotals().by, r = state.study.run, cur = pickedSubject(), ids = timerSubjects();
+  const week = ids.map(id => (t[id] ? t[id].week : 0) + (r && r.s === id ? runShown(r) : 0)), top = Math.max(1, ...week);
+  const cards = ids.map((id, i) => {
+    const x = t[id] || { all: 0, week: 0 }, live = r && r.s === id ? runShown(r) : 0;
+    const n = Object.values(state.study.log).filter(v => v.s === id).length;
+    return el("button", { class: "card tcard", type: "button", "aria-current": String(id === cur), title: r ? "Switch the timer to " + subjName(id) : "Time " + subjName(id),
+      onclick: () => setTimerSubject(id) },
+      el("span", { class: "cname" }, subjName(id)),
+      el("span", { class: "line" }, el("span", { class: "pct" }, dur(week[i])),
+        el("span", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + Math.round(100 * week[i] / top) + "%" })),
+        el("span", { class: "frac" }, "this week")),
+      el("span", { class: "cnum" }, el("span", {}, dur(x.all + live) + " in total"), el("span", {}, live && r.at ? "timing now" : n + (n === 1 ? " session" : " sessions"))));
+  });
+  cards.push(el("button", { class: "card add", type: "button", onclick: openPicker }, "+ Add or remove subjects"));
+  document.getElementById("cards").replaceChildren(...cards);
+  document.getElementById("rag-sum").replaceChildren(el("span", {}, r ? "Tap a subject to switch the timer to it" : "Tap a subject to pick it for the timer"));
 }
 ui.tmMode = load("hsc-timer-mode", "sw") === "cd" ? "cd" : "sw";
 ui.tmGoal = GOALS.includes(load("hsc-timer-goal", 25)) ? load("hsc-timer-goal", 25) : 25;
@@ -1562,8 +1624,10 @@ window.addEventListener("storage", e => { if (e.key === "hsc-log" && e.newValue)
 /* ---------- start ---------- */
 window.addEventListener("hashchange", async () => {
   const h = location.hash.slice(1);
-  if (h === "syllabus" || h.startsWith("syl-")) { const sid = h.startsWith("syl-") ? h.slice(4) : ""; if (ui.mode !== "syl") { if (sid) ui.sylActive = sid; await setMode("syl"); } else if (sid && sid !== ui.sylActive && sylSubjects().includes(sid)) openSyl(sid); return; }
-  if (SUB[h] && ui.mode === "syl") { ui.active = h; await setMode("papers"); return; }
+  if (h === "timer") { if (ui.mode !== "timer") await setMode("timer"); return; }
+  if (h === "papers") { if (ui.mode !== "papers") await setMode("papers"); return; }
+  if (h === "syllabus" || h === "lights" || h.startsWith("syl-")) { const sid = h.startsWith("syl-") ? h.slice(4) : ""; if (ui.mode !== "syl") { if (sid) ui.sylActive = sid; await setMode("syl"); } else if (sid && sid !== ui.sylActive && sylSubjects().includes(sid)) openSyl(sid); return; }
+  if (SUB[h] && ui.mode !== "papers") { ui.active = h; await setMode("papers"); return; }
   if (SUB[h] && h !== ui.active && subjects().includes(h)) openSubject(h);
 });
 document.querySelectorAll("#mode-seg button").forEach(b => b.addEventListener("click", () => { if (ui.mode !== b.dataset.mode) setMode(b.dataset.mode); }));
@@ -1572,9 +1636,13 @@ async function boot() {
   { const h = location.hash.slice(1); if (SUB[h] && subjects().includes(h)) ui.active = h; }
   applyPalette(); ui.type = load("hsc-type", "all"); ui.group = load("hsc-group", "school"); ui.all = load("hsc-all", true);
   if (!subjects().includes(ui.active)) ui.active = subjects()[0];
-  { const h = location.hash.slice(1); if (h === "syllabus" || h.startsWith("syl-")) { ui.mode = "syl"; if (h.startsWith("syl-")) ui.sylActive = h.slice(4); } else if (!SUB[h]) ui.mode = load("hsc-mode", "papers") === "syl" ? "syl" : "papers"; }
+  { const h = location.hash.slice(1);
+    if (h === "syllabus" || h === "lights" || h.startsWith("syl-")) { ui.mode = "syl"; if (h.startsWith("syl-")) ui.sylActive = h.slice(4); }
+    else if (h === "timer" || h === "papers") ui.mode = h;
+    else if (!SUB[h]) { const m = load("hsc-mode", "papers"); ui.mode = ["syl", "timer"].includes(m) ? m : "papers"; } }
   ui.sylUpTo = load("hsc-syl-upto", "all"); if (ui.sylUpTo !== "all" && termRank(ui.sylUpTo) < 0) ui.sylUpTo = "all";
-  if (ui.mode === "syl") { await setMode("syl"); return; }
+  if (ui.mode !== "papers") { await setMode(ui.mode); return; }
+  showTab("papers");
   renderStats(); renderCards(); renderView();
   await Promise.all(subjects().map(ensure));
   refresh();
