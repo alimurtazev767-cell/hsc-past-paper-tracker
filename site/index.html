@@ -4,15 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>HSC Past Paper Log</title>
-<meta name="description" content="Tick off the HSC past papers, trials and assessment tasks you've done, subject by subject, and see which subjects need work.">
+<meta name="description" content="Tick off the HSC past papers, trials and syllabus dot points you've done, subject by subject, and see which subjects need work.">
 <meta name="theme-color" content="#070708">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23121214'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <script>
-// The tracker used to live at this address. Old bookmarks (/#chem) and sign-in email links still go to it, with everything after the address kept.
+// This page is only for new visitors. Anyone already signed in, or with progress saved in this browser,
+// goes straight to the tracker before anything is drawn. ?home shows this page anyway.
 (function () {
   var h = location.hash, q = location.search;
-  if (/access_token|refresh_token|error_description|[#&]type=/.test(h) || /^#(signin|signup|[a-z0-9]{2,8})$/.test(h) && h !== "#how" || /[?&](code|error)=/.test(q))
-    location.replace("tracker" + q + h);
+  function go() { document.documentElement.style.visibility = "hidden"; location.replace("tracker" + q + h); }
+  // The tracker used to live at this address: old bookmarks (/#chem) and sign-in email links still go to it.
+  if (/access_token|refresh_token|error_description|[#&]type=/.test(h) || /^#(signin|signup|syllabus|syl-[a-z0-9]+|[a-z0-9]{2,8})$/.test(h) && h !== "#how" || /[?&](code|error)=/.test(q)) return go();
+  if (/[?&]home(=|&|$)/.test(q)) return;
+  try {
+    var ls = localStorage, s = JSON.parse(ls.getItem("hsc-log") || "null") || {};
+    var some = function (o) { return !!o && (Array.isArray(o) ? o.length > 0 : typeof o === "object" && Object.keys(o).length > 0); };
+    var session = false;
+    for (var i = 0; i < ls.length; i++) if (/^sb-.+-auth-token$/.test(ls.key(i) || "")) session = true;
+    if (session || ls.getItem("hsc-owner") || some(s.done) || some(s.marks) || some(s.custom) || some(s.subjects) || some(s.rag) || some(s.syl) || some(s.sylSubs)) go();
+  } catch (e) {}
 })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,25 +30,26 @@
 <style>
 /* Same layered dark look as the tracker: canvas #070708, raised panels #121214, recessed wells #1A1A1E */
 :root {
-  --bg: #070708; --sheet: #121214; --well: #1A1A1E; --raise: #1C1C20; --slate: #2C2C31;
-  --fg: #FFFFFF; --text: #F5F5F7; --muted: #8E8E93; --dim: #636366;
+  --bg: #070708; --sheet: #121214; --card: #161618; --well: #1A1A1E; --raise: #1C1C20; --slate: #2C2C31;
+  --fg: #FFFFFF; --text: #F5F5F7; --soft: #D1D1D6; --muted: #8E8E93; --dim: #636366;
   --rule: rgb(255 255 255 / .06); --rule-2: rgb(255 255 255 / .10);
   --tl-r: #FF453A; --tl-a: #FF9F0A; --tl-g: #30D158; --tl-off: #2C2C31;
   --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif;
   --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
   --lift: inset 0 1px 0 rgb(255 255 255 / .035), 0 1px 2px rgb(0 0 0 / .4), 0 12px 32px -12px rgb(0 0 0 / .6);
   --recess: inset 0 1px 2px rgb(0 0 0 / .45), inset 0 0 0 1px rgb(255 255 255 / .04);
   --sheen: linear-gradient(180deg, rgb(255 255 255 / .09), rgb(255 255 255 / 0) 55%);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 76px; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 [hidden] { display: none !important; }
 a { color: inherit; }
 a:focus-visible, button:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
 ::selection { background: #FFFFFF; color: #000000; }
-.wrap { max-width: 1080px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left)); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right)); }
 
 /* top bar: translucent material, content scrolls under it */
 .nav { position: sticky; top: 0; z-index: 5; background: rgb(7 7 8 / .72); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); border-bottom: 1px solid var(--rule); padding-top: env(safe-area-inset-top); }
@@ -49,110 +60,152 @@ a:focus-visible, button:focus-visible { outline: 2px solid #FFFFFF; outline-offs
 .mark svg { width: 16px; height: 16px; }
 .nav-actions { display: flex; gap: 8px; flex: none; }
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 9px 16px; border-radius: 11px; font: 500 14px var(--body); text-decoration: none; cursor: pointer; background: var(--sheet); color: var(--fg); border: 1px solid var(--rule-2); box-shadow: var(--lift); transition: background-color .2s ease, border-color .2s ease, transform .1s ease-out; white-space: nowrap; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 8px 16px; border-radius: 11px; font: 500 14px var(--body); text-decoration: none; cursor: pointer; background: var(--sheet); color: var(--fg); border: 1px solid var(--rule-2); box-shadow: var(--lift); transition: background-color .2s ease, border-color .2s ease, transform .1s ease-out; white-space: nowrap; }
 .btn:hover { background: var(--raise); border-color: rgb(255 255 255 / .16); }
 .btn:active { transform: scale(.97); }
 .btn.primary { background: #F5F5F7; color: #000000; border-color: transparent; font-weight: 600; }
 .btn.primary:hover { background: #FFFFFF; }
 .btn.big { min-height: 50px; padding: 12px 22px; font-size: 15.5px; border-radius: 13px; }
-.btn svg { width: 16px; height: 16px; }
+.btn svg { width: 16px; height: 16px; flex: none; }
 @media (pointer: coarse) { .btn { min-height: 44px; } }
 
-/* hero */
-.hero { padding: 72px 0 40px; display: grid; gap: 22px; justify-items: start; }
 .badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; margin: 0; border: 1px solid var(--rule); border-radius: 999px; background: var(--sheet); box-shadow: var(--lift); font: 600 10px/1.4 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .badge i { width: 6px; height: 6px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 8px rgb(255 255 255 / .5); }
-h1 { margin: 0; font: 800 clamp(2.6rem, 7.5vw, 5rem)/.98 var(--display); letter-spacing: -0.035em; text-wrap: balance; max-width: 14ch; font-optical-sizing: auto; }
-.lede { margin: 0; max-width: 54ch; font-size: clamp(1.02rem, 2vw, 1.18rem); line-height: 1.5; color: var(--muted); text-wrap: pretty; }
-.lede b { color: var(--text); font-weight: 500; }
-.cta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.eyebrow { margin: 0; font: 600 11px/1.4 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .small { margin: 0; font-size: 13px; color: var(--muted); }
 
-/* returning student */
-.back { width: 100%; max-width: 560px; display: grid; gap: 14px; padding: 18px 20px; border-radius: 16px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); }
-.back-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.back h2 { margin: 0; font: 600 1.05rem var(--display); letter-spacing: -0.015em; }
-.back .who { font-size: 12.5px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
-.back .who i { width: 7px; height: 7px; border-radius: 50%; background: var(--tl-g); }
-.nums { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13.5px; color: var(--muted); }
-.nums b { display: block; font: 700 1.5rem/1.1 var(--display); letter-spacing: -0.02em; color: var(--fg); font-variant-numeric: tabular-nums; }
-.tlsum { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--muted); }
-.tlsum span { display: inline-flex; align-items: center; gap: 6px; }
-.tlsum b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
-.tlsum i { width: 8px; height: 8px; border-radius: 50%; }
+/* hero: words on the left, the tracker on the right */
+.hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 56px; align-items: center; padding: 80px 0 72px; }
+.hero::before { content: ""; position: absolute; z-index: -1; inset: -80px 0 auto 25%; height: 640px; background: radial-gradient(50% 45% at 60% 40%, rgb(255 255 255 / .06), transparent 70%); pointer-events: none; }
+.hero-copy { display: grid; gap: 22px; justify-items: start; }
+h1 { margin: 0; font: 800 clamp(2.5rem, 5.4vw, 4.1rem)/1 var(--display); letter-spacing: -0.038em; text-wrap: balance; font-optical-sizing: auto; }
+h1 em { font-style: normal; color: var(--muted); }
+.lede { margin: 0; max-width: 46ch; font-size: clamp(1.02rem, 1.6vw, 1.16rem); line-height: 1.5; color: var(--muted); text-wrap: pretty; }
+.lede b { color: var(--text); font-weight: 500; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.have { margin: 0; font-size: 14px; color: var(--muted); }
+.have a { color: var(--text); font-weight: 500; text-decoration: underline; text-decoration-color: rgb(255 255 255 / .3); text-underline-offset: 3px; }
+.have a:hover { text-decoration-color: currentColor; }
 
-/* example window */
-.shot { margin: 8px 0 0; border-radius: 20px; padding: 18px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift), 0 40px 100px -40px rgb(0 0 0 / .9); display: grid; gap: 16px; position: relative; overflow: hidden; }
-.shot::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 50% at 70% 0%, rgb(255 255 255 / .05), transparent 70%); pointer-events: none; }
-.shot-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.shot-bar .dots { display: flex; gap: 6px; }
-.shot-bar .dots i { width: 10px; height: 10px; border-radius: 50%; background: #2C2C31; }
-.shot-bar small { font: 600 10px/1.4 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
-.mcards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.mcard { position: relative; display: grid; gap: 14px; padding: 16px; border-radius: 14px; background: #161618; border: 1px solid var(--rule); box-shadow: var(--lift); min-width: 0; }
+/* the pretend tracker window */
+.app { position: relative; border-radius: 22px; padding: 16px; background: var(--sheet); border: 1px solid var(--rule-2); box-shadow: var(--lift), 0 50px 120px -40px rgb(0 0 0 / .95); display: grid; gap: 14px; min-width: 0; }
+.app-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 0 2px; }
+.app-bar .dots { display: flex; gap: 6px; }
+.app-bar .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--slate); }
+.app-bar small { font: 600 10px/1.4 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.app-head { display: flex; justify-content: space-between; align-items: end; gap: 10px; flex-wrap: wrap; padding: 4px 4px 0; }
+.app-head b { font: 700 20px/1.1 var(--display); letter-spacing: -0.025em; }
+.app-head span { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.app-head span strong { color: var(--text); font-weight: 600; }
+
+.mcards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.mcard { position: relative; display: grid; gap: 12px; padding: 14px; border-radius: 14px; background: var(--card); border: 1px solid var(--rule); box-shadow: var(--lift); min-width: 0; }
 .mcard.on { border-color: rgb(255 255 255 / .28); }
-.mcard b { font: 600 14.5px/1.3 var(--display); letter-spacing: -0.012em; padding-right: 52px; }
+.mcard b { font: 600 14px/1.3 var(--display); letter-spacing: -0.012em; padding-right: 54px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mline { display: flex; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; }
-.mline strong { font: 700 19px var(--display); letter-spacing: -0.025em; min-width: 3.2ch; }
+.mline strong { font: 700 18px var(--display); letter-spacing: -0.025em; min-width: 3.2ch; }
 .meter { flex: 1; height: 4px; border-radius: 99px; background: var(--well); box-shadow: var(--recess); overflow: hidden; }
 .meter span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #D1D1D6, #FFFFFF); }
-.lights { position: absolute; top: 15px; right: 14px; display: inline-flex; gap: 4px; padding: 4px 6px; border-radius: 999px; background: var(--well); box-shadow: var(--recess); }
+.lights { position: absolute; top: 13px; right: 12px; display: inline-flex; gap: 4px; padding: 4px 6px; border-radius: 999px; background: var(--well); box-shadow: var(--recess); }
 .lights i { width: 8px; height: 8px; border-radius: 50%; background: var(--tl-off); }
 .lights .r { background: var(--tl-r); box-shadow: 0 0 8px rgb(255 69 58 / .75); }
 .lights .a { background: var(--tl-a); box-shadow: 0 0 8px rgb(255 159 10 / .7); }
 .lights .g { background: var(--tl-g); box-shadow: 0 0 8px rgb(48 209 88 / .7); }
-.mchips { display: flex; flex-wrap: wrap; gap: 6px; }
-.mchip { position: relative; padding: 8px 12px; border-radius: 10px; font-size: 13.5px; background: var(--well); box-shadow: var(--recess); color: #D1D1D6; }
+
+.mrow { display: grid; gap: 10px; padding: 14px; border-radius: 14px; background: var(--card); border: 1px solid var(--rule); }
+.mrow-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 13.5px; font-weight: 600; }
+.mrow-h small { font: 500 12px var(--mono); color: var(--muted); }
+.mchips { display: flex; flex-wrap: wrap; gap: 8px; }
+.mchip { position: relative; padding: 7px 12px; border-radius: 10px; font-size: 13px; background: var(--well); box-shadow: var(--recess); color: var(--soft); font-variant-numeric: tabular-nums; }
 .mchip.done { background: #F5F5F7; color: #000000; box-shadow: 0 1px 2px rgb(0 0 0 / .4); }
 .mchip.done::after { content: ""; position: absolute; top: -6px; right: -6px; width: 17px; height: 17px; border-radius: 50%; background: #070708 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.2 3.2L13 4.8' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 10px no-repeat; box-shadow: 0 0 0 1.5px #F5F5F7; }
-.mrow { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; align-items: start; padding-top: 14px; border-top: 1px solid var(--rule); }
-.mrow > span { padding-top: 7px; font-size: 14px; font-weight: 600; }
-.mrow > span small { display: block; font: 500 12px ui-monospace, "SF Mono", Menlo, monospace; color: var(--muted); }
+.mchip em { font-style: normal; font: 500 11px var(--mono); color: #3A3A3C; margin-left: 6px; }
 
 /* sections */
-section.block { padding: 72px 0 0; display: grid; gap: 22px; }
-.eyebrow { margin: 0; font: 600 10px/1.4 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-h2.title { margin: 0; font: 700 clamp(1.7rem, 4vw, 2.4rem)/1.08 var(--display); letter-spacing: -0.028em; text-wrap: balance; max-width: 22ch; }
-.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; counter-reset: s; }
-.steps li { padding: 22px 20px; border-radius: 16px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); display: grid; gap: 8px; align-content: start; }
-.steps .n { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 6px; font: 600 13px var(--display); background: var(--sheen), var(--slate); box-shadow: inset 0 1px 0 rgb(255 255 255 / .1), 0 0 0 .5px rgb(255 255 255 / .12); }
-.steps h3 { margin: 0; font: 600 1.05rem/1.3 var(--display); letter-spacing: -0.015em; }
-.steps p { margin: 0; font-size: 14.5px; color: var(--muted); line-height: 1.5; }
-.legend { display: grid; gap: 6px; margin-top: 4px; }
-.legend span { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: #D1D1D6; }
-.legend i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
-.facts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-radius: 16px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); overflow: hidden; }
-.facts li { padding: 18px 20px; display: grid; gap: 2px; border-top: 1px solid var(--rule); }
-.facts li:nth-child(-n+2) { border-top: 0; }
-.facts li:nth-child(2n) { border-left: 1px solid var(--rule); }
+section.block { padding: 88px 0 0; display: grid; gap: 28px; }
+.sec-head { display: grid; gap: 12px; max-width: 640px; }
+h2.title { margin: 0; font: 700 clamp(1.8rem, 4vw, 2.6rem)/1.06 var(--display); letter-spacing: -0.03em; text-wrap: balance; }
+.sec-head p:not(.eyebrow) { margin: 0; color: var(--muted); font-size: 1.05rem; text-wrap: pretty; }
+
+/* feature rows: words beside a small piece of the tracker */
+.feat { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 48px; align-items: center; padding: 36px; border-radius: 24px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); }
+.feat + .feat { margin-top: -10px; }
+.feat:nth-of-type(even) .feat-copy { order: 2; }
+.feat-copy { display: grid; gap: 12px; align-content: start; }
+.feat-copy .k { display: inline-flex; align-items: center; gap: 8px; font: 600 12px var(--body); color: var(--muted); }
+.feat-copy .k i { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; background: var(--sheen), var(--slate); box-shadow: inset 0 1px 0 rgb(255 255 255 / .1), 0 0 0 .5px rgb(255 255 255 / .12); color: var(--fg); }
+.feat-copy .k svg { width: 14px; height: 14px; }
+.feat-copy h3 { margin: 0; font: 700 clamp(1.35rem, 2.6vw, 1.7rem)/1.15 var(--display); letter-spacing: -0.024em; text-wrap: balance; }
+.feat-copy p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.55; text-wrap: pretty; }
+.feat-copy ul { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; color: var(--soft); }
+.feat-copy li { display: flex; gap: 9px; align-items: baseline; }
+.feat-copy li::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--muted); flex: none; transform: translateY(-2px); }
+.demo { display: grid; gap: 10px; padding: 16px; border-radius: 18px; background: var(--bg); border: 1px solid var(--rule); box-shadow: var(--recess); min-width: 0; }
+
+/* syllabus demo */
+.mod { display: grid; gap: 4px; }
+.mod-h { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 2px 4px 8px; }
+.mod-h b { font: 600 14px var(--display); letter-spacing: -0.01em; }
+.mod-h span { font: 500 12px var(--mono); color: var(--muted); }
+.dp { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--rule); font-size: 13.5px; line-height: 1.4; color: var(--soft); }
+.dp > span:first-child { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.rag { display: inline-flex; gap: 3px; padding: 3px; border-radius: 999px; background: var(--well); box-shadow: var(--recess); }
+.rag i { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font: 700 10px var(--body); font-style: normal; color: var(--dim); }
+.rag i.r { background: var(--tl-r); color: #000; } .rag i.a { background: var(--tl-a); color: #000; } .rag i.g { background: var(--tl-g); color: #000; }
+
+/* traffic light summary */
+.tlsum { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 4px 4px 0; font-size: 13px; color: var(--muted); }
+.tlsum span { display: inline-flex; align-items: center; gap: 6px; }
+.tlsum b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tlsum i { width: 8px; height: 8px; border-radius: 50%; }
+
+/* facts */
+.facts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.facts li { padding: 20px; border-radius: 18px; background: var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); display: grid; gap: 6px; align-content: start; }
 .facts b { font: 600 15px var(--display); letter-spacing: -0.01em; }
-.facts span { font-size: 14px; color: var(--muted); }
-.end { padding: 80px 0 24px; display: grid; justify-items: center; text-align: center; gap: 16px; }
-.end h2 { margin: 0; font: 700 clamp(1.6rem, 4vw, 2.2rem)/1.1 var(--display); letter-spacing: -0.028em; }
-footer.notes { padding: 32px 0 calc(48px + env(safe-area-inset-bottom)); border-top: 1px solid var(--rule); margin-top: 48px; display: grid; gap: 8px; font-size: 12.5px; color: var(--muted); max-width: 75ch; }
+.facts span { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+/* questions */
+.qa { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.qa div { padding: 20px; border-radius: 18px; border: 1px solid var(--rule); display: grid; gap: 6px; align-content: start; }
+.qa h3 { margin: 0; font: 600 15.5px/1.35 var(--display); letter-spacing: -0.012em; }
+.qa p { margin: 0; font-size: 14.5px; color: var(--muted); line-height: 1.55; }
+.qa a { color: var(--text); }
+
+.end { margin-top: 96px; padding: 56px 24px; border-radius: 28px; display: grid; justify-items: center; text-align: center; gap: 18px; background: radial-gradient(70% 90% at 50% 0%, rgb(255 255 255 / .07), transparent 70%), var(--sheet); border: 1px solid var(--rule); box-shadow: var(--lift); }
+.end h2 { margin: 0; font: 700 clamp(1.7rem, 4vw, 2.4rem)/1.08 var(--display); letter-spacing: -0.03em; text-wrap: balance; }
+.end p { margin: 0; color: var(--muted); max-width: 44ch; }
+.end .cta { justify-content: center; }
+footer.notes { padding: 32px 0 calc(48px + env(safe-area-inset-bottom)); border-top: 1px solid var(--rule); margin-top: 56px; display: grid; gap: 8px; font-size: 12.5px; color: var(--muted); max-width: 80ch; }
 footer.notes p { margin: 0; }
 
-@media (max-width: 860px) {
-  .mcards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .mcards .mcard:nth-child(n+3) { display: none; }
-  .steps { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 960px) {
+  .hero { grid-template-columns: minmax(0, 1fr); gap: 44px; padding: 56px 0 48px; }
+  .hero::before { inset: -40px 0 auto 0; }
+  .feat { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 26px; }
+  .feat:nth-of-type(even) .feat-copy { order: 0; }
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
-  .hero { padding: 44px 0 28px; gap: 18px; }
+  .hero { padding: 36px 0 36px; gap: 32px; }
+  .hero-copy { gap: 18px; }
   .cta { width: 100%; }
   .cta .btn { flex: 1 1 auto; }
-  .nav .ghost-sm { display: none; }
-  .shot { padding: 14px; border-radius: 18px; }
-  .mcard { padding: 14px 12px; }
-  .mcard b { padding-right: 46px; font-size: 13.5px; }
-  .lights { right: 10px; top: 13px; }
-  .mrow { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-  .mrow > span { padding: 0; }
-  .facts { grid-template-columns: minmax(0, 1fr); }
-  .facts li:nth-child(2) { border-top: 1px solid var(--rule); }
-  .facts li:nth-child(2n) { border-left: 0; }
-  section.block { padding-top: 56px; }
+  .nav .btn { padding-inline: 13px; }
+  .app { padding: 12px; border-radius: 18px; gap: 10px; }
+  .mcard { padding: 12px; }
+  .mcard b { font-size: 13px; padding-right: 48px; }
+  .lights { right: 9px; top: 11px; }
+  .mcards .mcard:nth-child(n+3) { display: none; }
+  section.block { padding-top: 64px; gap: 22px; }
+  .feat { padding: 20px 16px; border-radius: 20px; }
+  .demo { padding: 10px; }
+  .dp { padding: 10px; font-size: 13px; }
+  .rag i { width: 20px; height: 20px; }
+  .facts, .qa { grid-template-columns: minmax(0, 1fr); }
+  .end { margin-top: 64px; padding: 40px 18px; border-radius: 22px; }
 }
+@media (max-width: 430px) { .nav .brand span:last-child { display: none; } }
 @media (prefers-reduced-motion: reduce) { .btn { transition: none; } .btn:active { transform: none; } }
 @media (prefers-reduced-transparency: reduce) { .nav { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; } }
 @media (prefers-contrast: more) { :root { --rule: rgb(255 255 255 / .2); --rule-2: rgb(255 255 255 / .3); --muted: #AEAEB2; } }
@@ -162,75 +215,139 @@ footer.notes p { margin: 0; }
 
 <header class="nav">
   <div class="wrap">
-    <a class="brand" href="./" aria-label="HSC Past Paper Log, home"><span class="mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-6.5"/></svg></span><span>HSC Past Paper Log</span></a>
-    <nav class="nav-actions" aria-label="Get going">
-      <a class="btn ghost-sm" href="tracker#signin" id="nav-signin" hidden>Sign in</a>
-      <a class="btn primary" href="tracker" id="nav-open">Open tracker</a>
+    <a class="brand" href="./?home" aria-label="HSC Past Paper Log, home"><span class="mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-6.5"/></svg></span><span>HSC Past Paper Log</span></a>
+    <nav class="nav-actions" aria-label="Account">
+      <a class="btn" href="tracker#signin" data-acct>Sign in</a>
+      <a class="btn primary" href="tracker" data-start>Get started</a>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
   <section class="hero" aria-labelledby="h-t">
-    <p class="badge"><i aria-hidden="true"></i>Year 12 &middot; HSC 2026</p>
-    <h1 id="h-t">Every past paper, ticked off.</h1>
-    <p class="lede">Keep track of the <b>HSC papers, trials and assessment tasks</b> you've done, subject by subject. Give each subject a <b>red, amber or green</b> light so you can see where to spend your study time.</p>
-
-    <div class="back" id="back" hidden>
-      <div class="back-top"><h2>Welcome back</h2><span class="who" id="back-who" hidden><i aria-hidden="true"></i>Signed in</span></div>
-      <div class="nums" id="back-nums"></div>
-      <div class="tlsum" id="back-tl"></div>
+    <div class="hero-copy">
+      <p class="badge"><i aria-hidden="true"></i>Year 12 &middot; HSC 2026</p>
+      <h1 id="h-t">Know exactly what you've done. <em>And what's left.</em></h1>
+      <p class="lede">Tick off <b>HSC past papers and trials</b> as you do them, rate every <b>syllabus dot point</b>, and give each subject a <b>red, amber or green</b> light. Then you'll know where your next hour of study should go.</p>
+      <div class="cta">
+        <a class="btn primary big" href="tracker" data-start>Get started, it's free</a>
+        <a class="btn big" href="#how">See how it works</a>
+      </div>
+      <p class="have" data-acct>Already have an account? <a href="tracker#signin">Sign in</a></p>
     </div>
 
-    <div class="cta">
-      <a class="btn primary big" href="tracker" id="go">Get started</a>
-      <a class="btn big" href="tracker#signin" id="signin" hidden>Sign in</a>
-      <a class="btn big" href="#how" id="how-link">How it works</a>
-    </div>
-    <p class="small" id="cta-note">Free, with no account needed. Your ticks save in this browser.</p>
+    <figure class="app" aria-label="What the tracker looks like, with made-up progress" style="margin:0">
+      <div class="app-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><small>Your tracker</small></div>
+      <div class="app-head" aria-hidden="true"><b>HSC Past Paper Log</b><span><strong>23</strong> papers done &middot; <strong>9</strong> this week</span></div>
+      <div class="mcards" aria-hidden="true">
+        <div class="mcard on"><b>Maths Extension 1</b><span class="lights"><i></i><i></i><i class="g"></i></span><span class="mline"><strong>67%</strong><span class="meter"><span style="width:67%"></span></span></span></div>
+        <div class="mcard"><b>Chemistry</b><span class="lights"><i></i><i class="a"></i><i></i></span><span class="mline"><strong>43%</strong><span class="meter"><span style="width:43%"></span></span></span></div>
+        <div class="mcard"><b>Physics</b><span class="lights"><i class="r"></i><i></i><i></i></span><span class="mline"><strong>14%</strong><span class="meter"><span style="width:14%"></span></span></span></div>
+        <div class="mcard"><b>English Advanced</b><span class="lights"><i></i><i class="a"></i><i></i></span><span class="mline"><strong>33%</strong><span class="meter"><span style="width:33%"></span></span></span></div>
+      </div>
+      <div class="mrow" aria-hidden="true">
+        <div class="mrow-h">Maths Extension 1 &middot; HSC papers<small>4/6</small></div>
+        <div class="mchips"><span class="mchip done">2025<em>81%</em></span><span class="mchip done">2024</span><span class="mchip done">2023<em>74%</em></span><span class="mchip">2022</span><span class="mchip done">2021</span><span class="mchip">2020</span></div>
+      </div>
+      <figcaption class="small" style="padding:0 4px">Made-up progress, to show what it looks like.</figcaption>
+    </figure>
   </section>
 
-  <figure class="shot" aria-label="Example of the tracker" style="margin-inline:0">
-    <div class="shot-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><small>Example</small></div>
-    <div class="mcards" aria-hidden="true">
-      <div class="mcard on"><b>Maths Ext 1</b><span class="lights"><i></i><i></i><i class="g"></i></span><span class="mline"><strong>67%</strong><span class="meter"><span style="width:67%"></span></span></span></div>
-      <div class="mcard"><b>Chemistry</b><span class="lights"><i></i><i class="a"></i><i></i></span><span class="mline"><strong>43%</strong><span class="meter"><span style="width:43%"></span></span></span></div>
-      <div class="mcard"><b>Physics</b><span class="lights"><i class="r"></i><i></i><i></i></span><span class="mline"><strong>14%</strong><span class="meter"><span style="width:14%"></span></span></span></div>
-      <div class="mcard"><b>Maths Ext 2</b><span class="lights"><i></i><i class="a"></i><i></i></span><span class="mline"><strong>33%</strong><span class="meter"><span style="width:33%"></span></span></span></div>
-    </div>
-    <div class="mrow" aria-hidden="true"><span>HSC papers<small>4/6</small></span><span class="mchips"><span class="mchip done">2025</span><span class="mchip done">2024</span><span class="mchip done">2023</span><span class="mchip">2022</span><span class="mchip done">2021</span><span class="mchip">2020</span></span></div>
-    <figcaption class="small">Made-up numbers, to show what it looks like.</figcaption>
-  </figure>
-
   <section class="block" id="how" aria-labelledby="how-t">
-    <p class="eyebrow">How it works</p>
-    <h2 class="title" id="how-t">Three steps, then just keep ticking.</h2>
-    <ol class="steps">
-      <li><span class="n" aria-hidden="true">1</span><h3>Choose your subjects</h3><p>Pick from 32 Year 12 subjects, plus maths competitions. Each one lists the HSC papers and the trial papers and assessment tasks that THSC Online has, grouped by school or by year.</p></li>
-      <li><span class="n" aria-hidden="true">2</span><h3>Tick papers as you do them</h3><p>Tap a paper to mark it done. Add your mark if you like. Each subject shows how far through you are, and the Completed list keeps the dates.</p></li>
-      <li><span class="n" aria-hidden="true">3</span><h3>Set a traffic light</h3><p>Tap the lights on a subject to say how you feel about it. The colour is your call; the tracker only shows a faint hint from your progress.</p>
-        <span class="legend"><span><i style="background:var(--tl-r)"></i>Red: needs work</span><span><i style="background:var(--tl-a)"></i>Amber: getting there</span><span><i style="background:var(--tl-g)"></i>Green: confident</span></span></li>
-    </ol>
+    <div class="sec-head">
+      <p class="eyebrow">How it works</p>
+      <h2 class="title" id="how-t">Three ways to see where you stand.</h2>
+      <p>Pick your Year 12 subjects once. After that it's just tapping as you study.</p>
+    </div>
+
+    <article class="feat" aria-labelledby="f1">
+      <div class="feat-copy">
+        <span class="k"><i aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-6.5"/></svg></i>Past papers</span>
+        <h3 id="f1">Tick every paper you sit.</h3>
+        <p>Each subject lists the HSC papers, trial papers and assessment tasks from THSC Online and NESA. Tap one when you've done it and add your mark if you like.</p>
+        <ul><li>32 Year 12 subjects, plus maths competitions</li><li>Trials grouped by school or by year</li><li>Add your own school's papers</li></ul>
+      </div>
+      <div class="demo" aria-hidden="true">
+        <div class="mrow"><div class="mrow-h">Chemistry HSC papers<small>3/5</small></div><div class="mchips"><span class="mchip done">2025</span><span class="mchip done">2024<em>88%</em></span><span class="mchip">2023</span><span class="mchip done">2022</span><span class="mchip">2021</span></div></div>
+        <div class="mrow"><div class="mrow-h">Ext 1 trial papers &middot; 2024<small>2/6</small></div><div class="mchips"><span class="mchip done">Abbotsleigh</span><span class="mchip">Baulkham Hills</span><span class="mchip done">James Ruse<em>71%</em></span><span class="mchip">Knox</span><span class="mchip">Sydney Grammar</span><span class="mchip">Normanhurst Boys</span></div></div>
+      </div>
+    </article>
+
+    <article class="feat" aria-labelledby="f2">
+      <div class="feat-copy">
+        <span class="k"><i aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 4h7M6 8h7M6 12h7"/><circle cx="3" cy="4" r=".9" fill="currentColor" stroke="none"/><circle cx="3" cy="8" r=".9" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r=".9" fill="currentColor" stroke="none"/></svg></i>Syllabus</span>
+        <h3 id="f2">Rate every dot point.</h3>
+        <p>The Year 12 syllabus content is split into modules and dot points. Give each one a red, amber or green and watch each module fill up as you revise.</p>
+        <ul><li>Maths Advanced, Extension 1 and 2</li><li>Chemistry, Physics and Health and Movement Science</li><li>English Standard, Advanced and Extension 1</li></ul>
+      </div>
+      <div class="demo" aria-hidden="true">
+        <div class="mod">
+          <div class="mod-h"><b>Proof by mathematical induction</b><span>2/4</span></div>
+          <div class="dp"><span>Examine the nature of inductive proof, including the statement to be proved, the base case and the inductive step</span><span class="rag"><i>R</i><i>A</i><i class="g">G</i></span></div>
+          <div class="dp"><span>Prove results for sums using mathematical induction</span><span class="rag"><i>R</i><i>A</i><i class="g">G</i></span></div>
+          <div class="dp"><span>Prove divisibility results using mathematical induction</span><span class="rag"><i>R</i><i class="a">A</i><i>G</i></span></div>
+          <div class="dp"><span>Identify errors in false &lsquo;proofs by induction&rsquo;, such as cases where only one of the two required steps of a proof by induction is true</span><span class="rag"><i class="r">R</i><i>A</i><i>G</i></span></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="feat" aria-labelledby="f3">
+      <div class="feat-copy">
+        <span class="k"><i aria-hidden="true"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="4" cy="8" r="2" fill="#FF453A"/><circle cx="8" cy="8" r="2" fill="#FF9F0A"/><circle cx="12" cy="8" r="2" fill="#30D158"/></svg></i>Traffic lights</span>
+        <h3 id="f3">See which subject needs you most.</h3>
+        <p>Tap the lights on a subject to say how you feel about it. The colour is your call; the tracker only hints from your progress. One glance shows where to spend tonight.</p>
+        <ul><li>Red: needs work</li><li>Amber: getting there</li><li>Green: confident</li></ul>
+      </div>
+      <div class="demo" aria-hidden="true">
+        <div class="mcards">
+          <div class="mcard"><b>Physics</b><span class="lights"><i class="r"></i><i></i><i></i></span><span class="mline"><strong>14%</strong><span class="meter"><span style="width:14%"></span></span></span></div>
+          <div class="mcard"><b>Chemistry</b><span class="lights"><i></i><i class="a"></i><i></i></span><span class="mline"><strong>43%</strong><span class="meter"><span style="width:43%"></span></span></span></div>
+          <div class="mcard"><b>Maths Ext 1</b><span class="lights"><i></i><i></i><i class="g"></i></span><span class="mline"><strong>67%</strong><span class="meter"><span style="width:67%"></span></span></span></div>
+          <div class="mcard"><b>English Adv</b><span class="lights"><i></i><i class="a"></i><i></i></span><span class="mline"><strong>33%</strong><span class="meter"><span style="width:33%"></span></span></span></div>
+        </div>
+        <div class="tlsum"><span><i style="background:var(--tl-r)"></i><b>1</b> red</span><span><i style="background:var(--tl-a)"></i><b>2</b> amber</span><span><i style="background:var(--tl-g)"></i><b>1</b> green</span></div>
+      </div>
+    </article>
   </section>
 
   <section class="block" aria-labelledby="inc-t">
-    <p class="eyebrow">What's in it</p>
-    <h2 class="title" id="inc-t">Built for NSW Year 12.</h2>
+    <div class="sec-head">
+      <p class="eyebrow">Built for NSW Year 12</p>
+      <h2 class="title" id="inc-t">Everything in one place.</h2>
+    </div>
     <ul class="facts">
       <li><b>HSC papers</b><span>From THSC Online up to 2018 and NESA after that.</span></li>
       <li><b>Trials and assessments</b><span>Trial papers, plus half yearlies and AT1 to AT4 where THSC has them.</span></li>
       <li><b>Your own papers</b><span>Add a paper that isn't listed, like your school's own trial.</span></li>
-      <li id="fact-sync"><b>Saved for you</b><span>Ticks save in this browser, so come back on the same device.</span></li>
+      <li data-sync><b>Saved for you</b><span>Ticks save in this browser, so come back on the same device.</span></li>
     </ul>
   </section>
 
+  <section class="block" aria-labelledby="qa-t">
+    <div class="sec-head">
+      <p class="eyebrow">Questions</p>
+      <h2 class="title" id="qa-t">Good to know.</h2>
+    </div>
+    <div class="qa">
+      <div><h3>Do I need an account?</h3><p data-q-acct>No. You can start straight away and your ticks save in this browser.</p></div>
+      <div><h3>Does it have the papers themselves?</h3><p>No, only their names, so you can track your practice. Get the papers from <a href="https://thsconline.github.io/s/" target="_blank" rel="noopener">THSC Online</a> and <a href="https://www.nsw.gov.au/education-and-training/nesa/curriculum/hsc-exam-papers" target="_blank" rel="noopener">NESA</a>.</p></div>
+      <div><h3>What does it cost?</h3><p>Nothing. It's free and non-commercial, made for students' private study.</p></div>
+      <div><h3>I've used it before. Why am I seeing this page?</h3><p>Once you've ticked something on this device, this address takes you straight to your tracker.<span data-acct> On a new device, <a href="tracker#signin">sign in</a> to get your progress back.</span></p></div>
+    </div>
+  </section>
+
   <section class="end" aria-labelledby="end-t">
-    <h2 id="end-t">Ready when you are.</h2>
-    <a class="btn primary big" href="tracker" id="go-2">Get started</a>
+    <h2 id="end-t">Your next paper is waiting.</h2>
+    <p>Choose your subjects and tick off your first paper.</p>
+    <div class="cta">
+      <a class="btn primary big" href="tracker" data-start>Get started</a>
+      <a class="btn big" href="tracker#signin" data-acct>Sign in</a>
+    </div>
   </section>
 
   <footer class="notes">
     <p>Paper names come from <a href="https://thsconline.github.io/s/" target="_blank" rel="noopener">THSC Online</a> and <a href="https://www.nsw.gov.au/education-and-training/nesa/curriculum/hsc-exam-papers" target="_blank" rel="noopener">NESA</a>. This site only lists names so you can track your practice; get the papers themselves from those sites. Free and non-commercial, for students' private study.</p>
+    <p>Syllabus dot points are copied from NESA's syllabuses. &copy; NSW Education Standards Authority (NESA) for and on behalf of the Crown in right of the State of New South Wales. This site isn't made or endorsed by NESA.</p>
   </footer>
 </main>
 
@@ -239,39 +356,16 @@ footer.notes p { margin: 0; }
 (function () {
   var CFG = window.TRACKER_CONFIG || {};
   var accounts = !!(CFG.supabaseUrl && CFG.supabaseKey);
-  function load(k, fb) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } }
-  var $ = function (id) { return document.getElementById(id); };
-  var st = load("hsc-log", {}) || {};
-  var done = st.done || {}, rag = st.rag || {};
-  var signedIn = !!load("hsc-owner", null);
-  var n = Object.keys(done).length;
-  var returning = n > 0 || (st.subjects && st.subjects.length) || Object.keys(rag).length > 0 || signedIn;
-
+  var all = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
   if (accounts) {
-    $("cta-note").textContent = "Free, with no account needed. Sign in to keep your ticks on every device.";
-    $("fact-sync").lastChild.textContent = "Sign in and your ticks, marks and lights follow you to every device.";
-    if (!signedIn) { $("signin").hidden = false; $("nav-signin").hidden = false; }
+    // "Get started" opens the tracker with Create account showing; closing it carries on without one
+    all("[data-start]").forEach(function (a) { a.href = "tracker#signup"; });
+    document.querySelector("[data-sync] span").textContent = "Sign in and your ticks, marks and lights follow you to every device.";
+    document.querySelector("[data-q-acct]").textContent = "No. You can start straight away and your ticks save in this browser. Create a free account to keep them on every device.";
+  } else {
+    // Without accounts set up there's nothing to sign in to
+    all("[data-acct]").forEach(function (el) { el.hidden = true; });
   }
-  if (!returning) return;
-
-  // Returning student: straight back to their tracker
-  ["go", "go-2"].forEach(function (id) { $(id).textContent = "Open your tracker"; });
-  $("cta-note").hidden = true;
-  $("how-link").hidden = true;
-  $("back").hidden = false;
-  $("back-who").hidden = !signedIn;
-  var weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10), wk = 0;
-  for (var id in done) if (done[id] >= weekAgo) wk++;
-  var subs = st.subjects && st.subjects.length ? st.subjects.length : 4;
-  function num(v, label) { var s = document.createElement("span"), b = document.createElement("b"); b.textContent = v; s.append(b, label); return s; }
-  $("back-nums").replaceChildren(num(n, n === 1 ? "paper done" : "papers done"), num(wk, "in the last 7 days"), num(subs, subs === 1 ? "subject" : "subjects"));
-  var c = { r: 0, a: 0, g: 0 }, names = { r: "red", a: "amber", g: "green" }, col = { r: "--tl-r", a: "--tl-a", g: "--tl-g" }, any = false;
-  for (var k in rag) if (c[rag[k]] !== undefined && (!st.subjects || st.subjects.indexOf(k) >= 0)) { c[rag[k]]++; any = true; }
-  if (any) $("back-tl").replaceChildren.apply($("back-tl"), ["r", "a", "g"].map(function (k) {
-    var s = document.createElement("span"), i = document.createElement("i"), b = document.createElement("b");
-    i.style.background = "var(" + col[k] + ")"; b.textContent = c[k]; s.append(i, b, " " + names[k]); return s;
-  }));
-  else $("back-tl").textContent = "No traffic lights set yet. Tap the lights on a subject to add them.";
 })();
 </script>
 </body>
