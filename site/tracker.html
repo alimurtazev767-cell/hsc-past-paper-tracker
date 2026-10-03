@@ -615,6 +615,30 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
   .untag { padding: 0 16px 16px; }
   .syl-note { margin: 16px 16px 0; }
 }
+/* ---- feedback on the thing you just changed ----
+   Re-renders replace the clicked control, so script finds its replacement and adds .just for one run */
+@keyframes pop-on { 0% { transform: scale(.9); } 45% { transform: scale(1.07); } 100% { transform: none; } }
+@keyframes pop-off { 0% { transform: scale(1.04); } 100% { transform: none; } }
+@keyframes ring { 0% { opacity: .7; transform: scale(.6); } 100% { opacity: 0; transform: scale(1.9); } }
+@keyframes ck-in { 0% { transform: scale(0) rotate(-40deg); } 60% { transform: scale(1.25) rotate(8deg); } 100% { transform: none; } }
+@keyframes lamp-on { 0% { transform: scale(.4); } 55% { transform: scale(1.45); } 100% { transform: none; } }
+@keyframes bump { 0% { transform: translateY(5px); opacity: .2; } 100% { transform: none; opacity: 1; } }
+@keyframes row-in { 0% { opacity: 0; transform: translateY(-6px) scale(.98); } 100% { opacity: 1; transform: none; } }
+@keyframes breathe { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.chip.just[aria-pressed="true"] { animation: pop-on .42s cubic-bezier(.2, .9, .3, 1.2); }
+.chip.just[aria-pressed="false"] { animation: pop-off .25s ease-out; }
+.chip.just[aria-pressed="true"]::after { content: ""; position: absolute; inset: -2px; border-radius: inherit; border: 2px solid var(--line); pointer-events: none; animation: ring .55s ease-out forwards; }
+.chip.just[aria-pressed="true"] .ck { animation: ck-in .45s cubic-bezier(.2, .9, .3, 1.3) both; }
+.dl { position: relative; }
+.dl.just[aria-checked="true"] i { animation: lamp-on .4s cubic-bezier(.2, .9, .3, 1.3); box-shadow: inset 0 0 0 2px currentColor, 0 0 12px currentColor; }
+.dl.just[aria-checked="true"]::after { content: ""; position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; border: 2px solid currentColor; pointer-events: none; animation: ring .5s ease-out forwards; }
+.type.just, .ragseg button.just, .card.just, .stn.just .pin, input[type=checkbox].just:checked { animation: pop-on .38s cubic-bezier(.2, .9, .3, 1.2); }
+.bump { display: inline-block; animation: bump .35s cubic-bezier(.2, .9, .3, 1); }
+.task.new { animation: row-in .4s cubic-bezier(.2, .9, .3, 1); }
+.clock-face.on::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--line) 55%, transparent), inset 0 0 40px color-mix(in srgb, var(--line) 22%, transparent); animation: breathe 3.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .just, .just::after, .just i, .just .ck, .bump, .task.new, .clock-face.on::before { animation: none !important; }
+}
 @media (prefers-reduced-motion: reduce) {
   .swap .view, .swap .cards { animation: none; }
   *, *::before { transition: none !important; }
@@ -839,6 +863,23 @@ function keepFocus(fn) {
   if (sel && (!document.activeElement || document.activeElement === document.body)) document.querySelector(sel)?.focus({ preventScroll: true });
 }
 
+// Feedback for the thing you just changed. The click usually re-renders, which swaps in a new copy of the
+// control, so look it up again by its key after the render and play a one-off animation on it.
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-key], [data-id], input[type=checkbox][id]"); if (!t) return;
+  const sel = t.dataset.key ? '[data-key="' + CSS.escape(t.dataset.key) + '"]' : t.dataset.id ? '[data-id="' + CSS.escape(t.dataset.id) + '"]' : "#" + CSS.escape(t.id);
+  setTimeout(() => {
+    const n = document.querySelector("#view " + sel + ", #cards " + sel + ", " + sel); if (!n) return;
+    n.classList.remove("just"); void n.offsetWidth; n.classList.add("just");
+    setTimeout(() => n.classList.remove("just"), 700);
+  }, 0);
+});
+// Numbers in the header and tab counts slide up when they change
+function bumpChanged(before, mode) {
+  if (mode !== ui.mode) return;
+  document.querySelectorAll("#stats b, #mode-seg .tn").forEach((b, i) => { if (before[i] != null && before[i] !== b.textContent && b.textContent) { b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); } });
+}
+
 /* ---------- render ---------- */
 // The open tab's chrome capsule follows the pressed button; counts on each tab stay live
 function moveThumb() {
@@ -854,6 +895,10 @@ function renderTabCounts() {
   moveThumb();
 }
 function renderStats() {
+  const before = [...document.querySelectorAll("#stats b, #mode-seg .tn")].map(b => b.textContent), mode = ui.mode;
+  renderStatsNow(); bumpChanged(before, mode);
+}
+function renderStatsNow() {
   renderTabCounts();
   if (ui.mode === "syl") return renderSylStats();
   if (ui.mode === "timer") return renderTimerStats();
@@ -1670,7 +1715,7 @@ function drawTimerView() {
       el("div", { class: "vtitle" }, el("div", { class: "vname" }, badge(id, nameOf(id), true), el("h2", { id: "v-t" }, nameOf(id))),
         el("span", { class: "sub" }, fmtMins(todayM) + " today · " + fmtMins(weekM) + " this week")),
       el("div", { class: "clock-wrap" },
-        el("div", { class: "clock-face" },
+        el("div", { class: "clock-face" + (running ? " on" : "") },
           el("span", { id: "clock", class: "clock", role: "timer" }, clockText()),
           el("span", { class: "clock-sub" }, active ? (running ? (timer.target ? "left in your " + timer.target + " min block" : "studied so far") : "paused") : (timer.target ? timer.target + " min focus block" : "counts up until you finish")),
           timer.target ? el("span", { class: "clock-bar", "aria-hidden": "true" }, el("span", { style: "width:" + Math.min(100, 100 * elapsed() / (timer.target * 60000)) + "%" })) : null),
@@ -1713,7 +1758,7 @@ function tasksPanel(id, ids) {
   const done = mine.filter(x => x.done).sort((a, b) => b.done.localeCompare(a.done));
   const txt = el("input", { id: "task-t", type: "text", maxlength: "120", placeholder: "e.g. Finish AT1 practice paper", "aria-label": "New task for " + nameOf(id) });
   const due = el("input", { id: "task-d", type: "date", "aria-label": "Due date (optional)" });
-  const row = x => el("li", { class: "task" + (x.done ? " is-done" : "") + (!x.done && x.due && daysTo(x.due) < 0 ? " late" : ""), style: lineStyle(x.s, ids) },
+  const row = x => el("li", { class: "task" + (x.done ? " is-done" : "") + (x.id === ui.newTask ? " new" : "") + (!x.done && x.due && daysTo(x.due) < 0 ? " late" : ""), style: lineStyle(x.s, ids) },
     el("input", { type: "checkbox", id: "tk-" + x.id, checked: !!x.done, onchange: () => toggleTask(x) }),
     el("label", { for: "tk-" + x.id, class: "tk-t" }, x.t, el("span", { class: "tk-meta" }, (ui.taskAll ? nameOf(x.s) + (x.due || x.done ? " · " : "") : "") + (x.done ? "done " + fmtLong(x.done) : x.due ? dueText(x.due) : ""))),
     el("button", { type: "button", class: "linkbtn tk-x", "data-key": "tkx-" + x.id, "aria-label": "Delete task: " + x.t, onclick: () => removeTask(x) }, "Delete"));
@@ -1724,7 +1769,7 @@ function tasksPanel(id, ids) {
       e.preventDefault(); const t = txt.value.trim();
       if (!t) { txt.focus(); txt.setAttribute("aria-invalid", "true"); announce("Type a task first"); return; }
       const x = { id: Date.now().toString(36), s: id, t }; if (due.value) x.due = due.value;
-      state.tasks = (state.tasks || []).concat(x); persist(); refresh();
+      state.tasks = (state.tasks || []).concat(x); ui.newTask = x.id; persist(); refresh(); ui.newTask = null;
       requestAnimationFrame(() => document.getElementById("task-t")?.focus());
       toast("Added task for " + nameOf(id), () => { state.tasks = state.tasks.filter(y => y.id !== x.id); persist(); refresh(); });
     } }, txt, el("div", { class: "task-add-row" }, due, el("button", { class: "btn", type: "submit" }, "Add task"))),
