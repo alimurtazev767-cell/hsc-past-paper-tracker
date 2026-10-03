@@ -240,7 +240,7 @@ footer.notes a { color: #fff; text-decoration: underline; text-underline-offset:
       <a class="appear" href="#r3-t" style="--a:in-soft;--d:.52s">Study timer</a>
     </nav>
     <div class="head-cta appear" style="--a:in-scale;--d:.34s">
-      <a class="btn ghost-sm" href="tracker#signin" id="nav-signin" hidden>Sign in</a>
+      <a class="btn ghost-sm" href="tracker#signup" id="nav-signin" hidden>Sign up</a>
       <a class="btn primary" href="tracker" id="nav-open">Open tracker</a>
     </div>
   </header>
@@ -260,7 +260,7 @@ footer.notes a { color: #fff; text-decoration: underline; text-underline-offset:
       </div>
       <div class="actions">
         <a class="btn primary big appear" href="tracker" id="go" style="--a:in-btn;--d:.96s">Get started</a>
-        <a class="btn big appear" href="tracker#signin" id="signin" hidden style="--a:in-side;--d:1.04s">Sign in</a>
+        <a class="btn big appear" href="tracker#signup" id="signin" hidden style="--a:in-side;--d:1.04s">Sign up</a>
         <a class="btn big appear" href="#how" id="how-link" style="--a:in-side;--d:1.10s">See how it works</a>
       </div>
       <p class="small appear" id="cta-note" style="--a:in-soft;--d:1.18s">No ads, no account needed. Your ticks save in this browser.</p>
@@ -395,8 +395,8 @@ footer.notes a { color: #fff; text-decoration: underline; text-underline-offset:
   var returning = n > 0 || (st.subjects && st.subjects.length) || Object.keys(rag).length > 0 || signedIn;
 
   if (accounts) {
-    $("cta-note").textContent = "No ads, no account needed. Sign in to keep your ticks on every device.";
-    $("fact-sync").lastChild.textContent = "Sign in and your ticks, marks and lights follow you to every device.";
+    $("cta-note").textContent = "No ads, no account needed. Sign up with a username to keep your ticks on every device.";
+    $("fact-sync").lastChild.textContent = "Sign up and your ticks, marks and lights follow you to every device.";
     if (!signedIn) { $("signin").hidden = false; $("nav-signin").hidden = false; }
   }
   if (!returning) return;

@@ -1899,7 +1899,13 @@ function leaveAccount() {
   renderAcct(); refresh();
 }
 
-const initial = u => ((u && (u.user_metadata?.full_name || u.user_metadata?.name || u.email)) || "?").trim().charAt(0).toUpperCase();
+// Accounts use a username, not an email. Supabase still needs an email-shaped login, so each username
+// becomes <username>@<USER_DOMAIN>. Nothing is ever sent there: "Confirm email" is off in Supabase.
+const USER_DOMAIN = "hsc-past-paper-log-website.vercel.app";
+const USERNAME = /^[a-z0-9_]{3,20}$/;
+const loginFor = name => name.includes("@") ? name : name + "@" + USER_DOMAIN;
+const uname = u => (u && (u.user_metadata?.username || (u.email || "").replace("@" + USER_DOMAIN, ""))) || "";
+const initial = u => ((u && (u.user_metadata?.full_name || u.user_metadata?.name || uname(u))) || "?").trim().charAt(0).toUpperCase();
 const provider = u => (u && u.app_metadata && u.app_metadata.provider) || "email";
 function renderAcct() {
   const b = document.getElementById("acct-btn");
@@ -1909,7 +1915,7 @@ function renderAcct() {
   if (!sbUser) { b.replaceChildren("Sign in"); b.removeAttribute("aria-label"); return; }
   const ok = !/Couldn't/.test(syncMsg);
   b.replaceChildren(el("span", { class: "acct-av", "aria-hidden": "true" }, initial(sbUser)), "Account", el("span", { class: "acct-dot" + (ok ? "" : " warn"), "aria-hidden": "true" }));
-  b.setAttribute("aria-label", "Account, signed in as " + (sbUser.email || "you"));
+  b.setAttribute("aria-label", "Account, signed in as " + (uname(sbUser) || "you"));
 }
 
 /* ----- the sign-in sheet ----- */
@@ -1978,13 +1984,13 @@ function authView(mode, opts) {
   foot();
 
   if (mode === "account") {
-    head("", sbUser.user_metadata?.full_name || "Your account", ["Signed in as ", el("b", {}, sbUser.email || "your account")]);
+    head("", sbUser.user_metadata?.full_name || "Your account", ["Signed in as ", el("b", {}, uname(sbUser) || "your account")]);
     const mark = $("au-mark"); mark.className = "au-mark avatar"; mark.textContent = initial(sbUser);
     const p = provider(sbUser);
     const ok = !/Couldn't/.test(syncMsg);
     body.replaceChildren(
       el("dl", { class: "au-rows" },
-        el("div", {}, el("dt", {}, "Sign-in method"), el("dd", {}, p === "google" ? "Google" : "Email and password")),
+        el("div", {}, el("dt", {}, "Sign-in method"), el("dd", {}, p === "google" ? "Google" : "Username and password")),
         el("div", {}, el("dt", {}, "Papers done"), el("dd", {}, String(Object.keys(state.done).length))),
         el("div", {}, el("dt", {}, "Sync"), el("dd", {}, ok ? (lastSync ? "Up to date, " + lastSync.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" }) : "On") : "Waiting, saved on this device"))),
       el("div", { class: "au-actions" },
@@ -1997,7 +2003,7 @@ function authView(mode, opts) {
   }
   if (mode === "recover" || mode === "changepw") {
     head("key", mode === "recover" ? "Choose a new password" : "Change password",
-      mode === "recover" ? "You opened a password reset link. Pick a new password to finish." : "Pick a new password for " + (sbUser?.email || "your account") + ".");
+      mode === "recover" ? "You opened a password reset link. Pick a new password to finish." : "Pick a new password for " + (uname(sbUser) || "your account") + ".");
     body.replaceChildren(newPwField("New password"));
     setGo("Save password");
     if (mode === "changepw") foot(link("Back", () => authView("account")));
@@ -2030,15 +2036,16 @@ function authView(mode, opts) {
   body.replaceChildren(...[
     CFG.google ? el("button", { type: "button", class: "btn au-google", onclick: google }, el("span", { html: ICON.google, style: "display:grid" }), "Continue with Google") : null,
     CFG.google ? el("div", { class: "au-or", role: "separator" }, "or") : null,
-    field("Email", { type: "email", id: "au-email", autocomplete: "email", inputmode: "email", required: true, placeholder: "you@example.com", value: authEmail }),
+    field("Username", Object.assign({ type: "text", id: "au-email", autocomplete: "username", autocapitalize: "none", spellcheck: "false", required: true, maxlength: up ? "20" : null, placeholder: up ? "e.g. ali_m" : "", value: authEmail },
+      up ? { hint: "3 to 20 characters: letters, numbers and _" } : {})),
     up ? newPwField("Password")
-       : field("Password", { type: "password", id: "au-pw", autocomplete: "current-password", required: true }, link("Forgot password?", () => { authEmail = val("au-email") || authEmail; authView("reset"); })),
+       : field("Password", { type: "password", id: "au-pw", autocomplete: "current-password", required: true }),
     up ? null : el("p", { class: "au-hint warn", id: "au-caps", hidden: true }, "Caps Lock is on."),
   ].filter(Boolean));
   if (!up) capsWatch($("au-pw"));
   setGo(up ? "Create account" : "Sign in");
-  if (n) foot(el("p", { class: "au-note" }, "The " + n + (n === 1 ? " paper" : " papers") + " you've ticked in this browser will be added to your account."));
-  else if (up) foot(el("p", { class: "au-note" }, "We only use your email to sign you in and to reset your password."));
+  foot(up ? el("p", { class: "au-note" }, "No email needed. There's no way to reset a forgotten password, so keep it somewhere safe.") : null,
+    n ? el("p", { class: "au-note" }, "The " + n + (n === 1 ? " paper" : " papers") + " you've ticked in this browser will be added to your account.") : null);
 }
 
 function openAuth(mode) {
@@ -2059,12 +2066,12 @@ const here = () => location.origin + location.pathname;
 // Turn Supabase's errors into plain English. Codes are from supabase-js v2 (error.code); messages are a fallback for older servers.
 function friendly(err) {
   const c = (err && err.code) || "", m = (err && err.message) || "", s = err && err.status;
-  if (c === "invalid_credentials" || /Invalid login credentials/i.test(m)) return "That email and password don't match. Check for typos, or reset your password.";
+  if (c === "invalid_credentials" || /Invalid login credentials/i.test(m)) return "That username and password don't match. Check for typos.";
   if (c === "email_not_confirmed" || /Email not confirmed/i.test(m)) return ["Confirm your email first: open the link we sent you. ", link("Send it again", () => resend("signup"))];
-  if (c === "user_already_exists" || c === "email_exists" || /already registered|already been registered/i.test(m)) return ["There's already an account with this email. ", link("Sign in instead", () => authView("signin"))];
+  if (c === "user_already_exists" || c === "email_exists" || /already registered|already been registered/i.test(m)) return ["That username is taken. Pick another, or ", link("sign in", () => authView("signin")), " if it's yours."];
   if (c === "same_password" || /should be different/i.test(m)) return "That's already your password. Choose a new one.";
   if (c === "weak_password" || /^Password should/i.test(m)) return "Choose a stronger password. " + (m.replace(/^Password should/i, "It should") || "");
-  if (c === "email_address_invalid" || /invalid format|Unable to validate email/i.test(m)) return "That email address doesn't look right.";
+  if (c === "email_address_invalid" || /invalid format|Unable to validate email/i.test(m)) return "That username doesn't look right.";
   if (c === "signup_disabled" || /Signups not allowed/i.test(m)) return "New accounts are turned off on this site right now.";
   if (/rate|too many/i.test(c + " " + m) || s === 429) return "Too many tries in a short time. Wait a few minutes, then try again.";
   if (c === "otp_expired" || /expired|invalid/i.test(m) && /link|token|otp/i.test(m)) return "That link has expired or was already used. Ask for a new one.";
@@ -2116,10 +2123,14 @@ async function submitAuth(e) {
   if (authMode === "sent" || authMode === "confirm") { authView("signin"); focusFirst(); return; }
   if (authMode === "account") { closeAuth(); return; }
   const email = val("au-email"), pw = $("au-pw")?.value || "";
+  const tabs = authMode === "signin" || authMode === "signup";
+  const name = tabs ? email.toLowerCase() : email;
   if ($("au-email")) {
     authEmail = email;
-    if (!email) return bad("au-email", "Enter your email address.");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad("au-email", "That email address doesn't look right.");
+    if (!email) return bad("au-email", tabs ? "Enter your username." : "Enter your email address.");
+    // Older accounts signed up with an email, so an address still works for signing in
+    if (authMode === "signup" && !USERNAME.test(name)) return bad("au-email", "Usernames are 3 to 20 characters: letters, numbers and _ only.");
+    if (!tabs && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad("au-email", "That email address doesn't look right.");
   }
   if (authMode === "signin" && !pw) return bad("au-pw", "Enter your password.");
   if ((authMode === "signup" || authMode === "recover" || authMode === "changepw") && pw.length < 8) return bad("au-pw", "Use at least 8 characters for your password.");
@@ -2127,16 +2138,19 @@ async function submitAuth(e) {
   busy(true, { signin: "Signing in…", signup: "Creating account…", reset: "Sending…" }[authMode] || "Saving…");
   try {
     if (authMode === "signin") {
-      const { error } = await sb.auth.signInWithPassword({ email, password: pw });
+      const { error } = await sb.auth.signInWithPassword({ email: loginFor(name), password: pw });
       if (error) throw error;
-      closeAuth(); toast("Signed in as " + email);
+      closeAuth(); toast("Signed in as " + name);
     } else if (authMode === "signup") {
-      const { data, error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: here() } });
+      // Check first: with "Confirm email" on, Supabase would mail a confirmation to an address nobody owns
+      const set = await fetch(CFG.supabaseUrl + "/auth/v1/settings", { headers: { apikey: CFG.supabaseKey } }).then(r => r.json()).catch(() => ({}));
+      if (set.mailer_autoconfirm === false) throw { message: "Sign-up isn't fully switched on yet. Try again later." };
+      const { data, error } = await sb.auth.signUp({ email: loginFor(name), password: pw, options: { data: { username: name } } });
       if (error) throw error;
-      // With email confirmation on, Supabase hides whether an address is taken: it answers with a user that has no identities
       if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) throw { code: "user_already_exists" };
-      if (data.session) { closeAuth(); toast("Account created. Your ticks now sync."); }
-      else { resendAt = Date.now() + 60000; authView("confirm"); }
+      // No session means Supabase still has "Confirm email" on, which can't work without a real address
+      if (!data.session) throw { message: "Sign-up isn't fully switched on yet. Try again later." };
+      closeAuth(); toast("Account created. Your ticks now sync.");
     } else if (authMode === "reset") {
       const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: here() });
       if (error) throw error;
