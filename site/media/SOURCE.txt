@@ -1,0 +1,3 @@
+hero.mp4: background loop supplied by the site owner on 3 Oct 2026 (originally at d8j0ntlcm91z4.cloudfront.net/.../hf_20260818_072341_50851634-bbc3-4c33-9acc-7647d4db44aa.mp4).
+Re-encoded here: audio removed, 1600px wide, H.264 CRF 27, faststart.
+hero-poster.jpg: frame 45 of hero.mp4, shown while the video loads and for reduced-motion visitors.
