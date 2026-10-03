@@ -1511,6 +1511,8 @@ async function setMode(m) {
   ui.mode = m; save("hsc-mode", m);
   document.getElementById("mode-seg").dataset.on = m;
   moveThumb(); document.body.classList.remove("swap"); void document.body.offsetWidth; document.body.classList.add("swap");
+  // Only animate the tab switch itself: later re-renders (ticking, typing) must not replay it
+  clearTimeout(setMode.swapT); setMode.swapT = setTimeout(() => document.body.classList.remove("swap"), 600);
   document.querySelectorAll("#mode-seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
   document.body.dataset.mode = m;
   if (m === "timer") {
