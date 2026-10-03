@@ -50,7 +50,7 @@ button, input, select { font: inherit; color: inherit; }
 .section-label > span + span { font-size: 13.5px; font-weight: 600; color: var(--ink-3); }
 html { scrollbar-color: var(--rule-2) transparent; }
 
-/* Header band: navy, like the station sign above the platform */
+/* Header band: brand, stats, account and the tab dock */
 .band { background: var(--band); color: #FFFFFF; border-bottom: 1px solid var(--rule); }
 .band :focus-visible { outline-color: #FFFFFF; }
 .band-in { max-width: 1280px; margin: 0 auto; padding: 20px 16px 0; display: grid; gap: 10px; }
@@ -103,11 +103,12 @@ h1 { font: 600 clamp(1.2rem, 2vw, 1.45rem)/1.1 var(--sans); letter-spacing: -0.0
 .pick-nudge .linkbtn { font-size: 14px; font-weight: 700; color: var(--ink); }
 .subj-head .meta-label { margin: 0; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+@media (min-width: 561px) { .cards:has(> :nth-child(4)) { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); } }
 .cwrap { position: relative; display: grid; min-width: 0; }
 .card { text-align: left; color: var(--ink); border: 1px solid transparent; border-radius: 14px; background: radial-gradient(260px 120px at 0% 0%, color-mix(in srgb, var(--line) 12%, transparent), transparent 70%) padding-box, linear-gradient(var(--panel), var(--panel)) padding-box, linear-gradient(180deg, rgb(255 255 255 / .18), rgb(255 255 255 / .05)) border-box; box-shadow: 0 20px 40px -30px rgb(0 0 0 / .9); padding: 14px 16px 16px; display: grid; grid-template-rows: auto auto auto; align-content: start; gap: 12px; cursor: pointer; min-width: 0; transition: box-shadow .3s ease, transform .3s cubic-bezier(.16, 1, .3, 1); }
 .card:hover { transform: translateY(-2px); box-shadow: 0 24px 44px -26px rgb(0 0 0 / .95), 0 0 0 1px rgb(255 255 255 / .1); }
 .card[aria-current="true"] { background: radial-gradient(300px 140px at 0% 0%, color-mix(in srgb, var(--line) 26%, transparent), transparent 70%) padding-box, linear-gradient(var(--panel), var(--panel)) padding-box, linear-gradient(180deg, var(--line), color-mix(in srgb, var(--line) 25%, transparent)) border-box; box-shadow: 0 0 34px -12px var(--line), 0 20px 40px -30px rgb(0 0 0 / .9); }
-.chead { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 40px; padding-right: 54px; }
+.chead { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 40px; }
 .card .cname { font: 600 15px/1.25 var(--sans); min-width: 0; }
 .card .line { display: flex; align-items: center; gap: 10px; }
 .mroute { flex: 1; display: flex; align-items: center; justify-content: space-between; position: relative; height: 14px; }
@@ -117,11 +118,12 @@ h1 { font: 600 clamp(1.2rem, 2vw, 1.45rem)/1.1 var(--sans); letter-spacing: -0.0
 .mroute i.next { width: 14px; height: 14px; box-shadow: inset 0 0 0 3.5px var(--line); }
 .cnext { font-size: 13.5px; font-weight: 700; white-space: nowrap; }
 .card .cnum b { color: var(--ink); }
+.card[aria-current="true"] .cnum { color: var(--ink-2); }
 .card .line .meter { flex: 1; background: linear-gradient(color-mix(in srgb, var(--line) 40%, transparent), color-mix(in srgb, var(--line) 40%, transparent)) center / 100% 2px no-repeat; }
 .card .frac { font-size: 12.5px; color: var(--ink-3); }
 .card .cnum { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 8px; min-height: 1.4em; font-size: 12.5px; color: var(--ink-3); }
 
-/* Meter as a line under construction: thin planned track, solid built line in the subject's colour */
+/* Meter: a thin track with the filled part in the subject's colour */
 .meter { height: 8px; border-radius: 999px; background: linear-gradient(var(--rule-2), var(--rule-2)) center / 100% 2px no-repeat; overflow: hidden; }
 .meter > span { display: block; height: 100%; border-radius: inherit; background: var(--line); }
 
@@ -151,7 +153,7 @@ h2 em, .meta-label em { font-family: var(--serif); font-style: italic; font-weig
 /* The selected stop: your own assessment, its practice and its modules */
 .stop { display: grid; gap: 10px; padding: 14px 18px; border-radius: 12px; background: linear-gradient(180deg, rgb(255 255 255 / .045), rgb(255 255 255 / .015)); border: 1px solid var(--rule); box-shadow: inset 0 1px 0 rgb(255 255 255 / .05); margin-top: 4px; }
 .sp-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; }
-.sp-head h3 { margin: 0; font: 700 16px/1.3 var(--sans); display: flex; align-items: center; gap: 10px; }
+.sp-head h3 { margin: 0; font: 600 16px/1.3 var(--sans); display: flex; align-items: center; gap: 10px; }
 .sp-tag { font-size: 12.5px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--line); color: var(--on); }
 .sp-tag.done { background: var(--ink); color: #000000; }
 .sp-done { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; cursor: pointer; min-height: 36px; }
@@ -203,6 +205,16 @@ h2 em, .meta-label em { font-family: var(--serif); font-style: italic; font-weig
 .controls { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; padding: 0 24px; }
 .controls label { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; font-size: 13.5px; color: var(--ink-2); cursor: pointer; }
 .controls input[type=search] { flex: 1 1 12em; min-width: 0; padding: 7px 10px; min-height: 36px; }
+.filters { position: relative; }
+.filters summary { list-style: none; display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--rule-2); font-size: 13.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+.filters summary::-webkit-details-marker { display: none; }
+.filters summary svg { width: 15px; height: 15px; }
+.filters summary:hover, .filters[open] summary { color: var(--ink); border-color: var(--ink-3); }
+.filters summary .n { font-size: 12px; padding: 0 6px; border-radius: 999px; background: var(--ink); color: #000; }
+.filters-body { position: absolute; z-index: 6; right: 0; top: calc(100% + 6px); width: min(300px, 80vw); display: grid; gap: 4px; padding: 10px 14px 12px; border-radius: 12px; background: #121212; border: 1px solid var(--rule-2); box-shadow: 0 18px 40px -12px rgb(0 0 0 / .9); }
+.filters-body label { display: flex; align-items: center; gap: 8px; min-height: 36px; font-size: 13.5px; color: var(--ink-2); cursor: pointer; }
+.filters-body label select { margin-left: auto; }
+.filters-key { display: flex; align-items: center; gap: 8px; margin: 4px 0 0; padding-top: 8px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-3); }
 .controls input[type=search], form.add input, form.add select, .log .mark { background: var(--panel); border: 1px solid var(--rule-2); border-radius: 8px; color: var(--ink); transition: border-color .15s ease; }
 .controls input[type=search]:hover, form.add input:hover, .log .mark:hover { border-color: var(--ink-3); }
 .controls input[type=search]:focus, form.add input:focus, .log .mark:focus { border-color: var(--ink); }
@@ -220,7 +232,7 @@ input[type=checkbox] { accent-color: var(--ink); width: 16px; height: 16px; }
 /* Paper lists: chips snap to timetable columns */
 .section-label { padding: 22px 24px 8px; display: flex; justify-content: space-between; gap: 8px; }
 .yrow + .section-label, .srow + .section-label, .chips + .section-label { border-top: 1px solid var(--rule); margin-top: 6px; }
-.section-note { margin: -2px 24px 6px; font-size: 13px; color: var(--ink-2); }
+.section-note { margin: -2px 24px 6px; max-width: 72ch; font-size: 13px; color: var(--ink-2); }
 .yrow { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 10px 24px; border-top: 1px solid var(--rule); align-items: start; }
 .yrow:first-of-type { border-top: 0; }
 .ylab { display: grid; padding-top: 6px; }
@@ -233,7 +245,7 @@ input[type=checkbox] { accent-color: var(--ink); width: 16px; height: 16px; }
 .sl-l { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; }
 .pick-school { display: inline-flex; align-items: center; gap: 8px; font: 500 14px var(--sans); color: var(--ink-2); }
 .getpapers { padding: 16px 20px 18px; border-top: 1px solid var(--rule); display: grid; gap: 8px; }
-.getpapers .meta-label { margin: 0; }
+.getpapers .meta-label, .log .getpapers h3.meta-label { margin: 0; padding: 0; }
 .pick-school label { font-weight: 600; color: var(--ink); }
 .pick-school select { min-height: 34px; padding: 4px 8px; border: 1px solid var(--rule-2); border-radius: 8px; background: var(--panel); color: var(--ink); max-width: 18em; }
 .pick-school .hint { font-size: 13px; color: var(--ink-3); }
@@ -309,10 +321,12 @@ footer.notes a { color: var(--ink); text-underline-offset: 2px; }
 footer.notes summary { cursor: pointer; width: fit-content; }
 footer.notes summary:hover { color: var(--ink); }
 footer.notes details p { margin: 8px 0 0; }
-.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); transform: translateX(-50%); background: var(--chrome); color: #000000; padding: 10px 14px; border-radius: 10px; font-size: 14px; display: flex; gap: 12px; align-items: center; box-shadow: 0 10px 24px -10px rgb(0 0 0 / .4); }
+.toast { max-width: calc(100vw - 32px); flex-wrap: wrap; position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); transform: translateX(-50%); background: var(--chrome); color: #000000; padding: 10px 14px; border-radius: 10px; font-size: 14px; display: flex; gap: 12px; align-items: center; box-shadow: 0 10px 24px -10px rgb(0 0 0 / .4); }
 .toast kbd { font: 600 12px var(--sans); color: #555; }
 .toast button { background: none; border: 0; color: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; padding: 0; }
 .toast :focus-visible { outline-color: #000000; }
+.tmark-f { display: inline-flex; align-items: center; gap: 8px; }
+.tmark { width: 7.5em; padding: 4px 8px; border-radius: 6px; border: 1px solid rgb(0 0 0 / .35); background: rgb(255 255 255 / .7); color: #000; font: 600 13.5px var(--sans); }
 
 .chip:active, .type:active, .card:active, .btn:active { transform: scale(.98); }
 
@@ -339,11 +353,12 @@ footer.notes details p { margin: 8px 0 0; }
 .cnext.live { padding: 1px 8px; border-radius: 999px; background: var(--line); color: var(--on); font-size: 12.5px; }
 .cal { padding: 18px 24px 24px; border-top: 1px solid var(--rule); }
 .cal-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 12px; }
-.cal-head h3 { margin: 0; font: 800 1.2rem/1.2 var(--sans); }
+.cal-head h3 { margin: 0; font: 600 1.15rem/1.2 var(--sans); letter-spacing: -0.02em; }
 .cal-sum { font-size: 13.5px; color: var(--ink-2); margin-right: auto; }
 .cal-nav { display: flex; gap: 6px; }
 .cal-nav .btn { min-height: 34px; padding: 4px 12px; }
 .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal-more { margin-top: 10px; }
 .cal-w { font-size: 12.5px; font-weight: 700; color: var(--ink-3); padding: 0 6px 4px; }
 .cal-day { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-height: 84px; padding: 6px 7px 8px; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); color: var(--ink); text-align: left; cursor: pointer; min-width: 0; }
 .cal-day:hover { border-color: var(--ink-3); }
@@ -393,12 +408,13 @@ footer.notes details p { margin: 8px 0 0; }
 .day-tasks { border-top: 0 !important; }
 .weekly { padding: 18px 24px 20px; border-top: 1px solid var(--rule); display: grid; gap: 12px; }
 .wk-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; }
-.wk-head h3 { margin: 0; font: 800 1.2rem/1.2 var(--sans); }
+.wk-head h3 { margin: 0; font: 600 1.15rem/1.2 var(--sans); letter-spacing: -0.02em; }
 .wk-goal { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
 .wk-goal input { width: 4.5em; min-height: 34px; padding: 4px 8px; border: 1px solid var(--rule-2); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 14px; }
 .wk-goal span { font-weight: 500; }
 .wk-now { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 14.5px; color: var(--ink-2); }
-.wk-now b { font-size: 22px; font-weight: 800; color: var(--ink); }
+.wk-now b { font-size: 22px; font-weight: 600; color: var(--ink); }
+.wk-empty { margin: 0; padding: 14px 16px; border-radius: 10px; border: 1px dashed var(--rule-2); font-size: 14px; color: var(--ink-2); }
 .wk-meter { flex: 1 1 160px; max-width: 320px; height: 8px; border-radius: 999px; background: var(--well); border: 1px solid var(--rule); overflow: hidden; }
 .wk-meter > span { display: block; height: 100%; background: var(--chrome); border-radius: inherit; }
 .wk-left { font-weight: 600; color: var(--ink); }
@@ -496,22 +512,17 @@ footer.notes details p { margin: 8px 0 0; }
 .rag-sum { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; font-size: 13.5px; color: var(--ink-2); }
 .rsum { display: inline-flex; align-items: center; gap: 6px; }
 .rsum b { font-weight: 700; color: var(--ink); }
-.rsum i, .ragseg i { width: 9px; height: 9px; border-radius: 50%; background: var(--rule-2); flex: none; }
+.rsum i, .ragseg i, .ctag i { width: 9px; height: 9px; border-radius: 50%; background: var(--rule-2); flex: none; }
 .rs-r i { background: var(--tl-r) !important; } .rs-a i { background: var(--tl-a) !important; } .rs-g i { background: var(--tl-g) !important; }
-.rag { position: absolute; top: 12px; right: 10px; z-index: 1; border: 0; background: transparent; padding: 6px; margin: 0; border-radius: 10px; cursor: pointer; display: grid; place-items: center; }
-.lights { display: inline-flex; gap: 4px; padding: 4px 6px; border-radius: 999px; background: #1A1A1A; box-shadow: inset 0 0 0 1px var(--rule); transition: transform .1s ease-out, box-shadow .15s ease; }
-.rag:hover .lights { box-shadow: 0 0 0 2px var(--rule-2); }
-.rag:active .lights { transform: scale(.92); }
-.lights i { width: 8px; height: 8px; border-radius: 50%; background: var(--tl-off); transition: background-color .2s ease; }
-.lights .l-r.on { background: #FF5A4E; }
-.lights .l-a.on { background: #FFB020; }
-.lights .l-g.on { background: #34D27A; }
+.ctag { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--ink); background: #1A1A1A; box-shadow: inset 0 0 0 1px var(--rule); white-space: nowrap; }
+.ctag i { width: 7px; height: 7px; border-radius: 50%; flex: none; }
 .conf { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .conf-l { font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
 .ragseg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--well); border: 1px solid var(--rule); }
 .ragseg button { display: inline-flex; align-items: center; gap: 7px; border: 0; background: transparent; color: var(--ink-2); font-size: 13.5px; font-weight: 600; padding: 5px 11px; min-height: 32px; border-radius: 6px; cursor: pointer; transition: background-color .15s ease, color .15s ease; }
 .ragseg button:hover { color: var(--ink); }
-.ragseg button[aria-pressed="true"] { background: #2A2A2A; color: #FFFFFF; box-shadow: inset 0 1px 0 rgb(255 255 255 / .1); }
+.ragseg button[aria-pressed="true"] { --c: var(--tl-g); background: color-mix(in srgb, var(--c) 20%, #141414); color: #FFFFFF; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 60%, transparent), 0 0 14px -4px color-mix(in srgb, var(--c) 55%, transparent); }
+.ragseg button.rs-r[aria-pressed="true"] { --c: var(--tl-r); } .ragseg button.rs-a[aria-pressed="true"] { --c: var(--tl-a); }
 .conf-hint { font-size: 13px; color: var(--ink-2); }
 .home-btn svg { width: 16px; height: 16px; }
 
@@ -522,9 +533,10 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
 .mod:first-of-type { border-top: 0; }
 .mhead { display: grid; gap: 10px; margin-bottom: 12px; }
 .mtitle { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; }
-.mtitle h3 { font: 700 1.1rem/1.3 var(--sans); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.mtitle h3 { font: 600 1.15rem/1.3 var(--sans); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
 .mcount { font-size: 13px; color: var(--ink-3); }
 .mctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.btn.mall { min-height: 32px; padding: 4px 12px; font-size: 13px; }
 .mterm select, .urow select { padding: 5px 10px; min-height: 34px; border-radius: 8px; background: var(--panel); border: 1px solid var(--rule-2); color: var(--ink); font-size: 13.5px; }
 .mterm select:hover, .urow select:hover { border-color: var(--ink-3); }
 .grp + .grp { margin-top: 14px; }
@@ -542,7 +554,7 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
 .dl[aria-pressed="true"]:hover i { transform: none; }
 .band .dl:focus-visible, .dl:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .optpick { margin: 18px 24px 4px; padding: 16px 18px; border-radius: 12px; background: var(--well); border: 1px solid var(--rule); display: grid; gap: 12px; }
-.optpick h3 { margin: 0; font: 700 16px var(--sans); }
+.optpick h3 { margin: 0; font: 600 16px var(--sans); }
 .optpick > p { margin: 0; font-size: 14px; color: var(--ink-2); max-width: 70ch; }
 .optrow { display: grid; gap: 8px; }
 .optlab { margin: 0; font-size: 13.5px; font-weight: 700; }
@@ -550,7 +562,7 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
 .optchips { display: flex; flex-wrap: wrap; gap: 6px; }
 .optchips .type { flex: 0 1 auto; max-width: 100%; white-space: normal; text-align: left; border-color: var(--rule); }
 .firstrun { margin: 18px 24px 4px; padding: 16px 18px; border-radius: 10px; background: var(--well); border: 1px solid var(--rule); display: grid; gap: 10px; }
-.firstrun h3 { margin: 0; font: 700 16px var(--sans); }
+.firstrun h3 { margin: 0; font: 600 16px var(--sans); }
 .firstrun p { margin: 0; font-size: 14px; color: var(--ink-2); max-width: 70ch; }
 .firstrun .untag { padding: 0; }
 .dp-t { min-width: 0; overflow-wrap: anywhere; text-wrap: pretty; }
@@ -584,7 +596,6 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
 @media (pointer: coarse) {
   .chip, .type, .btn, .controls input[type=search], .controls label, .opts-row label, .ragseg button, .mterm select, .urow select, .dl { min-height: 44px; }
   .dl { min-width: 44px; }
-  .rag { top: 8px; right: 6px; padding: 10px; }
 }
 @media (max-width: 860px) {
   .view { grid-template-columns: minmax(0, 1fr); }
@@ -650,7 +661,7 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
 @media (prefers-reduced-motion: reduce) {
   .swap .view, .swap .cards { animation: none; }
   *, *::before { transition: none !important; }
-  .chip:active, .type:active, .card:active, .btn:active, .rag:active .lights { transform: none; }
+  .chip:active, .type:active, .card:active, .btn:active { transform: none; }
   dialog[open], dialog[open]::backdrop { animation: none; }
   .au-go .spin { animation-duration: 2s; }
 }
@@ -671,7 +682,7 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
         <button class="btn acct-btn" type="button" id="acct-btn" hidden>Sign in</button>
       </div>
     </div>
-    <div class="seg mode-seg" id="mode-seg" role="group" aria-label="What to track" data-on="papers"><span class="thumb" aria-hidden="true"></span><button type="button" data-mode="papers" aria-pressed="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.8h6.2L15.5 6v10.2a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3.8a1 1 0 0 1 1-1z"/><path d="M12 2.8V6h3.5M7.8 10.5l1.6 1.6 3.2-3.4"/></svg><span class="tl">Past papers</span><span class="tn" id="tn-papers"></span></button><button type="button" data-mode="syl" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="4.6" cy="5.5" r="1.6"/><circle cx="4.6" cy="10" r="1.6"/><circle cx="4.6" cy="14.5" r="1.6"/><path d="M8.8 5.5h7.4M8.8 10h7.4M8.8 14.5h5"/></svg><span class="tl">Syllabus</span><span class="tn" id="tn-syl"></span></button><button type="button" data-mode="timer" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="11" r="6.4"/><path d="M10 7.6V11l2.2 1.6M8 2.6h4"/></svg><span class="tl">Study timer</span><span class="tn" id="tn-timer"></span></button></div>
+    <div class="seg mode-seg" id="mode-seg" role="group" aria-label="What to track" data-on="papers"><span class="thumb" aria-hidden="true"></span><button type="button" data-mode="papers" aria-pressed="true" aria-keyshortcuts="1" title="Past papers (press 1)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.8h6.2L15.5 6v10.2a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3.8a1 1 0 0 1 1-1z"/><path d="M12 2.8V6h3.5M7.8 10.5l1.6 1.6 3.2-3.4"/></svg><span class="tl">Past papers</span><span class="tn" id="tn-papers"></span></button><button type="button" data-mode="syl" aria-pressed="false" aria-keyshortcuts="2" title="Syllabus (press 2)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="4.6" cy="5.5" r="1.6"/><circle cx="4.6" cy="10" r="1.6"/><circle cx="4.6" cy="14.5" r="1.6"/><path d="M8.8 5.5h7.4M8.8 10h7.4M8.8 14.5h5"/></svg><span class="tl">Syllabus</span><span class="tn" id="tn-syl"></span></button><button type="button" data-mode="timer" aria-pressed="false" aria-keyshortcuts="3" title="Study timer (press 3)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="11" r="6.4"/><path d="M10 7.6V11l2.2 1.6M8 2.6h4"/></svg><span class="tl">Study timer</span><span class="tn" id="tn-timer"></span></button></div>
   </div>
 </header>
 
@@ -838,11 +849,13 @@ const today = () => { const d = new Date(); return d.getFullYear() + "-" + Strin
 const fmtDate = d => new Date(d + "T00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short" });
 let toastTimer = null, lastUndo = null;
 function announce(msg) { const l = document.getElementById("live"); if (l) { l.textContent = ""; setTimeout(() => { l.textContent = msg; }, 30); } }
-function toast(msg, undo) {
+// act: an optional second action, { label, run(toast, button) }, e.g. adding a mark straight after a tick
+function toast(msg, undo, act) {
   announce(msg + (undo ? ". Undo with Control Z." : ""));
   document.querySelector(".toast")?.remove(); clearTimeout(toastTimer);
   const doUndo = () => { lastUndo = null; t.remove(); undo(); announce("Undone"); };
   const t = el("div", { class: "toast" }, msg,
+    act ? el("button", { type: "button", onclick: e => act.run(t, e.currentTarget) }, act.label) : null,
     undo ? el("button", { type: "button", onclick: doUndo }, "Undo") : null,
     undo ? el("kbd", { "aria-hidden": "true" }, /Mac|iP/.test(navigator.platform) ? "\u2318Z" : "Ctrl+Z") : null);
   lastUndo = undo ? doUndo : null;
@@ -856,6 +869,10 @@ function toast(msg, undo) {
 document.addEventListener("keydown", e => {
   if (e.key === "/" && !e.metaKey && !e.ctrlKey && !(e.target instanceof Element && e.target.closest("input, select, textarea, dialog"))) {
     const q = document.getElementById(ui.mode === "syl" ? "sq" : "q"); if (q) { e.preventDefault(); q.focus(); } return;
+  }
+  // 1, 2 and 3 switch between Past papers, Syllabus and Study timer
+  if (["1", "2", "3"].includes(e.key) && !e.metaKey && !e.ctrlKey && !e.altKey && !(e.target instanceof Element && e.target.closest("input, select, textarea, dialog, [contenteditable]"))) {
+    const m = ["papers", "syl", "timer"][+e.key - 1]; if (ui.mode !== m) { e.preventDefault(); setMode(m); } return;
   }
   if (!lastUndo || e.key.toLowerCase() !== "z" || !(e.metaKey || e.ctrlKey) || e.shiftKey) return;
   if (e.target instanceof Element && e.target.closest("input, select, textarea, dialog")) return;
@@ -931,13 +948,13 @@ function setRag(id, c) {
   persist(); refresh();
   toast(short(SUB[id].name) + ": " + (c ? RAG_NAME[c] + ", " + RAG_MEAN[c].toLowerCase() : "light cleared"), () => setRag(id, was));
 }
-const cycleRag = id => { const c = ragOf(id); setRag(id, c === null ? "r" : c === "r" ? "a" : c === "a" ? "g" : null); };
-const ragLights = (c, sug) => el("span", { class: "lights", "aria-hidden": "true" }, RAG.map(k => el("i", { class: "l-" + k + (c === k ? " on" : "") + (!c && sug === k ? " sug" : "") })));
+// The card shows the subject's light as words, so it never relies on colour alone. It's set in the subject's Confidence switch.
+const confTag = c => c ? el("span", { class: "ctag rs-" + c }, el("i", { "aria-hidden": "true" }), RAG_MEAN[c]) : null;
 function renderRagSum() {
   const ids = subjects(), n = { r: 0, a: 0, g: 0 }; let none = 0;
   ids.forEach(id => { const c = ragOf(id); if (c) n[c]++; else none++; });
   const box = document.getElementById("rag-sum");
-  if (none === ids.length) { box.replaceChildren(el("span", {}, "Use the lights on a subject to rate how confident you feel")); return; }
+  if (none === ids.length) { box.replaceChildren(el("span", {}, "Rate how confident you feel in each subject with its Confidence switch")); return; }
   box.replaceChildren(...RAG.map(k => el("span", { class: "rsum rs-" + k }, el("i", { "aria-hidden": "true" }), el("b", {}, String(n[k])), " " + RAG_NAME[k].toLowerCase())),
     none ? el("span", { class: "rsum" }, el("b", {}, String(none)), " not set") : "");
 }
@@ -952,12 +969,11 @@ function renderCards() {
     const s = SUB[id], x = tally(id, "all"), nx = nextStop(id);
     const wk = allOf(id).filter(pp => state.done[pp.id] && state.done[pp.id] >= weekAgo()).length;
     const c = ragOf(id);
-    const says = c ? RAG_NAME[c] + ", " + RAG_MEAN[c].toLowerCase() : "not set";
     return el("div", { class: "cwrap", style: lineStyle(id, ids) }, el("button", { class: "card", type: "button", "data-key": "card-" + id, "aria-current": String(id === ui.active), onclick: () => openSubject(id) },
-      el("span", { class: "chead" }, badge(id, short(s.name)), el("span", { class: "cname" }, short(s.name))),
-      el("span", { class: "line" }, miniRoute(id), el("span", { class: "cnext" }, nx ? "Next: " + nx.name : "All stops passed")),
+      el("span", { class: "chead" }, badge(id, short(s.name)), el("span", { class: "cname" }, short(s.name)), confTag(c)),
+      el("span", { class: "line" }, miniRoute(id), el("span", { class: "cnext" }, nextShort(nx))),
       el("span", { class: "cnum" }, el("span", {}, el("b", {}, String(x.allDone)), x.allDone === 1 ? " paper done" : " papers done", wk ? " \u00b7 " + wk + " this week" : ""), x.avg != null ? el("span", {}, "avg " + x.avg) : null)),
-      el("button", { class: "rag", type: "button", "data-key": "rag-" + id, title: "Confidence: " + says + ". Select to change.", "aria-label": "How confident you feel in " + s.name + ": " + says + ". Select to change.", onclick: () => cycleRag(id) }, ragLights(c)));
+      );
   });
   document.getElementById("cards").replaceChildren(...cards);
   renderRagSum();
@@ -981,7 +997,20 @@ function toggle(p) {
   if (was) delete state.done[p.id]; else state.done[p.id] = today();
   persist(); refresh();
   toast((was ? "Unticked " : "Ticked ") + p.name + (p.kind === "trial" && !/trial/i.test(p.name) ? " Trial" : ""), () => { if (was) state.done[p.id] = was; else delete state.done[p.id]; persist(); refresh();
-    document.querySelector('#view .chip[data-id="' + CSS.escape(p.id) + '"]')?.focus({ preventScroll: true }); });
+    document.querySelector('#view .chip[data-id="' + CSS.escape(p.id) + '"]')?.focus({ preventScroll: true }); },
+    was ? null : { label: "Add mark", run: (t, btn) => markInToast(t, btn, p) });
+}
+// The mark goes in right where the tick happened, rather than in the Completed list across the page
+function markInToast(t, btn, p) {
+  const i = el("input", { class: "tmark", type: "text", inputmode: "decimal", maxlength: "12", placeholder: "e.g. 38/45", "aria-label": "Mark for " + p.name, value: state.marks[p.id] || "",
+    onkeydown: e => { if (e.key === "Escape") { e.preventDefault(); t.remove(); } } });
+  const f = el("form", { class: "tmark-f", onsubmit: e => {
+    e.preventDefault(); const v = i.value.trim(); t.remove();
+    if (!v) return;
+    const was = state.marks[p.id]; state.marks[p.id] = v; persist(); refresh();
+    toast("Mark " + v + " saved for " + p.name, () => { if (was) state.marks[p.id] = was; else delete state.marks[p.id]; persist(); refresh(); });
+  } }, i, el("button", { type: "submit" }, "Save"));
+  btn.replaceWith(f); i.focus();
 }
 
 function yearRows(list, fromY, labelFor) {
@@ -1013,7 +1042,7 @@ function schoolRows(list, fromY, mixed) {
   return [...by.keys()].sort((a, b) => (b === state.school) - (a === state.school) || a.localeCompare(b)).map(k => {
     const ps = by.get(k).sort((a, b) => (b.year - a.year) || a.kind.localeCompare(b.kind) || a.name.localeCompare(b.name));
     const d = ps.filter(p => state.done[p.id]).length;
-    return el("div", { class: "srow" },
+    return el("div", { class: "srow", role: "group", "aria-label": k + ", " + d + " of " + ps.length + " done" },
       el("div", { class: "slab" }, el("b", {}, k, k === state.school ? el("span", { class: "mine" }, "Your school") : null), el("span", {}, d + " of " + ps.length)),
       el("div", { class: "chips" }, ps.map(p => {
         let label = p.year ? String(p.year) : p.chip;
@@ -1061,6 +1090,8 @@ function modulesFor(id, st) {
   return mods.map(m => Object.assign({ m }, modTally(m)));
 }
 const stopWhen = st => st.date ? fmtLong(st.date) : st.when;
+// Card-size next stop: with a date it counts down, so cards tell subjects apart
+const nextShort = nx => { if (!nx) return "All stops passed"; const n = nx.date ? daysTo(nx.date) : null; return nx.name + (n == null || n < 0 ? "" : n === 0 ? " · today" : " · " + n + "d"); };
 const weekAgo = () => new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
 // The route at card size: five stops, filled once sat, the next one ringed
 function miniRoute(id) {
@@ -1094,14 +1125,18 @@ function stopPanel(id, st, isNext) {
   const fy = fromYear(id), minePapers = state.school && papersOf(id) ? allOf(id).filter(pp => pp.kind === st.k && pp.school === state.school).sort((a, b) => b.year - a.year) : [];
   const recent = minePapers.filter(pp => pp.year >= fy), shown = ui.mineAll ? minePapers : recent.slice(0, 8), more = (ui.mineAll ? 0 : minePapers.length - shown.length);
   const pick = papersOf(id) && !SUB[id].comp ? schoolPick(allOf(id).filter(pp => pp.school), "stop") : null;
-  const mine = !state.school ? (pick ? el("div", { class: "sp-row sp-mine" }, el("div", { class: "sp-mine-head" }, pick, el("span", { class: "hint" }, "Pick it to see its past " + PRACTICE_NAME[st.k] + " here."))) : null) : minePapers.length || pick ? el("div", { class: "sp-row sp-mine" }, el("div", { class: "sp-mine-head" }, pick,
+  // No school yet: suggest the one the student has ticked most, instead of making them find it in the list
+  const top = !state.school && papersOf(id) ? Object.entries(allOf(id).filter(pp => pp.school && state.done[pp.id]).reduce((a, pp) => (a[pp.school] = (a[pp.school] || 0) + 1, a), {})).sort((a, b) => b[1] - a[1])[0] : null;
+  const suggest = top && top[1] >= 2 ? el("span", { class: "hint" }, "You've ticked " + top[1] + " " + top[0] + " papers. ",
+    el("button", { type: "button", class: "linkbtn", "data-key": "school-suggest", onclick: () => { state.school = top[0]; persist(); refresh(); announce(top[0] + " is now your school"); } }, "Make it your school")) : null;
+  const mine = !state.school ? (pick ? el("div", { class: "sp-row sp-mine" }, el("div", { class: "sp-mine-head" }, pick, suggest || el("span", { class: "hint" }, "Pick it to see its past " + PRACTICE_NAME[st.k] + " here."))) : null) : minePapers.length || pick ? el("div", { class: "sp-row sp-mine" }, el("div", { class: "sp-mine-head" }, pick,
     minePapers.length ? el("span", { class: "hint" }, "Past " + PRACTICE_NAME[st.k] + (ui.mineAll ? "" : " from " + fy)) : null,
     more > 0 ? el("button", { type: "button", class: "linkbtn", "data-key": "mine-all", onclick: () => { ui.mineAll = true; renderView(); } }, "Show all " + minePapers.length) : null),
     !minePapers.length ? null : shown.length ? el("div", { class: "chips" }, shown.map(pp => chip(Object.assign({}, pp, { chip: pp.year ? String(pp.year) : pp.chip }), fy))) : el("span", { class: "hint" }, "None since " + fy + "."),
     minePapers.length ? null : el("span", { class: "hint" }, state.school + " has no " + PRACTICE_NAME[st.k] + " listed.")) : null;
   const practice = pr ? el("div", { class: "sp-row" },
       el("span", {}, el("b", {}, pr.done + " of " + pr.total), " " + PRACTICE_NAME[st.k] + " done as practice"),
-      pr.total ? el("button", { type: "button", class: "btn", "data-key": "go-" + st.k, onclick: () => showPractice(id, st.k) }, "Show " + PRACTICE_NAME[st.k]) : null)
+      pr.total && (inSyl || ui.type !== st.k) ? el("button", { type: "button", class: "btn", "data-key": "go-" + st.k, onclick: () => showPractice(id, st.k) }, "Show " + PRACTICE_NAME[st.k]) : null)
     : null;
   let modLine = null;
   if (mods) {
@@ -1159,6 +1194,15 @@ function drawView() {
   const fromSel = el("select", { id: "from-year", "aria-label": "Count progress from year", onchange: e => { state.from[id] = +e.target.value; persist(); refresh(); } },
     Array.from({ length: HSC_YEAR - 1 - 2010 + 1 }, (_, i) => HSC_YEAR - 1 - i).map(y => el("option", { value: y, selected: y === fromY }, String(y))));
 
+  // The less-used options live behind one Filters button, with a count of the ones switched on
+  const nOn = (state.from && state.from[id] != null ? 1 : 0) + (ui.all ? 1 : 0) + (ui.solOnly ? 1 : 0);
+  const filters = el("details", { class: "filters", open: ui.filtersOpen || null, ontoggle: e => { ui.filtersOpen = e.target.open; } },
+    el("summary", {}, el("span", { html: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M2.5 4h11M4.5 8h7M6.5 12h3"/></svg>' }), "Filters", nOn ? el("span", { class: "n" }, String(nOn)) : null),
+    el("div", { class: "filters-body" },
+      el("label", { for: "from-year" }, "Count progress from", fromSel),
+      older ? el("label", { for: "all-yrs" }, el("input", { type: "checkbox", id: "all-yrs", checked: ui.all, onchange: e => { ui.all = e.target.checked; save("hsc-all", ui.all); renderView(); } }), "Show older papers (" + older + ")") : null,
+      el("label", { for: "sol-only" }, el("input", { type: "checkbox", id: "sol-only", checked: ui.solOnly, onchange: e => { ui.solOnly = e.target.checked; renderView(); } }), "Only papers with solutions"),
+      el("p", { class: "filters-key" }, el("span", { class: "dot", "aria-hidden": "true" }), "A dot on a paper means it has worked solutions.")));
   const typeBtns = ["all"].concat(TYPES).filter(t => t === "all" || t === ui.type || counts[t] > 0).map(t =>
     el("button", { class: "type", type: "button", "data-key": "type-" + t, "aria-pressed": String(ui.type === t), onclick: () => { ui.type = t; save("hsc-type", t); refresh(); } },
       TYPE_NAME[t], el("span", { class: "n" }, String(t === "all" ? Object.values(counts).reduce((a, b) => a + b, 0) : counts[t]))));
@@ -1219,9 +1263,7 @@ function drawView() {
         [["school", "By school"], ["year", "By year"]].map(([k, t]) => el("button", { type: "button", "data-key": "group-" + k, "aria-pressed": String(ui.group === k), onclick: () => { ui.group = k; save("hsc-group", k); renderView(); } }, t))),
       el("input", { type: "search", id: "q", placeholder: "Search papers ( / )", "aria-label": "Search papers", value: ui.query,
         oninput: e => { ui.query = e.target.value; renderView(); const n = document.getElementById("q"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }),
-      el("label", { for: "from-year" }, "From", fromSel),
-      older ? el("label", { for: "all-yrs" }, el("input", { type: "checkbox", id: "all-yrs", checked: ui.all, onchange: e => { ui.all = e.target.checked; save("hsc-all", ui.all); renderView(); } }), "Older papers (" + older + ")") : null,
-      el("label", { for: "sol-only" }, el("input", { type: "checkbox", id: "sol-only", checked: ui.solOnly, onchange: e => { ui.solOnly = e.target.checked; renderView(); } }), "With solutions", el("span", { class: "dot", "aria-hidden": "true" })))),
+      filters)),
     sections,
     addBox(id),
     DATA[id].failed ? el("p", { class: "empty" }, "The paper list didn't load. Check your connection, then ", el("button", { type: "button", class: "linkbtn", onclick: () => { delete DATA[id]; openSubject(id); } }, "try again"), ".") : null);
@@ -1411,13 +1453,16 @@ const ragMeter = (t, label) => el("div", { class: "meter stack", role: "img", "a
 const ragCounts = t => el("span", { class: "mrag" }, ["g", "a", "r"].map(k => el("span", { class: "rsum rs-" + k }, el("i", { "aria-hidden": "true" }), String(k === "g" ? t.done : t[k]) + " " + RAG_NAME[k].toLowerCase())));
 const pctOf = (a, b) => b ? Math.round(100 * a / b) : 0;
 
+// Before anything is rated, say what there is to do rather than counting zeros
+const rated = t => t.done + t.a + t.r;
+const greenLine = (t, unit = " dot points") => rated(t) ? t.done + " of " + t.total + unit + " green" : t.total + unit + " to rate";
 function renderSylStats() {
   let done = 0, total = 0;
   let rated = 0;
   for (const id of sylSubjects()) { const t = sylTally(id); done += t.done; total += t.total; rated += t.done + t.a + t.r; }
   document.getElementById("stats").replaceChildren(
-    el("span", {}, el("b", {}, String(rated)), rated === 1 ? " dot point rated" : " dot points rated"),
-    el("span", {}, el("b", {}, String(done)), " green"),
+    ...(rated ? [el("span", {}, el("b", {}, String(rated)), rated === 1 ? " dot point rated" : " dot points rated"), el("span", {}, el("b", {}, String(done)), " green")]
+      : [el("span", {}, el("b", {}, String(total)), " dot points to rate")]),
     ...(syncMsg ? [el("span", {}, syncMsg)] : []));
 }
 
@@ -1433,8 +1478,8 @@ function renderSylCards() {
     const s = SYLSUB()[id], x = sylTally(id), nx = nextStop(id);
     return el("div", { class: "cwrap", style: lineStyle(id, sylSubjects()) }, el("button", { class: "card", type: "button", "data-key": "sylcard-" + id, "aria-current": String(id === ui.sylActive), onclick: () => openSyl(id) },
       el("span", { class: "chead" }, badge(id, short(s.name)), el("span", { class: "cname" }, short(s.name))),
-      el("span", { class: "line" }, miniRoute(id), el("span", { class: "cnext" }, nx ? "Next: " + nx.name : "All stops passed")),
-      el("span", { class: "cnum" }, el("span", {}, el("b", {}, String(x.done)), " of " + x.total + " dot points green"))));
+      el("span", { class: "line" }, miniRoute(id), el("span", { class: "cnext" }, nextShort(nx))),
+      el("span", { class: "cnum" }, rated(x) ? el("span", {}, el("b", {}, String(x.done)), " of " + x.total + " dot points green") : el("span", {}, el("b", {}, String(x.total)), " dot points to rate"))));
   });
   document.getElementById("cards").replaceChildren(...cards);
 }
@@ -1497,10 +1542,10 @@ function moduleBlock(m, q) {
   return el("section", { class: "mod", id: "m-" + m.id, "aria-labelledby": "mh-" + m.id },
     el("div", { class: "mhead" },
       el("div", { class: "mtitle" }, el("h3", { id: "mh-" + m.id }, m.name),
-        el("span", { class: "mcount" }, t.done + " of " + t.total + " green")),
-      ragMeter(t, m.name), ragCounts(t),
+        el("span", { class: "mcount" }, greenLine(t, ""))),
+      rated(t) ? ragMeter(t, m.name) : null, rated(t) ? ragCounts(t) : null,
       el("div", { class: "mctl" }, termSelect(m),
-        el("button", { class: "linkbtn", type: "button", "data-key": "modall-" + m.id, onclick: () => setModule(m, t.done < t.total) }, t.done < t.total ? "Make all green" : "Clear module"))),
+        el("button", { class: "btn mall", type: "button", "data-key": "modall-" + m.id, onclick: () => setModule(m, t.done < t.total) }, t.done < t.total ? "Make all green" : "Clear module"))),
     solo ? el("div", { class: "dps" }, dotButton({ id: m.id, t: "This module" })) :
     groups.map(g => el("div", { class: "grp" }, g.h ? el("p", { class: "gh" }, g.h) : null, el("div", { class: "dps" }, g.dots.map(d => dotButton(d, q))))));
 }
@@ -1546,9 +1591,9 @@ function drawSylView() {
 
   const main = el("section", { class: "panel", "aria-labelledby": "v-t" },
     el("div", { class: "vhead" },
-      el("div", { class: "vtitle" }, el("div", { class: "vname" }, badge(id, short(ix.name), true), el("h2", { id: "v-t" }, ix.name)), el("span", { class: "sub" }, x.done + " of " + x.total + " dot points green")),
+      el("div", { class: "vtitle" }, el("div", { class: "vname" }, badge(id, short(ix.name), true), el("h2", { id: "v-t" }, ix.name)), el("span", { class: "sub" }, greenLine(x))),
       routeOf(id),
-      el("div", { class: "vrow" }, ragCounts(x), el("div", { class: "links" }, el("a", { href: d.url, target: "_blank", rel: "noopener" }, d.title + " on NESA")))),
+      el("div", { class: "vrow" }, rated(x) ? ragCounts(x) : el("span", { class: "hint" }, "Nothing rated yet. Start with the module you're learning now."), el("div", { class: "links" }, el("a", { href: d.url, target: "_blank", rel: "noopener" }, d.title + " on NESA")))),
     el("p", { class: "legend" }, "Give each dot point a light: red for needs work, amber for getting there, green for confident. Tag each module with the term you learn it, and it joins that stop on your route."),
     el("div", { class: "toolbar" },
       el("div", { class: "types", role: "group", "aria-label": "Show content learnt up to" }, pills),
@@ -1567,8 +1612,8 @@ function sylSide(d) {
     el("ul", {}, useMods(d.modules).map(m => { const t = modTally(m), p = pctOf(t.done, t.total);
       return el("li", {}, el("button", { type: "button", class: "mjump", "data-key": "jump-" + m.id, onclick: () => { if (!inFilter(m.id)) { ui.sylUpTo = "all"; save("hsc-syl-upto", "all"); renderSylView(); } document.getElementById("m-" + m.id)?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); } },
         el("span", { class: "n" }, m.name),
-        el("span", { class: "mm" }, ragMeter(t, m.name)),
-        el("span", { class: "d" }, (termOf(m.id) ? TERM_NAME[termOf(m.id)] : "No term set") + " · " + t.done + " of " + t.total + " green")));
+        rated(t) ? el("span", { class: "mm" }, ragMeter(t, m.name)) : null,
+        el("span", { class: "d" }, (termOf(m.id) ? TERM_NAME[termOf(m.id)] + " · " : "") + greenLine(t, ""))));
     })),
     el("p", { class: "hint syl-src" }, "From the " + d.title + ", checked " + d.checked + ". © NSW Education Standards Authority."));
 }
@@ -1679,8 +1724,7 @@ function removeSession(x) {
 function renderTimerStats() {
   const t = minsOf(studyOf(x => x.d === today())), w = minsOf(studyOf(x => x.d >= weekStart()));
   document.getElementById("stats").replaceChildren(
-    el("span", {}, el("b", {}, fmtMins(t)), " today"),
-    el("span", {}, el("b", {}, fmtMins(w)), " this week"),
+    ...(w ? [el("span", {}, el("b", {}, fmtMins(t)), " today"), el("span", {}, el("b", {}, fmtMins(w)), " this week")] : [el("span", {}, "Nothing logged this week")]),
     ...(syncMsg ? [el("span", {}, syncMsg)] : []));
 }
 function renderTimerCards() {
@@ -1691,7 +1735,7 @@ function renderTimerCards() {
     return el("div", { class: "cwrap", style: lineStyle(id, ids) }, el("button", { class: "card", type: "button", "data-key": "tcard-" + id, "aria-current": String(id === ui.timerSubj),
       onclick: () => { if (inSession() && timer.s !== id) { toast("Finish or discard your " + nameOf(timer.s) + " session first"); return; } ui.timerSubj = id; save("hsc-timer-subj", id); refresh(); } },
       el("span", { class: "chead" }, badge(id, nameOf(id)), el("span", { class: "cname" }, nameOf(id))),
-      el("span", { class: "line" }, el("span", { class: "tweek" }, el("b", {}, fmtMins(w)), " this week"), live ? el("span", { class: "cnext live" }, timer.at ? "Timing" : "Paused") : null),
+      el("span", { class: "line" }, el("span", { class: "tweek" }, w ? el("b", {}, fmtMins(w)) : "Not studied", " this week"), live ? el("span", { class: "cnext live" }, timer.at ? "Timing" : "Paused") : null),
       el("span", { class: "cnum" }, nx ? "Next: " + nx.name + " · " + stopWhen(nx) : "All stops passed")));
   }));
 }
@@ -1716,6 +1760,10 @@ function calendarOf() {
       tot ? el("span", { class: "cal-bars", "aria-hidden": "true" }, Object.entries(per).map(([s, m]) => el("i", { style: lineStyle(s, ids) + ";flex:" + m }))) : null));
   }
   const monthName = first.toLocaleDateString("en-AU", { month: "long", year: "numeric" });
+  // A month with nothing in it shows just this week, so the empty grid doesn't fill the page
+  const quiet = ui.calMonth === td.slice(0, 7) && !ui.calFull && !cells.some(c => c.classList && (c.classList.contains("has") || c.querySelector(".cal-stop, .cal-task")));
+  let shown = cells;
+  if (quiet) { const i = lead + Number(td.slice(8)) - 1, a = i - (i % 7); shown = cells.slice(a, a + 7); }
   const shift = n => { const d = new Date(y, mo - 1 + n, 1); ui.calMonth = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); renderView(); };
   const monthMins = minsOf(studyOf(x => x.d.startsWith(ui.calMonth)));
   return el("section", { class: "cal", "aria-labelledby": "cal-t" },
@@ -1726,7 +1774,8 @@ function calendarOf() {
         el("button", { type: "button", class: "btn", "data-key": "cal-prev", "aria-label": "Previous month", onclick: () => shift(-1) }, "←"),
         el("button", { type: "button", class: "btn", "data-key": "cal-today", onclick: () => { ui.calMonth = today().slice(0, 7); ui.calDay = today(); renderView(); } }, "Today"),
         el("button", { type: "button", class: "btn", "data-key": "cal-next", "aria-label": "Next month", onclick: () => shift(1) }, "→"))),
-    el("div", { class: "cal-grid" }, ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(w => el("span", { class: "cal-w", "aria-hidden": "true" }, w)), cells));
+    el("div", { class: "cal-grid" + (quiet ? " week" : "") }, ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(w => el("span", { class: "cal-w", "aria-hidden": "true" }, w)), shown),
+    quiet ? el("button", { type: "button", class: "linkbtn cal-more", "data-key": "cal-full", onclick: () => { ui.calFull = true; renderView(); } }, "Show the whole month") : null);
 }
 
 function dayPanel() {
@@ -1758,7 +1807,7 @@ function drawTimerView() {
   const main = el("section", { class: "panel", "aria-labelledby": "v-t" },
     el("div", { class: "vhead timer" },
       el("div", { class: "vtitle" }, el("div", { class: "vname" }, badge(id, nameOf(id), true), el("h2", { id: "v-t" }, nameOf(id))),
-        el("span", { class: "sub" }, fmtMins(todayM) + " today · " + fmtMins(weekM) + " this week")),
+        el("span", { class: "sub" }, weekM ? fmtMins(todayM) + " today · " + fmtMins(weekM) + " this week" : "No study logged this week yet")),
       el("div", { class: "clock-wrap" },
         el("div", { class: "clock-face" + (running ? " on" : "") },
           el("span", { id: "clock", class: "clock", role: "timer" }, clockText()),
@@ -1834,17 +1883,19 @@ function weekSection(ids) {
   const nice = Math.ceil(top / 60 / (top > 600 ? 5 : top > 240 ? 2 : 1)) * (top > 600 ? 5 : top > 240 ? 2 : 1) * 60;
   const subs = ids.filter(id => weeks.some(w => w.per[id])).concat(Object.keys(weeks.reduce((o, w) => Object.assign(o, w.per), {})).filter(id => !ids.includes(id)));
   const label = w => (w.now ? "This week" : "Week of " + fmtLong(w.a)) + ": " + (w.tot ? fmtMins(w.tot) + " (" + subs.filter(s => w.per[s]).map(s => nameOf(s) + " " + fmtMins(w.per[s])).join(", ") + ")" : "no study logged");
-  const goalIn = el("input", { id: "goal-h", type: "number", min: "0", max: "80", step: "0.5", value: goal ? String(goal / 60) : "", placeholder: "0", "aria-describedby": "goal-h-u",
+  const any = weeks.some(w => w.tot);
+  const goalIn = el("input", { id: "goal-h", type: "number", min: "0", max: "80", step: "0.5", value: goal ? String(goal / 60) : "", placeholder: "10", "aria-describedby": "goal-h-u",
     onchange: e => { const h = Math.max(0, Math.min(80, +e.target.value || 0)); state.weekGoal = Math.round(h * 60); persist(); setTimeout(refresh, 0); announce(h ? "Weekly goal " + fmtMins(state.weekGoal) : "Weekly goal cleared"); } });
   return el("section", { class: "weekly", "aria-labelledby": "wk-t" },
     el("div", { class: "wk-head" },
       el("h3", { id: "wk-t" }, "Study time per week"),
       el("label", { class: "wk-goal", for: "goal-h" }, "Weekly goal", goalIn, el("span", { id: "goal-h-u" }, "hours"))),
-    el("div", { class: "wk-now" },
+    !any ? el("p", { class: "wk-empty" }, "Your weekly study shows here after your first session. Pick a subject above and press Start.") : null,
+    !any && !goal ? null : el("div", { class: "wk-now" },
       el("b", {}, fmtMins(cur)), goal ? " of " + fmtMins(goal) + " this week" : " this week",
       goal ? el("span", { class: "wk-meter", role: "progressbar", "aria-label": "This week against your goal", "aria-valuemin": "0", "aria-valuemax": String(goal), "aria-valuenow": String(Math.min(cur, goal)) }, el("span", { style: "width:" + Math.min(100, 100 * cur / goal) + "%" })) : null,
       goal ? el("span", { class: "wk-left" }, cur >= goal ? "Goal reached" : fmtMins(goal - cur) + " to go") : null),
-    el("div", { class: "wk-chart", role: "group", "aria-label": "Study time for the last 8 weeks" },
+    !any ? null : el("div", { class: "wk-chart", role: "group", "aria-label": "Study time for the last 8 weeks" },
       el("div", { class: "wk-axis", "aria-hidden": "true" }, el("span", {}, fmtMins(nice)), el("span", {}, fmtMins(nice / 2)), el("span", {}, "0")),
       el("div", { class: "wk-plot" },
         goal ? el("span", { class: "wk-goalline", style: "bottom:calc(22px + (100% - 22px) * " + (goal / nice) + ")", "aria-hidden": "true" }, el("span", {}, "Goal")) : null,
@@ -1853,7 +1904,7 @@ function weekSection(ids) {
           el("span", { class: "wk-x", "aria-hidden": "true" }, w.now ? "This week" : fmtLong(w.a)))),
         el("div", { class: "wk-tip", id: "wk-tip", hidden: true }))),
     subs.length ? el("div", { class: "wk-legend" }, subs.map(s => el("span", { style: lineStyle(s, ids) }, el("i", { "aria-hidden": "true" }), nameOf(s)))) : null,
-    el("details", { class: "wk-table" }, el("summary", {}, "Show as a table"),
+    !any ? null : el("details", { class: "wk-table" }, el("summary", {}, "Show as a table"),
       el("table", {}, el("thead", {}, el("tr", {}, el("th", { scope: "col" }, "Week"), subs.map(s => el("th", { scope: "col" }, nameOf(s))), el("th", { scope: "col" }, "Total"))),
         el("tbody", {}, weeks.map(w => el("tr", {}, el("th", { scope: "row" }, w.now ? "This week" : fmtLong(w.a)), subs.map(s => el("td", {}, w.per[s] ? fmtMins(w.per[s]) : "")), el("td", {}, fmtMins(w.tot))))))));
 }
