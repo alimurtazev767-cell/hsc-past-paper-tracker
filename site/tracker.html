@@ -1279,8 +1279,9 @@ async function openSubject(id) {
 }
 
 /* ---------- subject picker ---------- */
-function openPicker() {
-  const chosen = new Set(subjects());
+// welcome: straight after sign-up, start with nothing ticked so the student picks their own
+function openPicker(welcome) {
+  const chosen = new Set(welcome ? [] : subjects());
   const body = document.getElementById("pk-body");
   body.replaceChildren(...GROUPS.flatMap(([g, ids]) => [el("h4", {}, g), el("div", { class: "opts" }, ids.filter(i => SUB[i]).map(i => {
     const s = SUB[i];
@@ -1289,8 +1290,10 @@ function openPicker() {
   }))]));
   function updCount() { const n = body.querySelectorAll("input:checked").length; document.getElementById("pk-count").textContent = n + (n === 1 ? " subject" : " subjects") + " selected"; document.getElementById("pk-save").disabled = n === 0; }
   updCount();
-  document.getElementById("pk-t").textContent = "Choose your subjects";
-  document.getElementById("pk-p").textContent = "Only the subjects you pick show up. Unticking a subject hides it but keeps your progress.";
+  document.getElementById("pk-t").textContent = welcome ? "Welcome! Pick your subjects" : "Choose your subjects";
+  document.getElementById("pk-p").textContent = welcome ? "Tick the subjects you're doing. Your papers, syllabus and timer will be set up for them. You can change them any time with Edit subjects."
+    : "Only the subjects you pick show up. Unticking a subject hides it but keeps your progress.";
+  document.getElementById("pk-cancel").textContent = welcome ? "Later" : "Cancel";
   ui.pickerFor = "papers";
   const d = document.getElementById("picker");
   if (d.showModal) d.showModal(); else d.setAttribute("open", "");
@@ -1547,6 +1550,7 @@ function openSylPicker() {
   function updCount() { const n = body.querySelectorAll("input:checked").length; document.getElementById("pk-count").textContent = n + (n === 1 ? " subject" : " subjects") + " selected"; document.getElementById("pk-save").disabled = n === 0; }
   updCount();
   document.getElementById("pk-t").textContent = "Choose your syllabus subjects";
+  document.getElementById("pk-cancel").textContent = "Cancel";
   document.getElementById("pk-p").textContent = "Pick the subjects you want to track syllabus content for. Unticking one hides it but keeps what you've marked.";
   ui.pickerFor = "syl";
   const dlg = document.getElementById("picker"); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
@@ -1934,6 +1938,8 @@ async function useAccount(user) {
   await Promise.all(subjects().map(ensure));
   renderAcct(); refresh();
   if (document.getElementById("auth").open && authMode === "account") authView("account");
+  // New accounts choose their own subjects instead of keeping the examples
+  if (ui.pickAfterSignup) { ui.pickAfterSignup = false; if (!(state.subjects && state.subjects.length)) openPicker(true); }
 }
 
 function leaveAccount() {
@@ -2197,6 +2203,7 @@ async function submitAuth(e) {
       if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) throw { code: "user_already_exists" };
       // No session means Supabase still has "Confirm email" on, which can't work without a real address
       if (!data.session) throw { message: "Sign-up isn't fully switched on yet. Try again later." };
+      ui.pickAfterSignup = true;
       closeAuth(); toast("Account created. Your ticks now sync.");
     } else if (authMode === "reset") {
       const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: here() });
