@@ -541,6 +541,14 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
 .dl[aria-checked="true"]:hover i { background: currentColor; }
 .dl[aria-pressed="true"]:hover i { transform: none; }
 .band .dl:focus-visible, .dl:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.optpick { margin: 18px 24px 4px; padding: 16px 18px; border-radius: 12px; background: var(--well); border: 1px solid var(--rule); display: grid; gap: 12px; }
+.optpick h3 { margin: 0; font: 700 16px var(--sans); }
+.optpick > p { margin: 0; font-size: 14px; color: var(--ink-2); max-width: 70ch; }
+.optrow { display: grid; gap: 8px; }
+.optlab { margin: 0; font-size: 13.5px; font-weight: 700; }
+.optlab span { font-weight: 400; color: var(--ink-3); }
+.optchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.optchips .type { flex: 0 1 auto; max-width: 100%; white-space: normal; text-align: left; border-color: var(--rule); }
 .firstrun { margin: 18px 24px 4px; padding: 16px 18px; border-radius: 10px; background: var(--well); border: 1px solid var(--rule); display: grid; gap: 10px; }
 .firstrun h3 { margin: 0; font: 700 16px var(--sans); }
 .firstrun p { margin: 0; font-size: 14px; color: var(--ink-2); max-width: 70ch; }
@@ -591,7 +599,7 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
   h1 { font-size: 1.35rem; }
   .band .home-btn { padding: 6px 10px; min-height: 36px; }
   .stn .yw { display: none; }
-  .firstrun { margin-inline: 16px; }
+  .firstrun, .optpick { margin-inline: 16px; }
   .dp { grid-template-columns: minmax(0, 1fr); }
   .dp-lamps { justify-self: start; }
   .seg.mode-seg button { flex: 1; min-width: 0; justify-content: center; gap: 6px; padding: 0 6px; font-size: 13.5px; white-space: nowrap; }
@@ -744,7 +752,7 @@ const DATA = {};
 // Each chosen subject rides its own line colour, in the order the student picked them. on = text colour on that line.
 // Validated as a chart palette in this order (CVD separation, lightness band, chroma, 3:1 on white); on = badge text colour
 const LINES = [["#6095D7", "#000000"], ["#BB8736", "#000000"], ["#BA77B4", "#000000"], ["#51A773", "#000000"], ["#9783D1", "#000000"], ["#CC7A54", "#000000"], ["#0CA3BE", "#000000"], ["#899C46", "#000000"]];
-const CODE = { ext1: "X1", ext2: "X2", adv: "MA", std: "MS", engadv: "EA", engstd: "ES", engx1: "E1", bio: "BI", chem: "CH", phys: "PH", ees: "EE", invsci: "IS", agri: "AG", anc: "AH", mod: "MH", histx: "HX", bus: "BS", eco: "EC", legal: "LS", eng: "EN", ipt: "IT", sdd: "SE", pdhpe: "PD", sac: "SC", sor1: "R1", sor2: "R2", va: "VA", jpc: "JC", jpx: "JX", jpb: "JB", latc: "LC", latx: "LX", comp: "MC", hms: "HM" };
+const CODE = { ext1: "X1", ext2: "X2", adv: "MA", std: "MS", engadv: "EA", engstd: "ES", engx1: "E1", bio: "BI", chem: "CH", phys: "PH", ees: "EE", invsci: "IS", agri: "AG", anc: "AH", mod: "MH", histx: "HX", bus: "BS", eco: "EC", legal: "LS", eng: "EN", ipt: "IT", sdd: "SE", pdhpe: "PD", sac: "SC", sor1: "R1", sor2: "R2", va: "VA", jpc: "JC", jpx: "JX", jpb: "JB", latc: "LC", latx: "LX", comp: "MC", hms: "HM", geo: "GE" };
 const lineStyle = (id, list) => { const l = LINES[Math.max(0, list.indexOf(id)) % LINES.length]; return "--line:" + l[0] + ";--on:" + l[1]; };
 const badge = (id, name, big) => el("span", { class: "lb" + (big ? " big" : ""), "aria-hidden": "true" }, CODE[id] || name.replace(/[^A-Z]/g, "").slice(0, 2) || name.slice(0, 2).toUpperCase());
 
@@ -1049,7 +1057,7 @@ function practiceOf(id, k) {
 // Syllabus modules the student tagged with this stop's term (or everything for the HSC)
 function modulesFor(id, st) {
   const d = SYLD[id]; if (!d || !d.modules) return null;
-  const mods = st.term ? d.modules.filter(m => termOf(m.id) === st.term) : d.modules;
+  const mods = st.term ? useMods(d.modules).filter(m => termOf(m.id) === st.term) : useMods(d.modules);
   return mods.map(m => Object.assign({ m }, modTally(m)));
 }
 const stopWhen = st => st.date ? fmtLong(st.date) : st.when;
@@ -1323,9 +1331,10 @@ document.getElementById("pk-form").addEventListener("submit", async e => {
 const SYL_GROUPS = [
   ["Mathematics", ["std", "adv", "ext1", "ext2"]],
   ["English", ["engstd", "engadv", "engx1"]],
-  ["Science", ["bio", "chem", "phys"]],
+  ["Science", ["bio", "chem", "phys", "ees", "invsci"]],
   ["History and society", ["mod", "anc", "eco", "legal", "bus", "sac", "geo"]],
   ["Health and community", ["hms", "cafs"]],
+  ["Technologies", ["sdd"]],
 ];
 // Year 12 (the HSC course) starts in Term 4, so the terms run in teaching order.
 const TERMS = [["t4", "Term 4"], ["t1", "Term 1"], ["t2", "Term 2"], ["t3", "Term 3"]];
@@ -1360,10 +1369,40 @@ const learnt = id => dotRag(id) === "g";
 const termOf = mid => (state.sylTerm || {})[mid] || "";
 // Shown when the filter is "up to Term X": modules tagged that term or earlier
 const inFilter = mid => ui.sylUpTo === "all" || (termOf(mid) && termRank(termOf(mid)) <= termRank(ui.sylUpTo));
+// Option topics (History electives, Legal Studies options): a module with "opt" only counts once the student picks it.
+// "pick" is how many of that group they study (1 unless the syllabus says otherwise).
+const optOn = mid => !!(state.sylOpt && state.sylOpt[mid]);
+const useMods = mods => (mods || []).filter(m => !m.opt || optOn(m.id));
 function sylTally(id) {
   const ix = SYLSUB()[id]; if (!ix) return { done: 0, total: 0 };
+  const total = useMods(ix.modules).reduce((a, m) => a + m.n, 0);
   const n = { r: 0, a: 0, g: 0 }; for (const k in state.syl) if (k.startsWith(id + "-")) { const c = dotRag(k); if (c) n[c]++; }
-  return { done: Math.min(n.g, ix.n), a: n.a, r: n.r, total: ix.n };
+  return { done: Math.min(n.g, total), a: n.a, r: n.r, total };
+}
+function setOpt(d, m) {
+  const pick = m.pick || 1, group = d.modules.filter(x => x.opt === m.opt);
+  state.sylOpt = state.sylOpt || {};
+  if (optOn(m.id)) delete state.sylOpt[m.id];
+  else {
+    const on = group.filter(x => optOn(x.id));
+    // Picking one more than allowed swaps out the earliest choice
+    if (on.length >= pick) delete state.sylOpt[on[0].id];
+    state.sylOpt[m.id] = true;
+  }
+  persist(); renderSylView(); renderStats(); renderCards();
+}
+// One row of buttons per option group, so the student says which topics they study
+function optPicker(d) {
+  const groups = [...new Set(d.modules.filter(m => m.opt).map(m => m.opt))];
+  if (!groups.length) return null;
+  return el("div", { class: "optpick" }, el("h3", {}, "Your options"),
+    el("p", {}, "Pick the topics your class studies. Only the ones you pick show up and count towards your progress."),
+    groups.map(gname => {
+      const mods = d.modules.filter(m => m.opt === gname), pick = mods[0].pick || 1, on = mods.filter(m => optOn(m.id)).length;
+      return el("div", { class: "optrow" },
+        el("p", { class: "optlab" }, gname, el("span", {}, on >= pick ? " · done" : " · choose " + (pick === 1 ? "one" : pick))),
+        el("div", { class: "optchips" }, mods.map(m => el("button", { type: "button", class: "type", "data-key": "opt-" + m.id, "aria-pressed": String(optOn(m.id)), onclick: () => setOpt(d, m) }, m.name.replace(gname + ": ", "").replace(/^Option: /, "")))));
+    }));
 }
 function modTally(m) { const u = unitsOf(m), c = u.map(x => dotRag(x.id)); return { done: c.filter(x => x === "g").length, a: c.filter(x => x === "a").length, r: c.filter(x => x === "r").length, total: u.length }; }
 // Progress bar split into green, amber and red
@@ -1477,14 +1516,16 @@ function drawSylView() {
   if (d.failed) { box.replaceChildren(el("div", { class: "panel" }, el("p", { class: "empty", style: "padding-top:18px" }, "The " + ix.name + " syllabus didn't load. Check your connection, then ", el("button", { type: "button", class: "linkbtn", onclick: () => { delete SYLD[id]; openSyl(id); } }, "try again"), "."))); return; }
   const q = (ui.sylQuery || "").trim().toLowerCase();
   const x = sylTally(id), pct = pctOf(x.done, x.total);
-  const shown = d.modules.filter(m => inFilter(m.id)), untagged = d.modules.filter(m => !termOf(m.id));
+  const mods = useMods(d.modules);
+  const shown = mods.filter(m => inFilter(m.id)), untagged = mods.filter(m => !termOf(m.id));
   const cov = shown.reduce((a, m) => { const t = modTally(m); return [a[0] + t.done, a[1] + t.total]; }, [0, 0]);
-  const counts = { all: d.modules.length }; for (const [k] of TERMS) counts[k] = d.modules.filter(m => termOf(m.id) && termRank(termOf(m.id)) <= termRank(k)).length;
+  const counts = { all: mods.length }; for (const [k] of TERMS) counts[k] = mods.filter(m => termOf(m.id) && termRank(termOf(m.id)) <= termRank(k)).length;
   const pills = [["all", "All of Year 12"]].concat(TERMS.map(([k, t]) => [k, "Up to " + t])).map(([k, t]) =>
     el("button", { class: "type", type: "button", "data-key": "upto-" + k, "aria-pressed": String(ui.sylUpTo === k), onclick: () => { ui.sylUpTo = k; save("hsc-syl-upto", k); renderSylView(); } },
       t, el("span", { class: "n" }, String(counts[k]))));
 
   const body = [];
+  const op = optPicker(d); if (op) body.push(op);
   if (ui.sylUpTo !== "all") {
     body.push(el("p", { class: "section-note syl-note" }, shown.length
       ? "Showing the modules you tagged " + TERM_NAME[ui.sylUpTo] + " or earlier. " + cov[0] + " of their " + cov[1] + " dot points are green (" + pctOf(cov[0], cov[1]) + "%)."
@@ -1493,7 +1534,7 @@ function drawSylView() {
   if (!untagged.length || ui.sylTagSkip || load("hsc-tag-done-" + id, false)) {} else body.push(el("div", { class: "firstrun" },
     el("h3", {}, "Start by tagging your modules"),
     el("p", {}, "Choose the term each module is taught at your school. Tagged modules join that stop on your route, so AT1 shows the Term 4 modules you need. You can change these any time."),
-    el("div", { class: "untag" }, d.modules.map(m => el("div", { class: "urow" }, el("span", {}, m.name), termSelect(m, "fr")))),
+    el("div", { class: "untag" }, mods.map(m => el("div", { class: "urow" }, el("span", {}, m.name), termSelect(m, "fr")))),
     el("button", { type: "button", class: "linkbtn", onclick: () => { ui.sylTagSkip = true; save("hsc-tag-done-" + id, true); renderSylView(); } }, "Done tagging for now")));
   const blocks = shown.map(m => moduleBlock(m, q)).filter(Boolean);
   body.push(...blocks);
@@ -1523,7 +1564,7 @@ function sylSide(d) {
   return el("aside", { class: "panel log syl-side", "aria-label": "Modules" },
     el("h3", { class: "meta-label" }, "Modules"),
     el("p", { class: "hint" }, "Your progress in each module. Choose one to jump to it."),
-    el("ul", {}, d.modules.map(m => { const t = modTally(m), p = pctOf(t.done, t.total);
+    el("ul", {}, useMods(d.modules).map(m => { const t = modTally(m), p = pctOf(t.done, t.total);
       return el("li", {}, el("button", { type: "button", class: "mjump", "data-key": "jump-" + m.id, onclick: () => { if (!inFilter(m.id)) { ui.sylUpTo = "all"; save("hsc-syl-upto", "all"); renderSylView(); } document.getElementById("m-" + m.id)?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); } },
         el("span", { class: "n" }, m.name),
         el("span", { class: "mm" }, ragMeter(t, m.name)),
@@ -1870,12 +1911,12 @@ function cleanState(d) {
   d = d || {};
   return { done: Object.assign({}, d.done), marks: Object.assign({}, d.marks), custom: Array.isArray(d.custom) ? d.custom.slice() : [],
     subjects: Array.isArray(d.subjects) ? d.subjects.slice() : null, from: Object.assign({}, d.from), rag: Object.assign({}, d.rag),
-    syl: Object.fromEntries(Object.entries(d.syl || {}).filter(([, v]) => v === 1 || ["r", "a", "g"].includes(v)).map(([k, v]) => [k, v === 1 ? "g" : v])), sylTerm: Object.assign({}, d.sylTerm), sylSubs: Array.isArray(d.sylSubs) ? d.sylSubs.slice() : null,
+    syl: Object.fromEntries(Object.entries(d.syl || {}).filter(([, v]) => v === 1 || ["r", "a", "g"].includes(v)).map(([k, v]) => [k, v === 1 ? "g" : v])), sylTerm: Object.assign({}, d.sylTerm), sylOpt: Object.assign({}, d.sylOpt), sylSubs: Array.isArray(d.sylSubs) ? d.sylSubs.slice() : null,
     route: JSON.parse(JSON.stringify(d.route && typeof d.route === "object" ? d.route : {})), school: typeof d.school === "string" ? d.school : "",
     study: Array.isArray(d.study) ? d.study.filter(x => x && x.id && x.s && /^\d{4}-\d\d-\d\d$/.test(x.d) && x.m > 0).map(x => Object.assign({}, x)) : [],
     tasks: Array.isArray(d.tasks) ? d.tasks.filter(x => x && x.id && x.s && x.t).map(x => Object.assign({}, x)) : [], weekGoal: +d.weekGoal > 0 ? +d.weekGoal : 0 };
 }
-const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length || Object.keys(s.syl).length || Object.keys(s.sylTerm).length || (s.sylSubs && s.sylSubs.length) || Object.keys(s.route).length || !!s.school || s.study.length || s.tasks.length || !!s.weekGoal;
+const hasLocal = s => Object.keys(s.done).length || s.custom.length || Object.keys(s.marks).length || (s.subjects && s.subjects.length) || Object.keys(s.rag).length || Object.keys(s.syl).length || Object.keys(s.sylTerm).length || Object.keys(s.sylOpt).length || (s.sylSubs && s.sylSubs.length) || Object.keys(s.route).length || !!s.school || s.study.length || s.tasks.length || !!s.weekGoal;
 
 // Guest ticks join the account without losing anything on either side. Where both have a value,
 // the account keeps its own (marks, start years); a paper ticked in both keeps the earlier date.
@@ -1890,6 +1931,7 @@ function mergeStates(acc, loc) {
   for (const id in loc.rag) if (!(id in m.rag)) m.rag[id] = loc.rag[id];
   for (const id in loc.syl) if (!(id in m.syl)) m.syl[id] = loc.syl[id];
   for (const id in loc.sylTerm) if (!(id in m.sylTerm)) m.sylTerm[id] = loc.sylTerm[id];
+  for (const id in loc.sylOpt) if (!(id in m.sylOpt)) m.sylOpt[id] = loc.sylOpt[id];
   for (const id in loc.route) m.route[id] = Object.assign({}, loc.route[id], m.route[id]);
   if (!m.school && loc.school) m.school = loc.school;
   { const have = new Set(m.study.map(x => x.id)); for (const x of loc.study) if (!have.has(x.id)) m.study.push(x); }
