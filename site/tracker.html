@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>HSC Past Paper Log</title>
+<title>HSC Compass</title>
 <meta name="description" content="Tick off the HSC past papers, trials and assessment tasks you've done, subject by subject.">
 <meta name="theme-color" content="#000000">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23000'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3Cpath d='M21 11l-3.3 6.7L11 21l3.3-6.7z' fill='%23fff'/%3E%3C/svg%3E">
 <style>html{-webkit-text-size-adjust:100%}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -633,7 +633,7 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
 <header class="band">
   <div class="band-in">
     <div class="titlerow">
-      <div class="brand-row"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><h1>HSC Past Paper Log</h1></a><div class="stats" id="stats"></div></div>
+      <div class="brand-row"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.3"/><path d="M10.6 5.4 8.9 8.9 5.4 10.6 7.1 7.1z" fill="currentColor" stroke-width="1.2"/></svg></span><h1>HSC Compass</h1></a><div class="stats" id="stats"></div></div>
       <div class="top-actions">
         <a class="btn ghost home-btn" href="./" aria-label="Home"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 7.2L8 2.5l5.5 4.7V13a.8.8 0 0 1-.8.8H9.8V10H6.2v3.8H3.3a.8.8 0 0 1-.8-.8z"/></svg>Home</a>
         <button class="btn acct-btn" type="button" id="acct-btn" hidden>Sign in</button>
@@ -1548,7 +1548,7 @@ function clockText() { return timer.target ? fmtClock(timer.target * 60000 - ela
 function tick() {
   const c = document.getElementById("clock"); if (c) c.textContent = clockText();
   const bar = document.querySelector(".clock-bar > span"); if (bar && timer.target) bar.style.width = Math.min(100, 100 * elapsed() / (timer.target * 60000)) + "%";
-  document.title = timer.at ? clockText() + " · " + nameOf(timer.s) : "HSC Past Paper Log";
+  document.title = timer.at ? clockText() + " · " + nameOf(timer.s) : "HSC Compass";
   if (timer.at && timer.target && elapsed() >= timer.target * 60000) finishTimer(true);
 }
 function runTick() { clearInterval(tickTimer); tickTimer = timer.at ? setInterval(tick, 1000) : null; tick(); }
