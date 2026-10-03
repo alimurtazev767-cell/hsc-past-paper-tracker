@@ -144,12 +144,12 @@ h2.title em { font-size: 1.06em; }
 .d-chip svg { width: 13px; height: 13px; display: none; }
 .d-chip:hover { border-color: rgb(255 255 255 / .5); }
 .d-chip:active { transform: scale(.95); }
-.d-chip[aria-pressed="true"] { background: #E07010; border-color: #E07010; color: #000; }
+.d-chip[aria-pressed="true"] { background: #6095D7; border-color: #6095D7; color: #000; }
 .d-chip[aria-pressed="true"] svg { display: block; }
 .d-meter { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--ink-2); }
 .d-meter b { color: #fff; font-weight: 600; }
 .d-track { flex: 1; height: 8px; border-radius: 99px; background: linear-gradient(var(--rule-2), var(--rule-2)) center / 100% 2px no-repeat; overflow: hidden; }
-.d-track span { display: block; height: 100%; width: 0; border-radius: inherit; background: #E07010; transition: width .5s var(--ease); }
+.d-track span { display: block; height: 100%; width: 0; border-radius: inherit; background: #6095D7; transition: width .5s var(--ease); }
 .d-dps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .d-dp { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--rule); font-size: 14.5px; line-height: 1.45; transition: background-color .25s ease, border-color .25s ease; }
 .d-dp[data-rag="r"] { background: rgb(255 90 78 / .1); border-color: rgb(255 90 78 / .45); }
@@ -270,20 +270,20 @@ footer.notes a { color: #fff; text-decoration: underline; text-underline-offset:
   <footer class="facts-row">
     <div class="stat appear" style="--a:in-soft;--d:1.12s"><svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 20.5z"/></svg><span>Past papers for 33 subjects, from THSC Online and NESA</span></div>
     <div class="stat appear" style="--a:in-soft;--d:1.28s"><svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.4" y="2.4" width="19.2" height="19.2" rx="6.2" fill="#ffffff"/><path d="M7.6 12.4l3 3 5.8-6.4" fill="none" stroke="#111" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Free. No ads, no account needed</span></div>
-    <div class="stat appear" style="--a:in-soft;--d:1.44s"><svg class="stat-icon stat-icon-wide" viewBox="0 0 40 22" aria-hidden="true"><path d="M3 11h34" stroke="#ffffff" stroke-opacity=".5" stroke-width="2"/><circle cx="5" cy="11" r="4" fill="#E07010"/><circle cx="15" cy="11" r="4" fill="#0A84C8"/><circle cx="25" cy="11" r="4" fill="#D23A8F"/><circle cx="35" cy="11" r="5" fill="#ffffff"/></svg><span>Made by a Year 12 student, for our year</span></div>
+    <div class="stat appear" style="--a:in-soft;--d:1.44s"><svg class="stat-icon stat-icon-wide" viewBox="0 0 40 22" aria-hidden="true"><path d="M3 11h34" stroke="#ffffff" stroke-opacity=".5" stroke-width="2"/><circle cx="5" cy="11" r="4" fill="#6095D7"/><circle cx="15" cy="11" r="4" fill="#BB8736"/><circle cx="25" cy="11" r="4" fill="#BA77B4"/><circle cx="35" cy="11" r="5" fill="#ffffff"/></svg><span>Made by a Year 12 student, for our year</span></div>
   </footer>
 </div>
 
 <main class="wrap">
   <div class="rooms" id="how">
     <section class="room reveal" aria-labelledby="r1-t">
-      <div class="demo" style="--c:#E07010">
+      <div class="demo" style="--c:#6095D7">
         <div class="demo-head"><b>Maths Extension 1 · AT1 papers</b><span>Try it: tick a paper</span></div>
         <div class="d-row"><b>Baulkham Hills</b><div class="d-chips"><button type="button" class="d-chip" aria-pressed="false" aria-label="Baulkham Hills 2024 AT1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span>2024</span></button><button type="button" class="d-chip" aria-pressed="true" aria-label="Baulkham Hills 2023 AT1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span>2023</span></button><button type="button" class="d-chip" aria-pressed="false" aria-label="Baulkham Hills 2022 AT1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span>2022</span></button><button type="button" class="d-chip" aria-pressed="false" aria-label="Baulkham Hills 2021 AT1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span>2021</span></button></div></div><div class="d-row"><b>Girraween</b><div class="d-chips"><button type="button" class="d-chip" aria-pressed="false" aria-label="Girraween 2024 AT1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span>2024</span></button><button type="button" class="d-chip" aria-pressed="false" aria-label="Girraween 2023 AT1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span>2023</span></button><button type="button" class="d-chip" aria-pressed="false" aria-label="Girraween 2021 AT1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span>2021</span></button><button type="button" class="d-chip" aria-pressed="false" aria-label="Girraween 2020 AT1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span>2020</span></button></div></div><div class="d-row"><b>James Ruse</b><div class="d-chips"><button type="button" class="d-chip" aria-pressed="false" aria-label="James Ruse 2023 AT1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span>2023</span></button><button type="button" class="d-chip" aria-pressed="true" aria-label="James Ruse 2022 AT1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span>2022</span></button><button type="button" class="d-chip" aria-pressed="false" aria-label="James Ruse 2021 AT1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span>2021</span></button><button type="button" class="d-chip" aria-pressed="false" aria-label="James Ruse 2020 AT1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span>2020</span></button></div></div>
         <div class="d-meter"><span id="d1-count"><b>2 of 12</b> done as practice</span><span class="d-track" aria-hidden="true"><span id="d1-bar"></span></span></div>
       </div>
       <div class="copy">
-        <span class="room-n" style="--c:#E07010;--on:#000"><span class="lb">1</span>Past papers</span>
+        <span class="room-n" style="--c:#6095D7;--on:#000"><span class="lb">1</span>Past papers</span>
         <h2 class="title" id="r1-t">Every trial and task, <em>school by school.</em></h2>
         <p>Paper lists for <b>33 subjects</b> from THSC Online and NESA: HSC papers, trials, half yearlies and AT1 to AT4. Tick what you've done, add your mark, and see your school's papers first.</p>
       </div>
@@ -297,7 +297,7 @@ footer.notes a { color: #fff; text-decoration: underline; text-underline-offset:
         <div class="d-counts" id="d2-c" aria-live="polite"></div>
       </div>
       <div class="copy">
-        <span class="room-n" style="--c:#D23A8F"><span class="lb">2</span>Syllabus</span>
+        <span class="room-n" style="--c:#BA77B4"><span class="lb">2</span>Syllabus</span>
         <h2 class="title" id="r2-t">Know which dot points <em>need work.</em></h2>
         <p>The Year 12 syllabus for Maths, English, Chemistry, Physics and HMS, dot point by dot point. Give each one <b>red, amber or green</b>, tag modules by term, and they join that stop on your route.</p>
       </div>
@@ -310,11 +310,11 @@ footer.notes a { color: #fff; text-decoration: underline; text-underline-offset:
           <div class="d-clock" role="timer"><b id="d3-clock">25:00</b><span id="d3-sub">25 min focus block</span></div>
           <div class="d-ctl"><button type="button" class="btn primary" id="d3-go">Start</button><button type="button" class="btn" id="d3-reset" hidden>Reset</button></div>
         </div>
-        <div class="d-week" id="d3-week" role="img" aria-label="Example study chart for five weeks, rising from 1 hour 20 minutes to 4 hours 45 minutes, split by subject"><div class="wk"><div class="wkbar" style="--h:26.7%"><i style="--c:#E07010;flex:50"></i><i style="--c:#0A84C8;flex:30"></i></div><span>29 Sep</span></div><div class="wk"><div class="wkbar" style="--h:53.3%"><i style="--c:#E07010;flex:90"></i><i style="--c:#0A84C8;flex:40"></i><i style="--c:#1E9A47;flex:30"></i></div><span>6 Oct</span></div><div class="wk"><div class="wkbar" style="--h:58.3%"><i style="--c:#E07010;flex:60"></i><i style="--c:#0A84C8;flex:70"></i><i style="--c:#1E9A47;flex:45"></i></div><span>13 Oct</span></div><div class="wk"><div class="wkbar" style="--h:76.7%"><i style="--c:#E07010;flex:120"></i><i style="--c:#0A84C8;flex:50"></i><i style="--c:#1E9A47;flex:60"></i></div><span>20 Oct</span></div><div class="wk"><div class="wkbar" style="--h:55.0%"><i style="--c:#E07010;flex:80"></i><i style="--c:#0A84C8;flex:45"></i><i style="--c:#1E9A47;flex:40"></i></div><span>This week</span></div></div>
+        <div class="d-week" id="d3-week" role="img" aria-label="Example study chart for five weeks, rising from 1 hour 20 minutes to 4 hours 45 minutes, split by subject"><div class="wk"><div class="wkbar" style="--h:26.7%"><i style="--c:#6095D7;flex:50"></i><i style="--c:#BB8736;flex:30"></i></div><span>29 Sep</span></div><div class="wk"><div class="wkbar" style="--h:53.3%"><i style="--c:#6095D7;flex:90"></i><i style="--c:#BB8736;flex:40"></i><i style="--c:#51A773;flex:30"></i></div><span>6 Oct</span></div><div class="wk"><div class="wkbar" style="--h:58.3%"><i style="--c:#6095D7;flex:60"></i><i style="--c:#BB8736;flex:70"></i><i style="--c:#51A773;flex:45"></i></div><span>13 Oct</span></div><div class="wk"><div class="wkbar" style="--h:76.7%"><i style="--c:#6095D7;flex:120"></i><i style="--c:#BB8736;flex:50"></i><i style="--c:#51A773;flex:60"></i></div><span>20 Oct</span></div><div class="wk"><div class="wkbar" style="--h:55.0%"><i style="--c:#6095D7;flex:80"></i><i style="--c:#BB8736;flex:45"></i><i style="--c:#51A773;flex:40"></i></div><span>This week</span></div></div>
         <p class="demo-note">Example week chart, made-up numbers.</p>
       </div>
       <div class="copy">
-        <span class="room-n" style="--c:#1E9A47"><span class="lb">3</span>Study timer</span>
+        <span class="room-n" style="--c:#51A773"><span class="lb">3</span>Study timer</span>
         <h2 class="title" id="r3-t">Time it, plan it, <em>watch your weeks grow.</em></h2>
         <p>Count up or run 25, 45 or 60 minute focus blocks for each subject. A calendar shows your study and your assessment dates, with <b>tasks</b>, a <b>weekly goal</b> and a chart of every week.</p>
       </div>

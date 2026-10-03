@@ -26,7 +26,7 @@
   --rule-2: rgb(255 255 255 / .22);
   --band: #000000;
   --band-2: #A3A3A3;
-  --line: #0A84C8;
+  --line: #6095D7;
   --on: #000000;
   --tl-r: #FF5A4E; --tl-a: #F2A33A; --tl-g: #34C770; --tl-off: #3A3A3A;
   --danger: #FF6B5E;
@@ -65,13 +65,18 @@ h1 { font: 600 clamp(1.2rem, 2vw, 1.45rem)/1.1 var(--sans); letter-spacing: -0.0
 .top-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
 /* Past papers / Syllabus: tabs sitting on the band's lower edge, the open one joins the page */
-.seg.mode-seg { display: flex; justify-self: start; gap: 8px; margin: 4px 0 14px; padding: 0; background: none; border: 0; border-radius: 0; }
-.seg.mode-seg .thumb { display: none; }
-.seg.mode-seg button { position: relative; overflow: hidden; color: #D8D8D8; font-weight: 400; font-size: 14px; padding: 0 18px; height: 40px; min-height: 0; border-radius: 7px; border: 1px solid rgb(198 198 198 / .35); background: linear-gradient(105deg, #050505 0%, #1c1c1c 60%, #2a2a2a 100%); transition: border-color .35s ease, box-shadow .35s ease, color .2s ease; }
-.seg.mode-seg button::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / .16) 50%, transparent 70%); transform: translateX(-120%); transition: transform .6s ease; pointer-events: none; }
-.seg.mode-seg button:hover { color: #FFFFFF; border-color: rgb(235 235 235 / .9); box-shadow: 0 0 18px rgb(200 210 230 / .18); }
-.seg.mode-seg button:hover::after { transform: translateX(120%); }
-.seg.mode-seg button[aria-pressed="true"] { color: #FFFFFF; border-color: rgb(235 235 235 / .9); background: linear-gradient(105deg, #111 0%, #3a3a3a 45%, #6a6a6a 100%); }
+/* The three tabs: a glass dock; a chrome capsule slides to the open tab */
+.seg.mode-seg { position: relative; display: inline-flex; justify-self: start; gap: 4px; margin: 6px 0 16px; padding: 5px; border-radius: 14px; background: linear-gradient(180deg, rgb(255 255 255 / .06), rgb(255 255 255 / .015)); border: 1px solid rgb(255 255 255 / .14); box-shadow: inset 0 1px 0 rgb(255 255 255 / .08), 0 18px 40px -20px rgb(0 0 0 / .9); isolation: isolate; }
+.seg.mode-seg .thumb { display: block; position: absolute; z-index: 0; top: 5px; bottom: 5px; left: 0; width: var(--tw, 0px); transform: translateX(var(--tx, 0px)); border-radius: 10px; background: linear-gradient(180deg, #FFFFFF 0%, #E9E9E9 50%, #CDCDCD 100%); box-shadow: inset 0 1px 0 #fff, 0 6px 18px -6px rgb(255 255 255 / .35), 0 0 0 1px rgb(255 255 255 / .6); transition: transform .45s cubic-bezier(.16, 1, .3, 1), width .45s cubic-bezier(.16, 1, .3, 1); }
+.seg.mode-seg button { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 9px; height: 44px; min-height: 0; padding: 0 16px 0 14px; border: 0; border-radius: 10px; background: transparent; color: #BDBDBD; font-weight: 500; font-size: 14.5px; letter-spacing: -0.02em; transition: color .3s ease; }
+.seg.mode-seg button svg { width: 19px; height: 19px; flex: none; opacity: .85; }
+.seg.mode-seg button:hover { color: #FFFFFF; }
+.seg.mode-seg button[aria-pressed="true"] { color: #0A0A0A; }
+.seg.mode-seg button[aria-pressed="true"] svg { opacity: 1; }
+.seg.mode-seg .tn { font-size: 12px; font-weight: 500; padding: 2px 7px; border-radius: 999px; background: rgb(255 255 255 / .08); color: #A3A3A3; transition: background-color .3s ease, color .3s ease; }
+.seg.mode-seg .tn:empty { display: none; }
+.seg.mode-seg button[aria-pressed="true"] .tn { background: rgb(0 0 0 / .08); color: #3A3A3A; }
+.no-thumb .seg.mode-seg .thumb { transition: none; }
 
 .wrap { max-width: 1280px; margin: 0 auto; padding: 22px 16px 88px; display: grid; gap: 22px; }
 
@@ -99,9 +104,9 @@ h1 { font: 600 clamp(1.2rem, 2vw, 1.45rem)/1.1 var(--sans); letter-spacing: -0.0
 .subj-head .meta-label { margin: 0; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 .cwrap { position: relative; display: grid; min-width: 0; }
-.card { text-align: left; color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--lift); padding: 14px 16px 16px; display: grid; grid-template-rows: auto auto auto; align-content: start; gap: 12px; cursor: pointer; min-width: 0; transition: border-color .15s ease, box-shadow .15s ease; }
-.card:hover { border-color: var(--rule-2); }
-.card[aria-current="true"] { border-color: var(--line); box-shadow: inset 0 0 0 1px var(--line), var(--lift); }
+.card { text-align: left; color: var(--ink); border: 1px solid transparent; border-radius: 14px; background: radial-gradient(260px 120px at 0% 0%, color-mix(in srgb, var(--line) 12%, transparent), transparent 70%) padding-box, linear-gradient(var(--panel), var(--panel)) padding-box, linear-gradient(180deg, rgb(255 255 255 / .18), rgb(255 255 255 / .05)) border-box; box-shadow: 0 20px 40px -30px rgb(0 0 0 / .9); padding: 14px 16px 16px; display: grid; grid-template-rows: auto auto auto; align-content: start; gap: 12px; cursor: pointer; min-width: 0; transition: box-shadow .3s ease, transform .3s cubic-bezier(.16, 1, .3, 1); }
+.card:hover { transform: translateY(-2px); box-shadow: 0 24px 44px -26px rgb(0 0 0 / .95), 0 0 0 1px rgb(255 255 255 / .1); }
+.card[aria-current="true"] { background: radial-gradient(300px 140px at 0% 0%, color-mix(in srgb, var(--line) 26%, transparent), transparent 70%) padding-box, linear-gradient(var(--panel), var(--panel)) padding-box, linear-gradient(180deg, var(--line), color-mix(in srgb, var(--line) 25%, transparent)) border-box; box-shadow: 0 0 34px -12px var(--line), 0 20px 40px -30px rgb(0 0 0 / .9); }
 .chead { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 40px; padding-right: 54px; }
 .card .cname { font: 600 15px/1.25 var(--sans); min-width: 0; }
 .card .line { display: flex; align-items: center; gap: 10px; }
@@ -121,8 +126,12 @@ h1 { font: 600 clamp(1.2rem, 2vw, 1.45rem)/1.1 var(--sans); letter-spacing: -0.0
 .meter > span { display: block; height: 100%; border-radius: inherit; background: var(--line); }
 
 /* Subject view */
+@keyframes view-in { from { opacity: 0; transform: translateY(10px); } }
+.swap .view { animation: view-in .5s cubic-bezier(.16, 1, .3, 1) both; }
+.swap .cards { animation: view-in .45s cubic-bezier(.16, 1, .3, 1) both; }
 .view { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
-.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--lift); min-width: 0; }
+.panel { border: 1px solid transparent; border-radius: 16px; background: linear-gradient(var(--panel), var(--panel)) padding-box, linear-gradient(180deg, rgb(255 255 255 / .2), rgb(255 255 255 / .05) 40%, rgb(255 255 255 / .1)) border-box; box-shadow: 0 30px 60px -40px rgb(0 0 0 / .9); min-width: 0; }
+.view > .panel:first-child { background: radial-gradient(640px 260px at 0% 0%, color-mix(in srgb, var(--line) 22%, transparent), transparent 70%) padding-box, linear-gradient(var(--panel), var(--panel)) padding-box, linear-gradient(180deg, color-mix(in srgb, var(--line) 45%, rgb(255 255 255 / .15)), rgb(255 255 255 / .05) 45%, rgb(255 255 255 / .1)) border-box; }
 .vhead { padding: 16px 24px 16px; display: grid; gap: 12px; border-bottom: 1px solid var(--rule); }
 .vtitle { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; }
 .vname { display: flex; align-items: center; gap: 14px; min-width: 0; }
@@ -140,7 +149,7 @@ h2 em, .meta-label em { font-family: var(--serif); font-style: italic; font-weig
 .route-head b { font-weight: 700; color: var(--ink); }
 .route-head .nx-name { font-size: 15px; }
 /* The selected stop: your own assessment, its practice and its modules */
-.stop { display: grid; gap: 10px; padding: 12px 16px; border-radius: 10px; background: var(--well); border: 1px solid var(--rule); margin-top: 4px; }
+.stop { display: grid; gap: 10px; padding: 14px 18px; border-radius: 12px; background: linear-gradient(180deg, rgb(255 255 255 / .045), rgb(255 255 255 / .015)); border: 1px solid var(--rule); box-shadow: inset 0 1px 0 rgb(255 255 255 / .05); margin-top: 4px; }
 .sp-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; }
 .sp-head h3 { margin: 0; font: 700 16px/1.3 var(--sans); display: flex; align-items: center; gap: 10px; }
 .sp-tag { font-size: 12.5px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--line); color: var(--on); }
@@ -172,7 +181,8 @@ h2 em, .meta-label em { font-family: var(--serif); font-style: italic; font-weig
 .stn:only-child::before { display: none; }
 .stn .pin { grid-row: 1; position: relative; width: 22px; height: 22px; border-radius: 50%; background: var(--panel); box-shadow: inset 0 0 0 4px var(--line); display: grid; place-items: center; color: var(--on); transition: background-color .15s ease, transform .15s ease; }
 .stn .pin svg { width: 12px; height: 12px; }
-.stn.done .pin { background: var(--line); box-shadow: inset 0 0 0 2px var(--panel), 0 0 0 2px var(--line); }
+.stn.done .pin { background: var(--line); box-shadow: inset 0 0 0 2px var(--panel), 0 0 0 2px var(--line), 0 0 16px var(--line); }
+.stn.past::before { box-shadow: 0 0 12px color-mix(in srgb, var(--line) 60%, transparent); }
 .stn:hover .pin { transform: scale(1.12); }
 .stn .yw { grid-row: 3; font-size: 12px; color: var(--ink-3); white-space: nowrap; }
 .stn[aria-current="true"] .yl { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
@@ -187,7 +197,7 @@ h2 em, .meta-label em { font-family: var(--serif); font-style: italic; font-weig
 .types { display: flex; flex-wrap: nowrap; gap: 4px; padding: 0 24px; overflow-x: auto; scrollbar-width: thin; }
 .type { flex: none; border: 1px solid transparent; background: transparent; color: var(--ink-2); border-radius: 8px; padding: 6px 12px; min-height: 36px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; transition: background-color .15s ease, color .15s ease; }
 .type:not([aria-pressed="true"]):hover { background: var(--well); color: var(--ink); }
-.type[aria-pressed="true"] { background: var(--ink); color: #000000; }
+.type[aria-pressed="true"] { background: linear-gradient(180deg, #FFFFFF, #D6D6D6); color: #000000; box-shadow: inset 0 1px 0 #fff, 0 4px 14px -6px rgb(255 255 255 / .35); }
 .type .n { font-size: 12px; font-weight: 500; color: var(--ink-3); }
 .type[aria-pressed="true"] .n { color: #444; }
 .controls { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; padding: 0 24px; }
@@ -234,7 +244,7 @@ input[type=checkbox] { accent-color: var(--ink); width: 16px; height: 16px; }
 .chips.pad { padding: 6px 24px 16px; }
 .chip { position: relative; background: var(--panel); border: 1px solid var(--rule-2); color: var(--ink); border-radius: 8px; padding: 6px 10px; min-height: 40px; font-size: 14px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-width: 0; text-align: left; transition: background-color .15s ease, border-color .15s ease, color .15s ease, transform .1s ease-out; }
 .chip:hover { border-color: var(--ink-3); background: var(--well); }
-.chip[aria-pressed="true"] { background: var(--line); border-color: var(--line); color: var(--on); }
+.chip[aria-pressed="true"] { background: linear-gradient(180deg, color-mix(in srgb, var(--line) 82%, #fff), var(--line)); border-color: var(--line); color: var(--on); box-shadow: inset 0 1px 0 rgb(255 255 255 / .35), 0 0 22px -8px var(--line); }
 .chip.hscchip { font-weight: 700; }
 .chip { flex-wrap: wrap; row-gap: 2px; }
 .chip .t { white-space: nowrap; min-width: 0; }
@@ -309,8 +319,8 @@ footer.notes details p { margin: 8px 0 0; }
 /* ---- study timer and calendar ---- */
 .vhead.timer { gap: 18px; }
 .clock-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 20px 28px; align-items: center; }
-.clock-face { display: grid; justify-items: center; gap: 6px; padding: 22px 16px; border-radius: 12px; background: radial-gradient(120% 90% at 50% 0%, #1E1E1E, #050505 70%); border: 1px solid var(--rule); color: #FFFFFF; }
-.clock { font: 800 clamp(3.2rem, 7vw, 5rem)/1 var(--sans); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.clock-face { position: relative; overflow: hidden; display: grid; justify-items: center; gap: 6px; padding: 26px 16px; border-radius: 16px; background: radial-gradient(90% 120% at 50% 110%, color-mix(in srgb, var(--line) 30%, transparent), transparent 60%), radial-gradient(120% 90% at 50% 0%, #1E1E1E, #050505 70%); border: 1px solid rgb(255 255 255 / .14); box-shadow: inset 0 1px 0 rgb(255 255 255 / .08); color: #FFFFFF; }
+.clock { font: 300 clamp(3.6rem, 7.5vw, 5.6rem)/1 var(--sans); letter-spacing: -0.06em; font-variant-numeric: tabular-nums; text-shadow: 0 0 32px rgb(255 255 255 / .25); }
 .clock-sub { font-size: 14px; color: var(--band-2); }
 .clock-bar { width: 80%; height: 6px; border-radius: 999px; background: rgb(255 255 255 / .15); overflow: hidden; margin-top: 6px; }
 .clock-bar > span { display: block; height: 100%; background: var(--line); border-radius: inherit; }
@@ -584,7 +594,10 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
   .firstrun { margin-inline: 16px; }
   .dp { grid-template-columns: minmax(0, 1fr); }
   .dp-lamps { justify-self: start; }
-  .seg.mode-seg button { flex: 1; padding: 10px 8px 11px; font-size: 13.5px; white-space: nowrap; }
+  .seg.mode-seg button { flex: 1; min-width: 0; justify-content: center; gap: 6px; padding: 0 6px; font-size: 13.5px; white-space: nowrap; }
+  .seg.mode-seg { display: flex; width: 100%; min-width: 0; }
+  .seg.mode-seg button svg { width: 16px; height: 16px; }
+  .seg.mode-seg .tn { display: none; }
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .card { padding: 12px; }
   .chead { padding-right: 0; flex-direction: column; align-items: flex-start; gap: 8px; }
@@ -603,6 +616,7 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
   .syl-note { margin: 16px 16px 0; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .swap .view, .swap .cards { animation: none; }
   *, *::before { transition: none !important; }
   .chip:active, .type:active, .card:active, .btn:active, .rag:active .lights { transform: none; }
   dialog[open], dialog[open]::backdrop { animation: none; }
@@ -625,7 +639,7 @@ body[data-mode="syl"] footer.notes > :not(.syl-only), body:not([data-mode="syl"]
         <button class="btn acct-btn" type="button" id="acct-btn" hidden>Sign in</button>
       </div>
     </div>
-    <div class="seg mode-seg" id="mode-seg" role="group" aria-label="What to track" data-on="papers"><span class="thumb" aria-hidden="true"></span><button type="button" data-mode="papers" aria-pressed="true">Past papers</button><button type="button" data-mode="syl" aria-pressed="false">Syllabus</button><button type="button" data-mode="timer" aria-pressed="false">Study timer</button></div>
+    <div class="seg mode-seg" id="mode-seg" role="group" aria-label="What to track" data-on="papers"><span class="thumb" aria-hidden="true"></span><button type="button" data-mode="papers" aria-pressed="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.8h6.2L15.5 6v10.2a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3.8a1 1 0 0 1 1-1z"/><path d="M12 2.8V6h3.5M7.8 10.5l1.6 1.6 3.2-3.4"/></svg><span class="tl">Past papers</span><span class="tn" id="tn-papers"></span></button><button type="button" data-mode="syl" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="4.6" cy="5.5" r="1.6"/><circle cx="4.6" cy="10" r="1.6"/><circle cx="4.6" cy="14.5" r="1.6"/><path d="M8.8 5.5h7.4M8.8 10h7.4M8.8 14.5h5"/></svg><span class="tl">Syllabus</span><span class="tn" id="tn-syl"></span></button><button type="button" data-mode="timer" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="11" r="6.4"/><path d="M10 7.6V11l2.2 1.6M8 2.6h4"/></svg><span class="tl">Study timer</span><span class="tn" id="tn-timer"></span></button></div>
   </div>
 </header>
 
@@ -705,7 +719,7 @@ let docRef = null, syncMsg = "Saved on this device";
 const DATA = {};
 // Each chosen subject rides its own line colour, in the order the student picked them. on = text colour on that line.
 // Validated as a chart palette in this order (CVD separation, lightness band, chroma, 3:1 on white); on = badge text colour
-const LINES = [["#E07010", "#000000"], ["#0A84C8", "#000000"], ["#D23A8F", "#000000"], ["#1E9A47", "#000000"], ["#8A62D0", "#000000"], ["#B88C00", "#000000"], ["#3D74C9", "#FFFFFF"], ["#B0673C", "#000000"]];
+const LINES = [["#6095D7", "#000000"], ["#BB8736", "#000000"], ["#BA77B4", "#000000"], ["#51A773", "#000000"], ["#9783D1", "#000000"], ["#CC7A54", "#000000"], ["#0CA3BE", "#000000"], ["#899C46", "#000000"]];
 const CODE = { ext1: "X1", ext2: "X2", adv: "MA", std: "MS", engadv: "EA", engstd: "ES", engx1: "E1", bio: "BI", chem: "CH", phys: "PH", ees: "EE", invsci: "IS", agri: "AG", anc: "AH", mod: "MH", histx: "HX", bus: "BS", eco: "EC", legal: "LS", eng: "EN", ipt: "IT", sdd: "SE", pdhpe: "PD", sac: "SC", sor1: "R1", sor2: "R2", va: "VA", jpc: "JC", jpx: "JX", jpb: "JB", latc: "LC", latx: "LX", comp: "MC", hms: "HM" };
 const lineStyle = (id, list) => { const l = LINES[Math.max(0, list.indexOf(id)) % LINES.length]; return "--line:" + l[0] + ";--on:" + l[1]; };
 const badge = (id, name, big) => el("span", { class: "lb" + (big ? " big" : ""), "aria-hidden": "true" }, CODE[id] || name.replace(/[^A-Z]/g, "").slice(0, 2) || name.slice(0, 2).toUpperCase());
@@ -826,7 +840,21 @@ function keepFocus(fn) {
 }
 
 /* ---------- render ---------- */
+// The open tab's chrome capsule follows the pressed button; counts on each tab stay live
+function moveThumb() {
+  const seg = document.getElementById("mode-seg"), b = seg && seg.querySelector('[aria-pressed="true"]'); if (!b) return;
+  seg.style.setProperty("--tx", b.offsetLeft + "px"); seg.style.setProperty("--tw", b.offsetWidth + "px");
+}
+window.addEventListener("resize", moveThumb);
+function renderTabCounts() {
+  const set = (id, v) => { const n = document.getElementById(id); if (n) n.textContent = v; };
+  const papers = Object.keys(state.done || {}).length, rated = Object.keys(state.syl || {}).length;
+  const today = typeof minsOf === "function" ? minsOf((state.study || []).filter(x => x.d === dayKey(new Date()))) : 0;
+  set("tn-papers", papers ? papers + " done" : ""); set("tn-syl", rated ? rated + " rated" : ""); set("tn-timer", today ? fmtMins(today) : "");
+  moveThumb();
+}
 function renderStats() {
+  renderTabCounts();
   if (ui.mode === "syl") return renderSylStats();
   if (ui.mode === "timer") return renderTimerStats();
   let done = 0, wk = 0; const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
@@ -1482,6 +1510,7 @@ function openSylPicker() {
 async function setMode(m) {
   ui.mode = m; save("hsc-mode", m);
   document.getElementById("mode-seg").dataset.on = m;
+  moveThumb(); document.body.classList.remove("swap"); void document.body.offsetWidth; document.body.classList.add("swap");
   document.querySelectorAll("#mode-seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
   document.body.dataset.mode = m;
   if (m === "timer") {
